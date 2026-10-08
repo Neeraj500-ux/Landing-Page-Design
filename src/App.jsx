@@ -1,4 +1,3 @@
-import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Problems from './components/Problems'
 import Audience from './components/Audience'
@@ -11,6 +10,24 @@ import FAQ from './components/FAQ'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 import StickyCta from './components/StickyCta'
+
 export default function App() {
-  return (<><Navbar /><main><Hero /><Problems /><Audience /><Services /><Benefits /><Work /><Process /><Why /><FAQ /><Contact /></main><Footer /><StickyCta /></>)
+  return (
+    <>
+      <main>
+        <Hero />
+        <Problems />
+        <Audience />
+        <Services />
+        <Benefits />
+        <Work />
+        <Process />
+        <Why />
+        <FAQ />
+        <Contact />
+      </main>
+      <Footer />
+      <StickyCta />
+    </>
+  )
 }

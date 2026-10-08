@@ -1,4 +1,3 @@
-export const nav = [['Who We Help','who'],['What You Get','get'],['Our Process','process'],['FAQs','faq']]
 export const problems = [
  ['Your Offer Takes Too Long to Understand','Visitors struggle to see what you provide, who it is for and why they should care.','A clear headline, a specific value proposition and an introduction that puts the visitor’s needs first.'],
  ['The Page Looks Generic','A template that doesn’t reflect your expertise can make your offer feel less distinctive.','A visual direction that matches your brand, audience and service.'],
