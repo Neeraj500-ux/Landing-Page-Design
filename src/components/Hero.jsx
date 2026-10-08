@@ -278,52 +278,68 @@ const styles = `
   }
 
   /*
-    Main image and phone occupy separate columns.
-    The phone never covers the main image or the CTA.
+    Equal side columns keep the main image on the page center.
+    The phone occupies only the right column.
   */
 
   .premium-hero__visual {
-    position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, .19fr);
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 640px)
+      minmax(0, 1fr);
     align-items: center;
-    gap: clamp(12px, 2.4vw, 26px);
-    width: min(100%, 760px);
+    column-gap: clamp(14px, 2vw, 24px);
+    width: 100%;
+    max-width: 980px;
     min-width: 0;
-    margin: 28px auto 0;
-    padding-block: 12px 20px;
+    margin: 30px auto 0;
+    padding: 12px 0 24px;
   }
 
   .premium-hero__image-wrap {
     position: relative;
-    display: grid;
-    place-items: center;
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
     min-width: 0;
     margin: 0;
+    padding: 7px;
+    border: 1px solid #e5d6ef;
+    border-radius: 28px;
+    background: linear-gradient(145deg, #ffffff, #faf6ff);
+    box-shadow:
+      0 22px 48px -28px #63418055,
+      0 5px 15px -10px #63418025,
+      inset 0 1px 0 #ffffff;
   }
 
   .premium-hero .premium-hero__image {
     position: static;
     display: block;
-    width: auto;
+    width: 100%;
     max-width: 100%;
+    min-width: 0;
     height: auto;
-    max-height: 420px;
-    margin: 0 auto;
+    max-height: none;
+    margin: 0;
     border: 0;
-    border-radius: 24px;
+    border-radius: 21px;
     object-fit: contain;
     object-position: center;
-    filter: drop-shadow(0 16px 20px #64418116);
   }
 
   .premium-hero__phone-wrap {
     position: relative;
-    align-self: end;
+    grid-column: 3;
+    grid-row: 1;
+    align-self: center;
+    justify-self: start;
     width: 100%;
+    max-width: 108px;
     min-width: 0;
-    margin-bottom: clamp(12px, 3vw, 32px);
-    padding-bottom: 16px;
+    margin: 0;
+    padding: 12px 0 18px;
   }
 
   .premium-hero .premium-hero__phone {
@@ -331,11 +347,11 @@ const styles = `
     z-index: 1;
     display: block;
     width: 100%;
-    max-width: 120px;
+    max-width: 100%;
     height: auto;
-    margin: 0 auto;
-    border: 4px solid #fff;
-    border-radius: 19px;
+    margin: 0;
+    border: 3px solid #fff;
+    border-radius: 17px;
     background: #fff;
     object-fit: contain;
     box-shadow:
@@ -350,7 +366,7 @@ const styles = `
     right: 10%;
     bottom: 0;
     left: 10%;
-    height: 10px;
+    height: 9px;
     border-radius: 50%;
     background: #65408130;
     filter: blur(5px);
@@ -364,7 +380,7 @@ const styles = `
     justify-content: center;
     gap: 12px;
     max-width: 560px;
-    margin: 4px auto 0;
+    margin: 0 auto;
   }
 
   .premium-hero__chip {
@@ -821,13 +837,27 @@ const styles = `
 
   @media (min-width: 640px) and (max-width: 1023px) {
     .premium-hero__visual {
-      width: min(90%, 620px);
-      gap: 18px;
-      margin-top: 25px;
+      grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 5fr)
+        minmax(0, 1fr);
+      column-gap: 14px;
+      max-width: 800px;
+      margin-top: 26px;
+    }
+
+    .premium-hero__image-wrap {
+      padding: 6px;
+      border-radius: 23px;
     }
 
     .premium-hero .premium-hero__image {
-      max-height: 350px;
+      border-radius: 17px;
+    }
+
+    .premium-hero .premium-hero__phone {
+      border-width: 2px;
+      border-radius: 13px;
     }
   }
 
@@ -872,27 +902,49 @@ const styles = `
       line-height: 1.8;
     }
 
+    /*
+      Main image gets its own centered row on mobile.
+      Phone has its own row and cannot squeeze or overlap it.
+    */
+
     .premium-hero__visual {
-      width: min(100%, 360px);
-      grid-template-columns: minmax(0, 1fr) minmax(0, .22fr);
-      gap: 12px;
-      margin-top: 20px;
-      padding-block: 10px 15px;
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: center;
+      row-gap: 18px;
+      width: min(100%, 400px);
+      margin-top: 22px;
+      padding: 4px 0 18px;
+    }
+
+    .premium-hero__image-wrap {
+      grid-column: 1;
+      grid-row: 1;
+      width: 100%;
+      padding: 5px;
+      border-radius: 20px;
+      box-shadow:
+        0 16px 32px -22px #63418055,
+        inset 0 1px 0 #ffffff;
     }
 
     .premium-hero .premium-hero__image {
-      max-height: 260px;
-      border-radius: 17px;
-      filter: drop-shadow(0 10px 13px #64418114);
+      width: 100%;
+      height: auto;
+      max-height: none;
+      border-radius: 15px;
     }
 
     .premium-hero__phone-wrap {
-      margin-bottom: 14px;
-      padding-bottom: 12px;
+      grid-column: 1;
+      grid-row: 2;
+      justify-self: center;
+      width: 62px;
+      max-width: 100%;
+      margin: 0;
+      padding: 6px 0 12px;
     }
 
     .premium-hero .premium-hero__phone {
-      max-width: 70px;
       border-width: 2px;
       border-radius: 11px;
       box-shadow:
@@ -908,7 +960,6 @@ const styles = `
     .premium-hero__chips {
       gap: 8px;
       max-width: 370px;
-      margin-top: 4px;
     }
 
     .premium-hero__chip {
@@ -1101,8 +1152,6 @@ export default function Hero() {
   const [motionPaused, setMotionPaused] = useState(false)
   const baseUrl = import.meta.env.BASE_URL || '/'
 
-  // Main image: public/imges/Neeraj2.png
-  // Existing phone image: public/images/hero-mobile.svg
   const heroImage = `${baseUrl}images/Neeraj2.png`
   const phoneImage = `${baseUrl}images/hero-mobile.svg`
 
@@ -1154,7 +1203,7 @@ export default function Hero() {
             <div className="premium-hero__image-wrap">
               <img
                 src={heroImage}
-                alt="Landing page design and development illustration"
+                alt="Coaching landing page shown on desktop and mobile"
                 className="premium-hero__image"
                 decoding="async"
                 fetchPriority="high"
@@ -1210,9 +1259,15 @@ export default function Hero() {
 
           <ul className="premium-hero__points">
             {points.map((point, index) => (
-              <li key={point.text} className="premium-hero__point">
+              <li
+                key={point.text}
+                className="premium-hero__point"
+              >
                 <div className="premium-hero__point-top">
-                  <IconTile name={point.icon} tone={point.tone} />
+                  <IconTile
+                    name={point.icon}
+                    tone={point.tone}
+                  />
 
                   <span
                     className="premium-hero__point-number"
