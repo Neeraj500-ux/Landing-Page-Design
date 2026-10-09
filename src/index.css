@@ -9,3 +9,90 @@ h1,h2,h3 { @apply font-display tracking-tight; }
 .floaty { animation: floaty 6s ease-in-out infinite; }
 :focus-visible { outline: 2px solid #6D35C9; outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto } .reveal { opacity: 1; transform: none; transition: none } .floaty, .marq { animation: none } * { transition-duration: .01ms !important } }
+
+.site-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 56px;
+  height: auto;
+  padding: 15px 18px;
+  overflow: hidden;
+  border: 1px solid #ffffff40;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(135deg, #9859de, #7238bd);
+  box-shadow:
+    0 5px 0 -1px #582b97,
+    0 16px 30px -13px #7941bc85,
+    inset 0 1px 0 #ffffff40;
+  font-family: inherit;
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: normal;
+  text-align: center;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  transition:
+    transform .3s cubic-bezier(.22, 1, .36, 1),
+    box-shadow .3s ease,
+    filter .3s ease;
+}
+
+.site-cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 32%, #ffffff45 50%, transparent 68%);
+  transform: translateX(-130%);
+  animation: siteCtaSheen 5.5s ease-in-out 1.8s infinite;
+}
+
+.site-cta--preserve-color {
+  background: linear-gradient(to right, #6D35C9, #9B5CF0);
+}
+
+.site-cta--sticky {
+  position: fixed;
+  max-width: calc(100vw - 2rem);
+}
+
+@keyframes siteCtaSheen {
+  0%, 55% { transform: translateX(-130%); }
+  100% { transform: translateX(130%); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .site-cta:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow:
+      0 5px 0 -1px #582b97,
+      0 22px 34px -14px #7941bc99,
+      inset 0 1px 0 #ffffff40;
+  }
+}
+
+.site-cta:active {
+  transform: translateY(2px) scale(.985);
+  box-shadow:
+    0 2px 0 -1px #582b97,
+    0 8px 18px -10px #7941bc85,
+    inset 0 1px 0 #ffffff40;
+}
+
+.site-cta:focus-visible {
+  outline: 3px solid #a577d9;
+  outline-offset: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-cta::after { animation: none; }
+}

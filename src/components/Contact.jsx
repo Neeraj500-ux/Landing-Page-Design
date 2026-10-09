@@ -28,7 +28,7 @@ export default function Contact() {
             <label className="block text-sm">Your Business Type<select name="type" className={`${field} mt-1.5`}>{['Coach', 'Consultant', 'Trainer', 'Other'].map(o => <option key={o} className="text-ink">{o}</option>)}</select></label>
             <label className="block text-sm">Current Website or Landing Page (optional)<input type="url" name="site" placeholder="https://" className={`${field} mt-1.5`} /></label>
             <label className="block text-sm">What Would You Like Your Page to Achieve?<textarea required rows={4} name="goal" className={`${field} mt-1.5`} /></label>
-            <button className="w-full rounded-full bg-gradient-to-r from-amber to-sun py-3.5 font-semibold text-ink transition duration-300 hover:-translate-y-0.5 hover:brightness-105">Book My One-to-One Call</button>
+            <button className="site-cta w-full rounded-full bg-gradient-to-r from-amber to-sun py-3.5 font-semibold text-ink transition duration-300 hover:-translate-y-0.5 hover:brightness-105">Book My One-to-One Call</button>
             <p className="text-center text-sm text-white/55">Share your details, and we’ll contact you to arrange a suitable time.</p>
             <p className="text-center text-xs text-white/40">By submitting this form, you agree to be contacted by Your Brand Name about your enquiry. Please read our <a href="#" className="underline">Privacy Policy</a>.</p>
           </form>}

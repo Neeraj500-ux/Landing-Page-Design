@@ -481,33 +481,39 @@ export default function Problems() {
         }
 
         .lp-problems .lp-problems__cta-button {
+          position: relative;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 9px;
           width: 100%;
           max-width: 100%;
           min-width: 0;
-          min-height: 54px;
+          min-height: 56px;
           height: auto;
-          padding: 15px 16px;
-          border: 1px solid rgba(255, 255, 255, .85);
-          border-radius: 15px;
-          color: #384896;
-          background: #fff;
-          background-image: none;
-          box-shadow: 0 8px 22px rgba(27, 24, 79, .15);
-          font-size: 14px;
-          font-weight: 750;
+          padding: 15px 18px;
+          overflow: hidden;
+          border: 1px solid #ffffff80;
+          border-radius: 18px;
+          color: #2B1245;
+          background: linear-gradient(to right, #FF8A3D, #FFC93C);
+          box-shadow:
+            0 5px 0 -1px #d97932,
+            0 16px 30px -13px #ff8a3d80,
+            inset 0 1px 0 #ffffff80;
+          font-family: inherit;
+          font-size: 15.5px;
+          font-weight: 700;
           line-height: 1.5;
           text-align: center;
           text-decoration: none;
           white-space: normal;
           overflow-wrap: anywhere;
+          cursor: pointer;
           transition:
-            transform .25s ease,
-            background-color .25s ease,
-            box-shadow .25s ease;
+            transform .3s cubic-bezier(.22, 1, .36, 1),
+            box-shadow .3s ease,
+            filter .3s ease;
         }
 
         .lp-problems__cta-button:focus-visible {
@@ -564,8 +570,11 @@ export default function Problems() {
 
           .lp-problems .lp-problems__cta-button:hover {
             transform: translateY(-2px);
-            background: #f1f5ff;
-            box-shadow: 0 12px 26px rgba(27, 24, 79, .22);
+            filter: brightness(1.05);
+            box-shadow:
+              0 5px 0 -1px #d97932,
+              0 22px 34px -14px #ff8a3d99,
+              inset 0 1px 0 #ffffff80;
           }
         }
 
@@ -684,7 +693,7 @@ export default function Problems() {
 
               <div className="lp-problems__cta-action">
                 <Button className="lp-problems__cta-button">
-                  Let’s Improve My Landing Page
+                  Get More Enquiries
                 </Button>
               </div>
             </div>

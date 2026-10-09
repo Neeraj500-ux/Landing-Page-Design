@@ -10,6 +10,6 @@ export default function Services() {
           <p className="mt-5 text-sm font-semibold">{i === 4 ? 'Available Within the Agreed Scope:' : 'What’s Included:'}</p>
           <ul className="mt-3 space-y-2">{l.map(x => <li key={x} className="flex gap-2 text-sm text-ink/75"><Check />{x}</li>)}</ul></Card></Reveal>)}
       </div>
-      <Reveal className="mt-12 text-center"><Button variant="dark">Plan My Landing Page</Button></Reveal>
+      <Reveal className="mt-12 text-center"><Button variant="dark" className="site-cta--preserve-color">Plan My Landing Page</Button></Reveal>
     </Container></section>)
 }
