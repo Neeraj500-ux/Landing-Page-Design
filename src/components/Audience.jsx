@@ -514,7 +514,7 @@ export default function Audience() {
             >
               <Reveal className="expert-audience__media">
                 <figure className="expert-audience__frame">
-                  <div className="expert-audience__image-stage">
+                  <div className="expert-audience__image-stage image-hover">
                     <img
                       src={`${imageBase}${audience.img}`}
                       alt={

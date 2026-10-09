@@ -93,6 +93,48 @@ h1,h2,h3 { @apply font-display tracking-tight; }
   outline-offset: 5px;
 }
 
+.image-hover {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.image-hover > img {
+  transition: transform .7s cubic-bezier(.22, 1, .36, 1);
+  will-change: transform;
+}
+
+.image-hover::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    #ffffff52 50%,
+    transparent 70%
+  );
+  transform: translateX(-150%) skewX(-18deg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .image-hover:hover > img {
+    transform: scale(1.045);
+  }
+
+  .image-hover:hover::after {
+    animation: imageHoverShine .85s ease-out;
+  }
+}
+
+@keyframes imageHoverShine {
+  to { transform: translateX(150%) skewX(-18deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .site-cta::after { animation: none; }
+  .image-hover > img { transition: none; }
+  .image-hover::after { display: none; }
 }
