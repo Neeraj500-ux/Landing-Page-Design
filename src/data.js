@@ -191,14 +191,14 @@ export const work = [
     'Founders and leadership teams',
     'Project enquiries',
     'Problem-first messaging with clear service cards and proof.',
-    'work2.svg',
+    'Neeraj8.png',
   ],
   [
     'Sales Training Workshop',
     'Corporate learning teams',
     'Workshop registrations',
     'Agenda-led layout with a short, mobile-friendly sign-up form.',
-    'work3.svg',
+    'Neeraj9.png',
   ],
 ]
 
