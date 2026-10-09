@@ -168,7 +168,7 @@ const styles = `
     border: 0;
     object-fit: contain;
     object-position: center;
-    transform: scale(.975);
+    transform: scale(1);
     transform-origin: center;
     transition: transform .85s var(--services-ease);
   }
@@ -533,7 +533,7 @@ const styles = `
     }
 
     .lp-services__media:hover .lp-services__image {
-      transform: scale(1);
+    transform: scale(1.04);
     }
 
     .lp-services__media:hover .lp-services__image-stage::after {

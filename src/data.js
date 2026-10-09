@@ -184,7 +184,7 @@ export const work = [
     'Mid-career professionals',
     'Discovery-call bookings',
     'A calm, credential-led hero with a single booking action.',
-    'work1.svg',
+    'Neeraj7.png',
   ],
   [
     'Strategy Consulting Practice',

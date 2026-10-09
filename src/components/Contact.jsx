@@ -14,7 +14,7 @@ export default function Contact() {
           <h3 className="mt-9 text-xl font-bold">Book Your One-to-One Landing Page Call.</h3>
           <p className="mt-3 text-sm font-semibold text-white/80">On the call, we’ll discuss:</p>
           <ul className="mt-3 space-y-2 text-white/70">{['Your audience and offer', 'Your existing page, if you have one', 'Your main conversion goal', 'The content and features you need', 'Suitable next steps for the project'].map(x => <li key={x} className="flex gap-2.5"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber" />{x}</li>)}</ul>
-          <img loading="lazy" src="/images/team.svg" alt="Team beside a landing page preview (concept image)" className="mt-9 hidden w-full rounded-3xl ring-1 ring-white/10 lg:block" />
+          <div className="image-hover mt-9 hidden w-full rounded-3xl ring-1 ring-white/10 lg:block"><img loading="lazy" src="/images/team.svg" alt="Team beside a landing page preview (concept image)" className="w-full" /></div>
         </Reveal>
         <Reveal delay={120}>
           {sent ? <div className="grid min-h-[24rem] place-items-center rounded-3xl bg-white p-8 text-center text-ink"><div><div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-cobalt text-2xl text-white">✓</div><h3 className="mt-5 text-2xl font-bold">Thank you—we’ve got your details.</h3><p className="mt-2 text-ink/65">We’ll contact you to arrange a suitable time.</p></div></div> :
