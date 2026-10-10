@@ -1,5 +1,5 @@
 import { benefits } from '../data'
-import { Container, Reveal, SectionHead } from './ui'
+import { Container, Reveal } from './ui'
 
 function BenefitIcon({ index }) {
   const icons = [
@@ -34,8 +34,8 @@ function BenefitIcon({ index }) {
 
   return (
     <svg
-      width="26"
-      height="26"
+      width="24"
+      height="24"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -51,162 +51,119 @@ function BenefitIcon({ index }) {
 }
 
 const styles = `
-  .glass-benefits {
-    --benefit-ink: #fff;
-    --benefit-muted: #e1d4ed;
-    --benefit-gold: #f2cb85;
-    --benefit-ease: cubic-bezier(.22, 1, .36, 1);
+  .pv-benefits {
+    --pv-ink: #26103d;
+    --pv-body: #5a4a70;
+    --pv-note: #75658a;
+    --pv-violet: #5b2f8f;
+    --pv-violet-deep: #2b1245;
+    --pv-violet-mid: #4b266a;
+    --pv-violet-soft: #b78bdd;
+    --pv-line: #e8dff4;
+    --pv-tint: #f5effc;
+    --pv-ease: cubic-bezier(.22, 1, .36, 1);
 
     position: relative;
     isolation: isolate;
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    padding-block: clamp(52px, 8vw, 108px);
-    color: var(--benefit-ink);
-    background: linear-gradient(
-      125deg,
-      #2B1245 0%,
-      #4B266A 52%,
-      #5B2F8F 100%
-    );
+    padding-block: clamp(64px, 9vw, 128px);
+    overflow: hidden;
+    color: var(--pv-ink);
+    background:
+      radial-gradient(
+        ellipse 70% 40% at 50% 0%,
+        rgba(183, 139, 221, .14) 0%,
+        rgba(183, 139, 221, 0) 70%
+      ),
+      linear-gradient(180deg, #ffffff 0%, #faf7fe 50%, #f3ecfa 100%);
     font-family: Inter, ui-sans-serif, system-ui, -apple-system,
       BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  .glass-benefits,
-  .glass-benefits *,
-  .glass-benefits *::before,
-  .glass-benefits *::after {
+  .pv-benefits,
+  .pv-benefits *,
+  .pv-benefits *::before,
+  .pv-benefits *::after {
     box-sizing: border-box;
   }
 
-  /* Decoration is clipped independently, keeping text and shadows free. */
-
-  .glass-benefits__ambient {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-    pointer-events: none;
-    border-radius: inherit;
-    background:
-      radial-gradient(ellipse at 50% 0%, #b78bdd20, transparent 55%),
-      radial-gradient(ellipse at 95% 90%, #9e6bd326, transparent 52%);
-  }
-
-  .glass-benefits__ambient::before {
-    content: "";
-    position: absolute;
-    width: min(70vw, 700px);
-    aspect-ratio: 1;
-    top: 8%;
-    left: -20%;
-    border-radius: 50%;
-    background: #b17adb;
-    filter: blur(90px);
-    opacity: .18;
-  }
-
-  .glass-benefits__ambient::after {
-    content: "";
-    position: absolute;
-    width: min(60vw, 560px);
-    aspect-ratio: 1;
-    right: -16%;
-    bottom: 2%;
-    border-radius: 50%;
-    background: #e3b577;
-    filter: blur(100px);
-    opacity: .1;
-  }
-
-  .glass-benefits__grid-pattern {
-    position: absolute;
-    inset: 0;
-    opacity: .2;
-    background-image:
-      linear-gradient(#ffffff12 1px, transparent 1px),
-      linear-gradient(90deg, #ffffff12 1px, transparent 1px);
-    background-size: 64px 64px;
-    -webkit-mask-image: linear-gradient(#000, transparent 78%);
-    mask-image: linear-gradient(#000, transparent 78%);
-  }
-
-  .glass-benefits .glass-benefits__container {
-    position: relative;
+  .pv-benefits .pv-benefits__container {
     width: 100%;
     max-width: 1200px;
     min-width: 0;
     margin-inline: auto;
-    padding-inline: clamp(16px, 4vw, 40px);
+    padding-inline: clamp(20px, 4.5vw, 48px);
   }
 
-  .glass-benefits__header {
-    width: 100%;
-    max-width: 820px;
+  /* ---------- Header ---------- */
+
+  .pv-benefits__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: clamp(16px, 2.2vw, 22px);
     min-width: 0;
-    margin-inline: auto;
-    text-align: center;
   }
 
-  .glass-benefits__header::before {
-    content: "";
-    display: block;
-    width: 62px;
-    height: 5px;
-    margin: 0 auto 24px;
-    border: 1px solid #ffeac440;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #bd8bca, #f2cb85);
-    box-shadow:
-      0 0 25px #edc28b28,
-      inset 0 1px 0 #ffffff45;
+  .pv-benefits__header > * {
+    min-width: 0;
   }
 
-  .glass-benefits .glass-benefits__header h2 {
-    max-width: 24ch;
-    margin-inline: auto;
-    color: #fff;
-    font-size: clamp(29px, 4.2vw, 48px);
-    font-weight: 800;
-    line-height: 1.17;
-    letter-spacing: -.04em;
+  .pv-benefits .pv-benefits__header h2 {
+    width: 100%;
+    max-width: 17em;
+    margin: 0;
+    color: var(--pv-ink);
+    font-size: clamp(28px, 4.2vw, 48px);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -.032em;
     text-wrap: balance;
     overflow-wrap: break-word;
+    hyphens: manual;
   }
 
-  .glass-benefits .glass-benefits__header p {
-    max-width: 64ch;
-    margin: 20px auto 0;
-    color: var(--benefit-muted);
-    font-size: clamp(15px, 1.65vw, 17px);
-    line-height: 1.8;
+  .pv-benefits .pv-benefits__header p {
+    width: 100%;
+    max-width: 34em;
+    margin: 0;
+    color: var(--pv-body);
+    font-size: clamp(16px, 1.45vw, 18px);
+    font-weight: 400;
+    line-height: 1.7;
+    letter-spacing: -.005em;
     text-wrap: pretty;
     overflow-wrap: break-word;
   }
 
-  /* Individual glass panels replace the previous joined grid. */
+  /* ---------- Joined grid (hairline dividers) ---------- */
 
-  .glass-benefits__grid {
+  .pv-benefits__grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    align-items: stretch;
-    gap: clamp(16px, 2vw, 24px);
+    gap: 1px;
     min-width: 0;
-    margin-top: clamp(32px, 5vw, 58px);
+    margin-top: clamp(36px, 5.5vw, 72px);
+    overflow: hidden;
+    border: 1px solid var(--pv-line);
+    border-radius: clamp(20px, 2.4vw, 28px);
+    background: var(--pv-line);
+    box-shadow:
+      0 1px 2px rgba(43, 18, 69, .05),
+      0 12px 24px -12px rgba(43, 18, 69, .10),
+      0 40px 80px -40px rgba(43, 18, 69, .30);
   }
 
-  .glass-benefits__reveal {
+  .pv-benefits__reveal {
     display: flex;
     min-width: 0;
     height: 100%;
   }
 
-  .glass-benefits__card {
-    --card-accent: #e2c3ff;
-    --card-glow: #c89bff18;
-
+  .pv-benefits__card {
     position: relative;
     isolation: isolate;
     display: flex;
@@ -214,333 +171,232 @@ const styles = `
     width: 100%;
     min-width: 0;
     height: 100%;
-    padding: clamp(23px, 2.8vw, 32px);
-    border: 1px solid #ffffff26;
-    border-top-color: #ffffff47;
-    border-radius: 26px;
+    padding: clamp(24px, 2.8vw, 40px);
+    background: linear-gradient(180deg, #ffffff 0%, #fdfbff 100%);
+  }
+
+  /* Dark violet panel fades in on hover */
+  .pv-benefits__card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     background:
       radial-gradient(
-        ellipse at 100% 0%,
-        var(--card-glow),
-        transparent 75%
+        circle at 100% 0%,
+        rgba(183, 139, 221, .28) 0%,
+        rgba(183, 139, 221, 0) 55%
       ),
-      linear-gradient(145deg, #ffffff13, #ffffff06),
-      #3d205dd9;
-    box-shadow:
-      inset 0 1px 0 #ffffff16,
-      inset 0 -1px 0 #ffffff05,
-      0 8px 16px -12px #16082380,
-      0 24px 42px -30px #160823c0;
-    transition:
-      transform .45s var(--benefit-ease),
-      border-color .45s ease,
-      box-shadow .45s ease;
-  }
-
-  @supports ((backdrop-filter: blur(1px)) or
-             (-webkit-backdrop-filter: blur(1px))) {
-    .glass-benefits__card {
-      background:
-        radial-gradient(
-          ellipse at 100% 0%,
-          var(--card-glow),
-          transparent 75%
-        ),
-        linear-gradient(145deg, #ffffff15, #ffffff06),
-        #34174f45;
-      -webkit-backdrop-filter: blur(22px) saturate(125%);
-      backdrop-filter: blur(22px) saturate(125%);
-    }
-  }
-
-  .glass-benefits__card--1,
-  .glass-benefits__card--4 {
-    --card-accent: #f2cb85;
-    --card-glow: #f2cb8514;
-  }
-
-  .glass-benefits__card--2,
-  .glass-benefits__card--5 {
-    --card-accent: #f3d7d0;
-    --card-glow: #efb7bd14;
-  }
-
-  .glass-benefits__card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 18%;
-    right: 18%;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      #ffffff70,
-      transparent
-    );
+      linear-gradient(145deg, var(--pv-violet-deep) 0%, var(--pv-violet-mid) 100%);
+    opacity: 0;
+    transition: opacity .5s var(--pv-ease);
     pointer-events: none;
   }
 
-  .glass-benefits__card::after {
-    content: "";
-    position: absolute;
-    inset: 6px;
-    z-index: -1;
-    border: 1px solid #ffffff05;
-    border-radius: 20px;
-    pointer-events: none;
-  }
-
-  .glass-benefits__card-top {
+  .pv-benefits__card-top {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 16px;
     min-width: 0;
-    margin-bottom: 26px;
+    margin-bottom: clamp(24px, 3vw, 40px);
   }
 
-  /* Translucent icon tiles with a subtle raised edge. */
-
-  .glass-benefits__icon {
-    position: relative;
+  .pv-benefits__icon {
     display: grid;
-    flex: 0 0 56px;
+    flex: 0 0 52px;
     place-items: center;
-    width: 56px;
-    height: 56px;
-    border: 1px solid #ffffff30;
-    border-top-color: #ffffff60;
-    border-radius: 18px;
-    color: var(--card-accent);
-    background:
-      radial-gradient(ellipse at 20% 0%, #ffffff20, transparent 75%),
-      linear-gradient(145deg, #ffffff15, #ffffff06);
-    box-shadow:
-      inset 0 1px 0 #ffffff25,
-      inset 0 -2px 5px #200e3618,
-      0 4px 0 -1px #22103665,
-      0 12px 18px -13px #160823cc;
-    transition: transform .45s var(--benefit-ease);
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--pv-line);
+    border-radius: 16px;
+    color: var(--pv-violet);
+    background: linear-gradient(145deg, #faf6ff 0%, var(--pv-tint) 100%);
+    box-shadow: 0 1px 2px rgba(43, 18, 69, .06);
+    transition:
+      color .5s var(--pv-ease),
+      background .5s var(--pv-ease),
+      border-color .5s var(--pv-ease),
+      box-shadow .5s var(--pv-ease);
   }
 
-  .glass-benefits__icon::before {
-    content: "";
-    position: absolute;
-    inset: 4px;
-    border: 1px solid #ffffff10;
-    border-radius: 13px;
-    pointer-events: none;
-  }
-
-  .glass-benefits__icon svg {
+  .pv-benefits__icon svg {
     display: block;
-    width: 26px;
-    height: 26px;
-    filter: drop-shadow(0 2px 4px #170c3020);
+    width: 24px;
+    height: 24px;
   }
 
-  .glass-benefits__number {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  .pv-benefits__number {
     flex: 0 0 auto;
-    min-width: 34px;
-    min-height: 28px;
-    padding: 4px 8px;
-    border: 1px solid #ffffff15;
-    border-radius: 10px;
-    color: #ddc9ec;
-    background: #ffffff05;
-    font-size: 11px;
-    font-weight: 500;
-    line-height: 1.5;
-    letter-spacing: .06em;
+    color: #cbb8e2;
+    font-size: clamp(26px, 2.6vw, 32px);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -.02em;
     font-variant-numeric: tabular-nums;
+    transition: color .5s var(--pv-ease);
   }
 
-  .glass-benefits .glass-benefits__title {
+  .pv-benefits .pv-benefits__title {
     margin: 0;
-    color: #fff;
-    font-size: clamp(20px, 2vw, 23px);
-    font-weight: 700;
-    line-height: 1.35;
-    letter-spacing: -.025em;
+    color: var(--pv-ink);
+    font-size: clamp(18px, 1.7vw, 21px);
+    font-weight: 650;
+    line-height: 1.3;
+    letter-spacing: -.018em;
     text-wrap: balance;
     overflow-wrap: break-word;
+    transition: color .5s var(--pv-ease);
   }
 
-  .glass-benefits .glass-benefits__description {
-    margin: 15px 0 0;
-    color: var(--benefit-muted);
+  .pv-benefits .pv-benefits__description {
+    max-width: 38em;
+    margin: 12px 0 0;
+    color: var(--pv-body);
     font-size: 15px;
     font-weight: 400;
-    line-height: 1.8;
+    line-height: 1.7;
     text-wrap: pretty;
     overflow-wrap: break-word;
+    transition: color .5s var(--pv-ease);
   }
 
-  .glass-benefits__card-footer {
+  .pv-benefits__card-footer {
     margin-top: auto;
-    padding-top: 26px;
+    padding-top: clamp(24px, 2.8vw, 34px);
   }
 
-  .glass-benefits__accent-line {
+  .pv-benefits__accent-line {
     display: block;
-    width: 40px;
+    width: 32px;
     max-width: 100%;
-    height: 3px;
+    height: 2px;
     border-radius: 999px;
-    background: linear-gradient(
-      90deg,
-      var(--card-accent),
-      #ffffff15
-    );
-    opacity: .8;
-    transform-origin: left;
-    transition:
-      transform .45s var(--benefit-ease),
-      opacity .45s ease;
+    background: linear-gradient(90deg, var(--pv-violet), var(--pv-violet-soft));
+    transition: width .5s var(--pv-ease);
   }
 
-  /* Original results note retained in a quieter glass panel. */
+  /* ---------- Note ---------- */
 
-  .glass-benefits__note {
+  .pv-benefits__note {
     display: flex;
     align-items: flex-start;
     gap: 12px;
     width: 100%;
-    max-width: 800px;
+    max-width: 44rem;
     min-width: 0;
-    margin: clamp(26px, 3vw, 36px) auto 0;
-    padding: 18px 20px;
-    border: 1px solid #ffffff16;
-    border-radius: 18px;
-    background: linear-gradient(110deg, #ffffff08, #ffffff03);
-    box-shadow: inset 0 1px 0 #ffffff08;
+    margin: clamp(24px, 3.2vw, 36px) 0 0;
   }
 
-  .glass-benefits__note-icon {
+  .pv-benefits__note-icon {
     display: grid;
-    flex: 0 0 21px;
+    flex: 0 0 22px;
     place-items: center;
-    width: 21px;
-    height: 21px;
-    margin-top: 2px;
-    border: 1px solid #e1ccee45;
+    width: 22px;
+    height: 22px;
+    margin-top: 1px;
+    border: 1px solid #d6c4ea;
     border-radius: 50%;
-    color: #e1ccee;
+    color: var(--pv-violet);
+    background: #fff;
     font-family: Georgia, serif;
     font-size: 13px;
     font-style: italic;
     line-height: 1;
   }
 
-  .glass-benefits .glass-benefits__note p {
+  .pv-benefits .pv-benefits__note p {
     min-width: 0;
     margin: 0;
-    color: #cbbbd8;
-    font-size: 13px;
-    line-height: 1.8;
-    text-align: left;
+    color: var(--pv-note);
+    font-size: 14px;
+    line-height: 1.7;
     text-wrap: pretty;
     overflow-wrap: break-word;
   }
 
+  /* ---------- Breakpoints ---------- */
+
   @media (min-width: 680px) {
-    .glass-benefits__grid {
+    .pv-benefits__grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
+  @media (min-width: 960px) {
+    .pv-benefits__header {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+      align-items: end;
+      column-gap: clamp(48px, 7vw, 104px);
+    }
+
+    .pv-benefits .pv-benefits__header p {
+      padding-bottom: 6px;
+    }
+  }
+
   @media (min-width: 1080px) {
-    .glass-benefits__grid {
+    .pv-benefits__grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
-  @media (max-width: 679px) {
-    .glass-benefits__header::before {
-      margin-bottom: 20px;
-    }
-
-    .glass-benefits__card {
-      border-radius: 23px;
-    }
-
-    .glass-benefits__card-top {
-      margin-bottom: 23px;
-    }
-
-    .glass-benefits__icon {
-      flex-basis: 50px;
-      width: 50px;
-      height: 50px;
-      border-radius: 16px;
-    }
-
-    .glass-benefits__icon svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    .glass-benefits__note {
-      padding: 16px;
-    }
-  }
-
   @media (max-width: 359px) {
-    .glass-benefits .glass-benefits__container {
-      padding-inline: 14px;
+    .pv-benefits .pv-benefits__container {
+      padding-inline: 16px;
     }
 
-    .glass-benefits .glass-benefits__header h2 {
-      font-size: 27px;
+    .pv-benefits .pv-benefits__header h2 {
+      font-size: 26px;
     }
 
-    .glass-benefits__card {
-      padding: 22px 19px;
+    .pv-benefits__card {
+      padding: 22px 20px;
     }
   }
+
+  /* ---------- Hover (only on devices that support it) ---------- */
 
   @media (hover: hover) and (pointer: fine) {
-    .glass-benefits__card:hover {
-      transform: translateY(-5px);
-      border-color: #ffffff42;
-      box-shadow:
-        inset 0 1px 0 #ffffff25,
-        inset 0 -1px 0 #ffffff08,
-        0 10px 20px -13px #16082385,
-        0 30px 50px -28px #160823d0;
-    }
-
-    .glass-benefits__card:hover .glass-benefits__icon {
-      transform: translateY(-2px) rotate(-4deg);
-    }
-
-    .glass-benefits__card:hover .glass-benefits__accent-line {
-      transform: scaleX(1.4);
+    .pv-benefits__card:hover::before {
       opacity: 1;
+    }
+
+    .pv-benefits__card:hover .pv-benefits__icon {
+      color: #ecdcff;
+      background: rgba(255, 255, 255, .08);
+      border-color: rgba(255, 255, 255, .2);
+      box-shadow: none;
+    }
+
+    .pv-benefits__card:hover .pv-benefits__number {
+      color: rgba(255, 255, 255, .35);
+    }
+
+    .pv-benefits__card:hover .pv-benefits__title {
+      color: #fff;
+    }
+
+    .pv-benefits__card:hover .pv-benefits__description {
+      color: #dccdee;
+    }
+
+    .pv-benefits__card:hover .pv-benefits__accent-line {
+      width: 56px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .glass-benefits *,
-    .glass-benefits *::before,
-    .glass-benefits *::after {
+    .pv-benefits *,
+    .pv-benefits *::before,
+    .pv-benefits *::after {
       animation: none !important;
       transition: none !important;
     }
 
-    .glass-benefits__reveal {
+    .pv-benefits__reveal {
       opacity: 1 !important;
       transform: none !important;
-    }
-
-    .glass-benefits__card:hover,
-    .glass-benefits__card:hover .glass-benefits__icon,
-    .glass-benefits__card:hover .glass-benefits__accent-line {
-      transform: none;
     }
   }
 `
@@ -548,78 +404,62 @@ const styles = `
 export default function Benefits() {
   return (
     <section
-      className="glass-benefits"
+      className="pv-benefits"
       aria-label="Benefits of a focused landing page"
     >
       <style>{styles}</style>
 
-      <div className="glass-benefits__ambient" aria-hidden="true">
-        <div className="glass-benefits__grid-pattern" />
-      </div>
-
-      <Container className="glass-benefits__container">
-        <div className="glass-benefits__header">
-          <SectionHead
-            light
-            title="Give More of Your Visitors a Reason to Take the Next Step."
-            text="A focused landing page helps connect the promise that brought someone to you with the information they need before enquiring."
-          />
+      <Container className="pv-benefits__container">
+        <div className="pv-benefits__header">
+          <Reveal>
+            <h2>Give More of Your Visitors a Reason to Take the Next Step.</h2>
+          </Reveal>
+          <Reveal delay={80}>
+            <p>
+              A focused landing page helps connect the promise that brought
+              someone to you with the information they need before enquiring.
+            </p>
+          </Reveal>
         </div>
 
-        <div className="glass-benefits__grid">
+        <div className="pv-benefits__grid">
           {benefits.map(([title, description], index) => (
             <Reveal
               key={title}
               delay={(index % 3) * 70}
-              className="glass-benefits__reveal"
+              className="pv-benefits__reveal"
             >
-              <article
-                className={`glass-benefits__card glass-benefits__card--${index}`}
-              >
-                <div className="glass-benefits__card-top">
-                  <span className="glass-benefits__icon">
+              <article className="pv-benefits__card">
+                <div className="pv-benefits__card-top">
+                  <span className="pv-benefits__icon">
                     <BenefitIcon index={index} />
                   </span>
 
-                  <span
-                    className="glass-benefits__number"
-                    aria-hidden="true"
-                  >
+                  <span className="pv-benefits__number" aria-hidden="true">
                     {String(index + 1).padStart(2, '0')}
                   </span>
                 </div>
 
-                <h3 className="glass-benefits__title">
-                  {title}
-                </h3>
+                <h3 className="pv-benefits__title">{title}</h3>
 
-                <p className="glass-benefits__description">
-                  {description}
-                </p>
+                <p className="pv-benefits__description">{description}</p>
 
-                <div
-                  className="glass-benefits__card-footer"
-                  aria-hidden="true"
-                >
-                  <span className="glass-benefits__accent-line" />
+                <div className="pv-benefits__card-footer" aria-hidden="true">
+                  <span className="pv-benefits__accent-line" />
                 </div>
               </article>
             </Reveal>
           ))}
         </div>
 
-        <div className="glass-benefits__note">
-          <span
-            className="glass-benefits__note-icon"
-            aria-hidden="true"
-          >
+        <div className="pv-benefits__note">
+          <span className="pv-benefits__note-icon" aria-hidden="true">
             i
           </span>
 
           <p>
-            Results depend on your offer, traffic quality, audience and
-            sales follow-up. A landing page is one important part of that
-            journey.
+            Results depend on your offer, traffic quality, audience and sales
+            follow-up. A landing page is one important part of that journey.
           </p>
         </div>
       </Container>
