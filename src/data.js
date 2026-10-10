@@ -202,36 +202,46 @@ export const work = [
   ],
 ]
 
+/*
+  steps: [title, description, details, label, icon]
+  icon is one of: 'discover' | 'plan' | 'design' | 'build' | 'launch'
+  (Process.jsx falls back to a default icon by position if it is missing.)
+*/
 export const steps = [
   [
     'Understand Your Offer',
     'We discuss your business, audience, service and the action you want visitors to take.',
     'Your offer details, brand assets, available content, testimonials and examples you like.',
     'You Share',
+    'discover',
   ],
   [
     'Plan the Content',
     'We organise the page around the questions a prospective client needs answered before taking action.',
     'The headline, offer explanation, proof, section flow and primary CTA.',
     'We Define',
+    'plan',
   ],
   [
     'Design the Experience',
     'We create a visual direction that fits your brand and makes the content easy to explore.',
     'Layout, colours, typography, imagery and the mobile experience.',
     'You Review',
+    'design',
   ],
   [
     'Build and Connect',
     'We develop the approved page and connect the agreed forms, booking tools and tracking.',
     'Buttons, forms, integrations and the complete enquiry journey.',
     'We Check',
+    'build',
   ],
   [
     'Review and Launch',
     'We complete the agreed revisions, check the page across relevant devices and prepare it for publishing.',
     'The completed landing page and guidance on managing it.',
     'You Receive',
+    'launch',
   ],
 ]
 
