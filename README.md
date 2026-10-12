@@ -1,6 +1,6 @@
 # Landing Page for Coaches, Consultants & Trainers
 
-Single-page site built with React + Vite + Tailwind CSS. Brand placeholder: "Your Brand Name".
+Single-page site built with React + Vite + Tailwind CSS. Brand placeholder: "Creative Crew".
 
 ## Run
 ```bash

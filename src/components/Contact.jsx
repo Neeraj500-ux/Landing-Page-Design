@@ -1024,7 +1024,7 @@ export default function Contact() {
                 </label>
 
                 <button type="submit" className="ct-submit">
-                  <span>Book My One-to-One Call</span>
+                  <span>Yes! Help Me Increase My Revenue.</span>
 
                   <svg
                     width="19"

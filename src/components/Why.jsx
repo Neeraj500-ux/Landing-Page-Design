@@ -216,7 +216,7 @@ export default function Why() {
       </div>
 
       <Container>
-        <SectionHead title="Why Your Brand Name?" text="Your Expertise Deserves a Page That Explains It Well." />
+        <SectionHead title="Why Creative Crew?" text="Your Expertise Deserves a Page That Explains It Well." />
         <div
           data-wy
           aria-hidden
