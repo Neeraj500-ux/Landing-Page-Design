@@ -760,36 +760,14 @@ const styles = `
     margin-top: clamp(42px, 5.5vw, 64px);
   }
 
-  .premium-hero .premium-hero__section-title {
-    max-width: 24em;
-    margin: 0 auto;
-    color: var(--hero-ink);
-    font-size: clamp(23px, 3.1vw, 36px);
-    font-weight: 800;
-    line-height: 1.28;
-    letter-spacing: -.034em;
-    text-align: center;
-    text-wrap: balance;
-  }
-
-  .premium-hero__section-title::before {
-    content: "";
-    display: block;
-    width: 48px;
-    height: 4px;
-    margin: 0 auto 20px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #8b5cf6, #e58a5c);
-    box-shadow: 0 6px 14px -4px #7c3aed66;
-  }
-
   .premium-hero .premium-hero__intro {
-    max-width: 780px;
-    margin: 18px auto 0;
+    max-width: 900px;
+    margin: 0 auto;
     color: var(--hero-muted);
-    font-size: clamp(15px, 1.6vw, 17.5px);
-    font-weight: 400;
-    line-height: 1.75;
+    font-size: clamp(19px, 2.2vw, 24px);
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: -.012em;
     text-wrap: balance;
   }
 
@@ -1592,18 +1570,14 @@ export default function Hero() {
 
           <Reveal delay={290} className="premium-hero__actions-slot">
             <div className="premium-hero__actions">
-              <Button className="premium-hero__button">
-                Yes! Help Me Increase My Revenue.
+              <Button className="site-cta--revenue premium-hero__button">
+                Yes! Help Me Increase My Revenue
               </Button>
             </div>
           </Reveal>
         </div>
 
         <Reveal delay={390} className="premium-hero__showcase">
-          <h2 className="premium-hero__section-title">
-            Guaranteed Better Funnel Performance. More Value from Every Ad Spend.
-          </h2>
-
           <p className="premium-hero__intro">
             At <strong>Creative Crew</strong>, we simplify growth with a complete
             funnel system that works seamlessly.

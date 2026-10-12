@@ -1,6 +1,6 @@
 export const problems = [
   [
-    'Your Offer Takes Too Long to Understand',
+    'Your Offer Takes Too Long To Understand',
     'Visitors struggle to see what you provide, who it is for and why they should care.',
     'A clear headline, a specific value proposition and an introduction that puts the visitor’s needs first.',
   ],
@@ -10,7 +10,7 @@ export const problems = [
     'A visual direction that matches your brand, audience and service.',
   ],
   [
-    'There Is Too Much Competing for Attention',
+    'There Is Too Much Competing For Attention',
     'Extra links, unrelated information and multiple offers make it harder to decide what to do next.',
     'A focused page structure built around one primary action.',
   ],
@@ -20,7 +20,7 @@ export const problems = [
     'Readable content, comfortable buttons and layouts designed for smaller screens.',
   ],
   [
-    'Visitors Don’t Have Enough Confidence to Act',
+    'Visitors Don’t Have Enough Confidence To Act',
     'An offer without context, relevant proof or clear answers can leave important questions unresolved.',
     'Thoughtfully placed credentials, genuine testimonials, offer details and FAQs.',
   ],
@@ -29,7 +29,7 @@ export const problems = [
 export const audiences = [
   {
     t: 'For Coaches',
-    h: 'Make Your Coaching Offer Clear, Personal and Easy to Explore.',
+    h: 'Make Your Coaching Offer Clear, Personal And Easy To Explore.',
     p: 'Present your approach, explain who you help and show prospective clients what working with you involves.',
     l: [
       'Business and executive coaching',
@@ -45,7 +45,7 @@ export const audiences = [
   },
   {
     t: 'For Consultants',
-    h: 'Turn Your Experience Into a Strong Reason to Start a Conversation.',
+    h: 'Turn Your Experience Into A Strong Reason To Start A Conversation.',
     p: 'Explain the problems you solve, the services you offer and the expertise you bring—so prospective clients can assess whether you are the right fit.',
     l: [
       'Business and strategy consultants',
@@ -61,7 +61,7 @@ export const audiences = [
   },
   {
     t: 'For Trainers',
-    h: 'Give Your Training Program a Page That Makes the Next Step Obvious.',
+    h: 'Give Your Training Program A Page That Makes The Next Step Obvious.',
     p: 'Show visitors what they will learn, who the program is for and how to register or request more information.',
     l: [
       'Corporate trainers',
@@ -165,15 +165,15 @@ export const benefits = [
     'If more relevant visitors convert into enquiries and customers, your existing marketing spend can work harder.',
   ],
   [
-    'Make Your Expertise Easier to Trust',
+    'Make Your Expertise Easier To Trust',
     'Bring your experience, genuine client feedback and relevant work together in a clear, professional presentation.',
   ],
   [
-    'Simplify the Path to a Conversation',
+    'Simplify The Path To A Conversation',
     'Give visitors a clear action to take, with fewer unnecessary steps between interest and contact.',
   ],
   [
-    'Create a Foundation for Improvement',
+    'Create A Foundation For Improvement',
     'Use visitor behaviour and conversion data to identify what to refine after launch.',
   ],
 ]
@@ -216,28 +216,28 @@ export const steps = [
     'discover',
   ],
   [
-    'Plan the Content',
+    'Plan The Content',
     'We organise the page around the questions a prospective client needs answered before taking action.',
     'The headline, offer explanation, proof, section flow and primary CTA.',
     'We Define',
     'plan',
   ],
   [
-    'Design the Experience',
+    'Design The Experience',
     'We create a visual direction that fits your brand and makes the content easy to explore.',
     'Layout, colours, typography, imagery and the mobile experience.',
     'You Review',
     'design',
   ],
   [
-    'Build and Connect',
+    'Build And Connect',
     'We develop the approved page and connect the agreed forms, booking tools and tracking.',
     'Buttons, forms, integrations and the complete enquiry journey.',
     'We Check',
     'build',
   ],
   [
-    'Review and Launch',
+    'Review And Launch',
     'We complete the agreed revisions, check the page across relevant devices and prepare it for publishing.',
     'The completed landing page and guidance on managing it.',
     'You Receive',
@@ -251,7 +251,7 @@ export const why = [
     'We start with your audience and offer so the design supports a clear purpose.',
   ],
   [
-    'Content and Design Working Together',
+    'Content And Design Working Together',
     'Your headline, images, proof and calls to action tell one consistent story.',
   ],
   [
@@ -259,11 +259,11 @@ export const why = [
     'Every section helps visitors understand the offer, assess fit or take the next step.',
   ],
   [
-    'Attention to Mobile Details',
+    'Attention To Mobile Details',
     'Spacing, readability, image placement and forms receive attention on smaller screens.',
   ],
   [
-    'Clear Scope and Communication',
+    'Clear Scope And Communication',
     'Deliverables, project stages, revision rounds and responsibilities are agreed before work begins.',
   ],
   [
@@ -274,51 +274,51 @@ export const why = [
 
 export const faqs = [
   [
-    'Who is this service for?',
+    'Who Is This Service For?',
     'This service is for coaches, consultants and trainers who need a dedicated page to promote an offer, generate enquiries, book consultations or collect registrations.',
   ],
   [
-    'Can you redesign my existing landing page?',
+    'Can You Redesign My Existing Landing Page?',
     'Yes. We can review your current page and recommend changes to its content, structure, design and enquiry journey.',
   ],
   [
-    'Do you write the content as well?',
+    'Do You Write The Content As Well?',
     'Content planning and writing can be included in the project scope. We use the information you provide about your business, audience and offer to create relevant copy.',
   ],
   [
-    'Will the page work on mobile?',
+    'Will The Page Work On Mobile?',
     'Yes. The page is designed and developed to adapt to mobile, tablet and desktop screens, with attention to readability and ease of use.',
   ],
   [
-    'Can you connect my calendar or enquiry form?',
+    'Can You Connect My Calendar Or Enquiry Form?',
     'Yes. Booking tools, forms and supported integrations can be included. We confirm compatibility and any third-party costs before starting.',
   ],
   [
-    'Do I need an existing website?',
+    'Do I Need An Existing Website?',
     'No. A landing page can work as a standalone page on an appropriate domain or subdomain. Hosting and domain requirements will be discussed during planning.',
   ],
   [
-    'Can the page be used with my ads?',
+    'Can The Page Be Used With My Ads?',
     'Yes. We can align the page with the offer and messaging in your campaign. This service focuses on landing page creation; any additional campaign work would need a separate scope.',
   ],
   [
-    'How long will the project take?',
+    'How Long Will The Project Take?',
     'The timeline depends on the page’s complexity, integrations and how quickly content and feedback are provided. We agree on a schedule before work begins.',
   ],
   [
-    'How many revisions are included?',
+    'How Many Revisions Are Included?',
     'The proposal specifies the number of revision rounds and what they cover, so expectations are clear from the start.',
   ],
   [
-    'Will I be able to update the page later?',
+    'Will I Be Able To Update The Page Later?',
     'We discuss your editing needs before choosing the platform and explain how updates will be handled during handover.',
   ],
   [
-    'Do you guarantee more leads or lower acquisition costs?',
+    'Do You Guarantee More Leads Or Lower Acquisition Costs?',
     'We design the page to support conversion, but specific results cannot be guaranteed. Performance also depends on traffic quality, pricing, offer strength and your follow-up process.',
   ],
   [
-    'Are hosting and software subscriptions included?',
+    'Are Hosting And Software Subscriptions Included?',
     'Your proposal will identify which costs are included and which domain, hosting or third-party subscriptions are separate.',
   ],
 ]
