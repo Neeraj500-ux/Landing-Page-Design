@@ -1,705 +1,451 @@
+import { useId } from 'react'
 import { problems } from '../data'
-import { Button, Container, Pill, Reveal, SectionHead } from './ui'
+import { Button, Reveal } from './ui'
 
-function ProblemIcon({ index }) {
-  const icons = [
-    <>
-      <circle cx="12" cy="12" r="8.5" />
-      <circle cx="12" cy="12" r="5" />
-      <circle cx="12" cy="12" r="1.6" />
-    </>,
-    <>
-      <circle cx="10" cy="7" r="3" />
-      <path d="M4 21v-3a6 6 0 0 1 12 0v3" />
-      <path d="M17 4.2a3 3 0 0 1 0 5.6M19 14a5 5 0 0 1 2 4v3" />
-    </>,
-    <>
-      <path d="m12 3 9 4.5-9 4.5-9-4.5L12 3Z" />
-      <path d="m3 12 9 4.5 9-4.5M3 16.5l9 4.5 9-4.5" />
-    </>,
-    <>
-      <circle cx="12" cy="6" r="3" />
-      <path d="M7 21v-3a5 5 0 0 1 10 0v3" />
-      <path d="M5 6a2.5 2.5 0 0 0 0 5M19 6a2.5 2.5 0 0 1 0 5" />
-      <path d="M4 14a4 4 0 0 0-2 3.5V20M20 14a4 4 0 0 1 2 3.5V20" />
-    </>,
-    <>
-      <rect x="6" y="2.5" width="12" height="19" rx="3" />
-      <path d="M10 6h4M11 18h2" />
-    </>,
-  ]
+const solutionContent = {
+  'Your Offer Takes Too Long to Understand': {
+    title: 'Make Your Offer Clear at First Glance',
+    description:
+      'We write a clear headline, a focused value proposition and a concise introduction so visitors quickly understand what you offer, who it helps and why it matters.',
+  },
+  'The Page Looks Generic': {
+    title: 'Create a Design That Reflects Your Expertise',
+    description:
+      'We tailor the layout, typography, colors and visuals to your brand, giving your offer a distinctive, professional presentation.',
+  },
+  'There Is Too Much Competing for Attention': {
+    title: 'Guide Visitors Toward One Clear Next Step',
+    description:
+      'We remove distractions and build the page around one primary goal, using clear calls to action that make enquiring or booking easy.',
+  },
+  'The Mobile Experience Feels Difficult': {
+    title: 'Make the Mobile Experience Effortless',
+    description:
+      'We use readable text, balanced spacing, easy-to-tap buttons and simple forms so visitors can comfortably browse and connect from their phones.',
+  },
+  'Visitors Don’t Have Enough Confidence to Act': {
+    title: 'Build Trust Before Asking for Action',
+    description:
+      'We thoughtfully place genuine testimonials, relevant credentials, clear offer details and helpful FAQs so visitors feel informed and confident about taking the next step.',
+  },
+}
 
+function StatusIcon({ solution = false }) {
   return (
-    <svg
-      width="27"
-      height="27"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+    <span
+      className={`comparison-status ${
+        solution ? 'comparison-status--solution' : ''
+      }`}
       aria-hidden="true"
-      focusable="false"
     >
-      {icons[index % icons.length]}
-    </svg>
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        focusable="false"
+      >
+        {solution ? (
+          <path d="m5 12 4 4L19 6" />
+        ) : (
+          <path d="m7 7 10 10M17 7 7 17" />
+        )}
+      </svg>
+    </span>
   )
 }
 
-function CheckIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="m5 12 4 4L19 6" />
-    </svg>
-  )
+const styles = `
+/* ---------- Section shell ---------- */
+.landing-comparison{
+  --comparison-ink:#25143f;
+  --comparison-muted:#706382;
+  --comparison-red:#b83e51;
+  --comparison-green:#20734e;
+  --comparison-purple:#7542a4;
+  --comparison-gap:36px;
+  position:relative;isolation:isolate;overflow:hidden;overflow:clip;
+  width:100%;max-width:100%;
+  padding:clamp(64px,9vw,128px) 0;
+  color:var(--comparison-ink);
+  background:
+    radial-gradient(ellipse at 8% 8%,#eee3ffc0,transparent 42%),
+    radial-gradient(ellipse at 94% 78%,#e9dcfb90,transparent 42%),
+    linear-gradient(180deg,#fff,#fcfaff 60%,#f8f3ff);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+.landing-comparison,.landing-comparison *,.landing-comparison *::before,.landing-comparison *::after{box-sizing:border-box}
+
+/* Ambient glow orbs (decorative, clipped inside the section) */
+.landing-comparison::before,.landing-comparison::after{
+  content:"";position:absolute;z-index:-1;border-radius:50%;pointer-events:none;filter:blur(70px);
+  animation:comparison-float 16s ease-in-out infinite alternate;
+}
+.landing-comparison::before{top:-120px;left:-120px;width:380px;height:380px;background:#d9c2f8;opacity:.5}
+.landing-comparison::after{bottom:-140px;right:-120px;width:420px;height:420px;background:#e6cdf5;opacity:.4;animation-delay:-8s}
+@keyframes comparison-float{
+  from{transform:translate3d(0,0,0) scale(1)}
+  to{transform:translate3d(30px,24px,0) scale(1.08)}
 }
 
-function SparkIcon() {
-  return (
-    <svg
-      width="28"
-      height="28"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4L12 3Z" />
-      <path d="M20 2v4m-2-2h4" />
-    </svg>
-  )
+.comparison-container{width:min(1200px,calc(100% - 48px));min-width:0;margin-inline:auto}
+
+/* ---------- Header ---------- */
+.comparison-header{max-width:820px;margin-inline:auto;text-align:center;animation:comparison-rise .9s cubic-bezier(.2,.7,.2,1) both}
+.comparison-eyebrow{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;max-width:100%;margin-bottom:24px;padding:10px 18px;
+  border:1px solid #ddcdf0;border-radius:999px;color:#6b3b8c;
+  background:linear-gradient(180deg,#ffffffe6,#f6effbc0);
+  backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);
+  box-shadow:0 8px 24px #68428a10,inset 0 1px 0 #fff,inset 0 -1px 0 #e6d8f4;
+  font-size:12px;font-weight:650;line-height:1.6;letter-spacing:.01em;text-wrap:balance;
+}
+.comparison-eyebrow::before{
+  content:"";width:8px;height:8px;flex-shrink:0;border-radius:50%;background:linear-gradient(135deg,#a066d6,#7542a4);
+  box-shadow:0 0 0 4px #8750b814;animation:comparison-pulse 2.8s ease-in-out infinite;
+}
+@keyframes comparison-pulse{50%{box-shadow:0 0 0 8px #8750b800}}
+.comparison-header h2{margin:0;font-size:clamp(30px,4.4vw,54px);font-weight:760;line-height:1.12;letter-spacing:-.045em;text-wrap:balance;overflow-wrap:break-word}
+.comparison-header h2 span{
+  background:linear-gradient(110deg,#6a359b,#9a5ad4 55%,#6a359b);
+  background-size:200% auto;-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:var(--comparison-purple);
+  animation:comparison-shimmer 8s linear infinite;
+}
+@keyframes comparison-shimmer{to{background-position:200% center}}
+.comparison-header p{max-width:700px;margin:22px auto 0;color:var(--comparison-muted);font-size:clamp(15px,1.3vw,17.5px);line-height:1.8;text-wrap:pretty}
+@keyframes comparison-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+/* ---------- Board ---------- */
+.comparison-board{position:relative;margin-top:clamp(36px,5vw,64px)}
+.comparison-column-headings,.comparison-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--comparison-gap);min-width:0}
+.comparison-column-headings{margin-bottom:20px}
+
+/* ---------- Glass cells ---------- */
+.comparison-cell{
+  --cell-accent:var(--comparison-red);--cell-border:#efd6de;--cell-tint:#fff1f5;--cell-glow:#b83e5118;
+  position:relative;min-width:0;overflow:hidden;
+  border:1px solid var(--cell-border);border-radius:24px;
+  background:
+    radial-gradient(ellipse at 0% 0%,#ffffffd9,transparent 55%),
+    linear-gradient(130deg,#fffffff0,var(--cell-tint));
+  box-shadow:0 10px 30px #44226008,0 2px 6px #4422610a,inset 0 1px 0 #fff,inset 0 -1px 0 #ffffff80;
+  backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);
+}
+.comparison-cell--solution{--cell-accent:var(--comparison-green);--cell-border:#cfe5da;--cell-tint:#eef9f2;--cell-glow:#20734e18}
+.comparison-cell::before{
+  content:"";position:absolute;inset:0 0 auto 0;height:3px;opacity:.55;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--cell-accent),transparent);
+  transition:opacity .4s ease;
+}
+.comparison-cell::after{
+  content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,#ffffffb0,transparent);
+  transform:skewX(-18deg);opacity:0;
+}
+.comparison-column-heading{padding:28px 30px;border-radius:26px}
+.comparison-column-title{display:flex;align-items:center;gap:16px;min-width:0}
+.comparison-column-title h3{margin:0;font-size:clamp(19px,1.85vw,24px);font-weight:750;line-height:1.35;letter-spacing:-.035em;overflow-wrap:break-word;text-wrap:balance}
+.comparison-column-heading p{margin:12px 0 0 62px;color:var(--comparison-muted);font-size:14px;line-height:1.7}
+
+/* ---------- List & pairs ---------- */
+.comparison-list{display:grid;gap:18px;margin:0;padding:0;list-style:none;min-width:0}
+.comparison-pair{position:relative}
+
+/* Connector arrow: desktop = centered in the gutter between the two cards */
+.comparison-pair::before{
+  content:"";position:absolute;z-index:2;top:50%;left:50%;width:30px;height:30px;
+  transform:translate(-50%,-50%);border-radius:50%;border:1px solid #e1d2f1;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237542a4' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12h12M13 6l6 6-6 6'/%3E%3C/svg%3E") center/14px no-repeat,
+    linear-gradient(180deg,#fff,#f4ecfb);
+  box-shadow:0 6px 14px #7542a41c,inset 0 1px 0 #fff;
+  pointer-events:none;
+}
+.comparison-item{
+  padding:28px;
+  transition:transform .45s cubic-bezier(.2,.7,.2,1),background .35s ease,border-color .35s ease,box-shadow .45s ease;
+}
+.comparison-item-inner{display:flex;align-items:flex-start;gap:18px;min-width:0}
+
+/* ---------- Icons (position fixed; only the svg rotates) ---------- */
+.comparison-status{
+  display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;margin-top:2px;
+  border:1px solid #ffffffb8;border-radius:14px;color:#fff;
+  background:radial-gradient(circle at 25% 0%,#ffffff80,transparent 62%),linear-gradient(145deg,#e77593,#be3558);
+  box-shadow:0 8px 16px #b83e5126,inset 0 1px 2px #ffffffb8,inset 0 -2px 4px #8d163b24;
+  transition:box-shadow .4s ease,filter .4s ease;
+}
+.comparison-status--solution{
+  background:radial-gradient(circle at 25% 0%,#ffffff80,transparent 62%),linear-gradient(145deg,#48b88c,#208356);
+  box-shadow:0 8px 16px #20734e26,inset 0 1px 2px #ffffffb8,inset 0 -2px 4px #07533124;
+}
+.comparison-column-title .comparison-status{flex-basis:46px;width:46px;height:46px;margin-top:0;border-radius:16px}
+.comparison-status svg{
+  display:block;width:19px;height:19px;transform-box:view-box;transform-origin:12px 12px;
+  animation:comparison-icon-turn 18s cubic-bezier(.45,0,.25,1) infinite;
+}
+.comparison-status--solution svg{animation-delay:-3s}
+.comparison-pair:nth-child(2n) .comparison-status svg{animation-delay:-6s}
+.comparison-pair:nth-child(3n) .comparison-status svg{animation-delay:-9s}
+@keyframes comparison-icon-turn{0%,72%{transform:rotate(0deg)}92%,100%{transform:rotate(360deg)}}
+
+/* ---------- Copy ---------- */
+.comparison-copy{flex:1;min-width:0}
+.comparison-mobile-label{display:flex;align-items:center;gap:9px;margin-bottom:10px;color:var(--cell-accent);font-size:10.5px;font-weight:750;line-height:1.5;letter-spacing:.09em;text-transform:uppercase}
+.comparison-number{
+  display:inline-grid;place-items:center;min-width:26px;height:21px;padding:0 5px;
+  border:1px solid var(--cell-border);border-radius:7px;background:#ffffffc0;
+  box-shadow:inset 0 1px 0 #fff;font-size:10px;letter-spacing:0;font-variant-numeric:tabular-nums;
+}
+.comparison-copy h3{margin:0;font-size:clamp(17px,1.5vw,20.5px);font-weight:700;line-height:1.4;letter-spacing:-.027em;overflow-wrap:break-word;text-wrap:balance;transition:color .3s ease}
+.comparison-copy p{margin:11px 0 0;color:var(--comparison-muted);font-size:14.5px;line-height:1.75;overflow-wrap:break-word;text-wrap:pretty}
+
+/* ---------- CTA ---------- */
+.comparison-cta{
+  position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:32px;
+  margin-top:36px;padding:38px 40px;border:1px solid #e2d2f1;border-radius:30px;
+  background:
+    radial-gradient(ellipse at 0% 0%,#e9dbfaa0,transparent 62%),
+    radial-gradient(ellipse at 100% 100%,#efdffa80,transparent 55%),
+    linear-gradient(120deg,#fffffff2,#f4edfcd0);
+  backdrop-filter:blur(24px) saturate(1.5);-webkit-backdrop-filter:blur(24px) saturate(1.5);
+  box-shadow:0 22px 56px #7643ad12,0 4px 12px #7643ad0a,inset 0 1px 0 #fff;
+}
+.comparison-cta h3{max-width:560px;margin:0;font-size:clamp(22px,2.2vw,30px);font-weight:760;line-height:1.3;letter-spacing:-.038em;text-wrap:balance;overflow-wrap:break-word}
+.comparison-cta-action{min-width:0;max-width:100%}
+.landing-comparison .comparison-cta-button{
+  position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  min-width:0;max-width:100%;min-height:58px;height:auto;padding:17px 28px;
+  border:1px solid #ffffff90;border-radius:18px;color:#fff;
+  background:linear-gradient(180deg,#ffffff38,transparent 55%),linear-gradient(115deg,#9856d8,#7b3bbd 55%,#6c32aa);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  box-shadow:0 12px 28px #7637ba38,inset 0 1px 1px #ffffff90,inset 0 -2px 1px #51228055;
+  font-family:inherit;font-size:15px;font-weight:700;line-height:1.45;letter-spacing:-.015em;text-align:center;text-decoration:none;
+  text-wrap:balance;white-space:normal;overflow-wrap:break-word;cursor:pointer;
+  transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s ease,filter .35s ease;
+}
+.landing-comparison .comparison-cta-button::after{
+  content:"";position:absolute;top:0;bottom:0;left:-70%;width:45%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,#ffffff55,transparent);transform:skewX(-20deg);
+}
+.comparison-cta-button:focus-visible{outline:3px solid #7542a4;outline-offset:5px}
+.landing-comparison .comparison-cta-button:active{transform:translateY(1px) scale(.99)}
+
+/* ---------- Hover (pointer devices only) ---------- */
+@media(hover:hover) and (pointer:fine){
+  .comparison-item:hover{
+    transform:translateY(-4px);
+    background:radial-gradient(ellipse at 0% 0%,#fff,transparent 55%),linear-gradient(130deg,#fff,var(--cell-tint));
+    border-color:var(--cell-accent);
+    box-shadow:0 20px 44px var(--cell-glow),0 4px 10px #44226010,inset 0 1px 0 #fff;
+  }
+  .comparison-item:hover::before{opacity:1}
+  .comparison-item:hover::after{animation:comparison-sheen 1.1s ease forwards}
+  .comparison-item:hover .comparison-copy h3{color:var(--cell-accent)}
+  .comparison-item:hover .comparison-status{filter:saturate(1.15);box-shadow:0 12px 22px var(--cell-glow),inset 0 1px 2px #ffffffb8}
+  .landing-comparison .comparison-cta-button:hover{transform:translateY(-3px);filter:brightness(1.07);box-shadow:0 18px 36px #7637ba48,inset 0 1px 1px #ffffffa8}
+  .landing-comparison .comparison-cta-button:hover::after{animation:comparison-sheen 1s ease forwards}
+}
+@keyframes comparison-sheen{from{left:-60%;opacity:1}to{left:130%;opacity:0}}
+
+/* ---------- Tablet (768–1023) ---------- */
+@media(min-width:768px) and (max-width:1023px){
+  .landing-comparison{--comparison-gap:20px}
+  .comparison-pair::before{display:none}
+  .comparison-column-heading,.comparison-item{padding:24px 22px}
+  .comparison-item-inner{gap:14px}
+  .comparison-column-heading p{margin-left:0}
+  .comparison-cta{grid-template-columns:minmax(0,1fr);gap:22px;padding:34px 30px}
+  .comparison-cta-action{justify-self:start}
 }
 
-const iconThemes = ['peach', 'lavender', 'gold', 'lavender', 'peach']
+/* ---------- Mobile (≤767) ---------- */
+@media(max-width:767px){
+  .landing-comparison{padding:56px 0 104px} /* extra bottom room so a sticky CTA bar never hides the last card */
+  .comparison-container{width:calc(100% - 32px)}
+  .comparison-eyebrow{font-size:11.5px;padding:9px 14px;margin-bottom:20px}
+  .comparison-header h2{font-size:clamp(28px,8vw,38px);line-height:1.15}
+  .comparison-header p{margin-top:18px;font-size:15px;line-height:1.75}
+  .comparison-board{margin-top:34px}
+  .comparison-column-headings{display:none}
+  .comparison-list{gap:22px}
+
+  /* Each pair becomes a glass-framed stack: problem, arrow row, solution */
+  .comparison-pair{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto;
+    gap:6px;padding:10px;
+    border:1px solid #e8def0;border-radius:28px;
+    background:linear-gradient(160deg,#ffffffa0,#f6f0fc80);
+    box-shadow:0 12px 32px #57347b0a,inset 0 1px 0 #fff;
+  }
+  .comparison-pair > .comparison-item:first-child{order:0}
+  .comparison-pair > .comparison-item:last-child{order:2}
+
+  /* Arrow is now a real grid row between the cards: centered, never overlapping */
+  .comparison-pair::before{
+    order:1;position:relative;top:auto;left:auto;z-index:auto;
+    justify-self:center;align-self:center;
+    width:32px;height:32px;margin:0;
+    transform:rotate(90deg);
+    background-size:15px,auto;
+  }
+
+  .comparison-item{padding:20px 18px;border-radius:20px}
+
+  /* Icon + number + label share one header row; title and text use the full card width */
+  .comparison-item-inner{display:grid;grid-template-columns:36px minmax(0,1fr);column-gap:12px;align-items:center}
+  .comparison-copy{display:contents}
+  .comparison-status{grid-column:1;grid-row:1;flex-basis:auto;width:36px;height:36px;margin:0;border-radius:12px}
+  .comparison-status svg{width:18px;height:18px}
+  .comparison-mobile-label{grid-column:2;grid-row:1;margin:0;min-width:0;font-size:11px}
+  .comparison-copy h3{grid-column:1 / -1;grid-row:2;margin:16px 0 0;font-size:clamp(18px,5vw,20px);line-height:1.38}
+  .comparison-copy p{grid-column:1 / -1;grid-row:3;margin:10px 0 0;font-size:14.5px;line-height:1.75}
+
+  .comparison-cta{grid-template-columns:minmax(0,1fr);gap:22px;padding:28px 20px;margin-top:28px;border-radius:26px;text-align:center}
+  .comparison-cta h3{max-width:none;margin-inline:auto;font-size:clamp(21px,6vw,26px)}
+  .comparison-cta-action{width:100%}
+  .landing-comparison .comparison-cta-button{width:100%;min-height:56px;font-size:15px;padding:16px 18px}
+  .landing-comparison::before{width:260px;height:260px}
+  .landing-comparison::after{width:280px;height:280px}
+}
+
+/* ---------- Small phones (≤359) ---------- */
+@media(max-width:359px){
+  .comparison-container{width:calc(100% - 24px)}
+  .comparison-pair{padding:7px;border-radius:24px}
+  .comparison-item{padding:18px 14px;border-radius:18px}
+  .comparison-item-inner{grid-template-columns:32px minmax(0,1fr);column-gap:10px}
+  .comparison-status{width:32px;height:32px;border-radius:10px}
+  .comparison-status svg{width:16px;height:16px}
+  .comparison-copy h3{font-size:17px}
+  .comparison-copy p{font-size:14px}
+  .comparison-eyebrow{letter-spacing:0}
+  .comparison-eyebrow::before{display:none}
+  .comparison-cta{padding:24px 16px}
+}
+
+/* ---------- Reduced motion ---------- */
+@media(prefers-reduced-motion:reduce){
+  .landing-comparison *,.landing-comparison *::before,.landing-comparison *::after{animation:none!important;transition:none!important}
+  .landing-comparison .comparison-reveal{opacity:1!important;transform:none!important}
+  .comparison-item:hover,.landing-comparison .comparison-cta-button:hover,.landing-comparison .comparison-cta-button:active{transform:none}
+}
+`
 
 export default function Problems() {
+  const headingId = useId()
+
   return (
-    <section className="lp-problems">
-      <style>{`
-        .lp-problems {
-          --lp-ink: #172440;
-          --lp-muted: #5e6c82;
-          --lp-blue: #3569e8;
-          position: relative;
-          isolation: isolate;
-          overflow: hidden;
-          padding: clamp(64px, 7.5vw, 112px) 0;
-          color: var(--lp-ink);
-          background:
-            radial-gradient(
-              ellipse at 7% 18%,
-              rgba(214, 230, 255, .64),
-              transparent 43%
-            ),
-            radial-gradient(
-              ellipse at 94% 75%,
-              rgba(231, 224, 255, .52),
-              transparent 42%
-            ),
-            linear-gradient(180deg, #fbfcff, #f4f7fc 55%, #fbfcff);
-        }
-
-        .lp-problems,
-        .lp-problems *,
-        .lp-problems *::before,
-        .lp-problems *::after {
-          box-sizing: border-box;
-        }
-
-        .lp-problems::before {
-          content: "";
-          position: absolute;
-          z-index: -1;
-          inset: 0;
-          pointer-events: none;
-          background-image:
-            linear-gradient(rgba(66, 98, 151, .035) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(66, 98, 151, .035) 1px, transparent 1px);
-          background-size: 56px 56px;
-          -webkit-mask-image: linear-gradient(#000, transparent 82%);
-          mask-image: linear-gradient(#000, transparent 82%);
-        }
-
-        .lp-problems__header {
-          max-width: 850px;
-          margin-inline: auto;
-          text-align: center;
-        }
-
-        .lp-problems__pill {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 22px;
-        }
-
-        .lp-problems__pill > * {
-          max-width: 100%;
-          padding: 10px 18px;
-          border: 1px solid rgba(82, 118, 194, .16);
-          border-radius: 999px;
-          color: #365b9c;
-          background: rgba(255, 255, 255, .88);
-          box-shadow:
-            0 4px 16px rgba(45, 77, 135, .045),
-            inset 0 1px 0 #fff;
-          font-size: 12px;
-          font-weight: 700;
-          line-height: 1.5;
-          letter-spacing: .035em;
-          white-space: normal;
-        }
-
-        .lp-problems__header h2 {
-          max-width: 780px;
-          margin-inline: auto;
-          color: var(--lp-ink);
-          font-size: clamp(30px, 4.2vw, 52px);
-          font-weight: 750;
-          line-height: 1.12;
-          letter-spacing: -.045em;
-          text-wrap: balance;
-        }
-
-        .lp-problems__header p {
-          max-width: 690px;
-          margin-inline: auto;
-          color: var(--lp-muted);
-          font-size: clamp(15px, 1.3vw, 17px);
-          line-height: 1.85;
-          text-wrap: pretty;
-        }
-
-        .lp-problems__divider {
-          width: 64px;
-          height: 4px;
-          margin: 28px auto 0;
-          border-radius: 999px;
-          background: linear-gradient(90deg, #a8c7ff, #537ee9, #c4b5f5);
-          box-shadow: 0 4px 14px rgba(83, 126, 233, .18);
-        }
-
-        .lp-problems__grid {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr);
-          align-items: stretch;
-          gap: 20px;
-          margin-top: clamp(32px, 4.5vw, 56px);
-        }
-
-        .lp-problems__item {
-          display: flex;
-          min-width: 0;
-          height: 100%;
-        }
-
-        .lp-problem-card {
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          width: 100%;
-          min-width: 0;
-          height: 100%;
-          padding: clamp(23px, 2.3vw, 32px);
-          border: 1px solid rgba(133, 156, 195, .2);
-          border-radius: 26px;
-          background: rgba(255, 255, 255, .93);
-          box-shadow:
-            0 14px 38px -24px rgba(30, 58, 104, .25),
-            0 3px 8px rgba(30, 58, 104, .025),
-            inset 0 1px 0 #fff;
-          transition:
-            transform .3s ease,
-            box-shadow .3s ease,
-            border-color .3s ease;
-        }
-
-        .lp-problem-card::before {
-          content: "";
-          position: absolute;
-          top: -1px;
-          left: 30px;
-          right: 30px;
-          height: 2px;
-          border-radius: 999px;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(107, 150, 237, .7),
-            transparent
-          );
-          opacity: 0;
-          transition: opacity .3s ease;
-        }
-
-        .lp-problem-card__top {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          margin-bottom: 24px;
-        }
-
-        /* Raised pastel icons — reference image style */
-
-        .lp-problem-card__icon {
-          --icon-top: #fff8f2;
-          --icon-bottom: #ffe8d9;
-          --icon-border: #f4ceb9;
-          --icon-color: #d77852;
-          --icon-base: #dcae97;
-          --icon-shadow: rgba(175, 104, 71, .19);
-
-          position: relative;
-          isolation: isolate;
-          display: grid;
-          flex: 0 0 auto;
-          place-items: center;
-          width: 58px;
-          height: 58px;
-          margin-bottom: 6px;
-          border: 1px solid var(--icon-border);
-          border-radius: 19px;
-          color: var(--icon-color);
-          background: linear-gradient(
-            145deg,
-            var(--icon-top),
-            var(--icon-bottom)
-          );
-          box-shadow:
-            0 6px 0 -1px var(--icon-base),
-            0 12px 18px -7px var(--icon-shadow),
-            inset 0 1px 1px rgba(255, 255, 255, .98),
-            inset 0 -1px 2px rgba(255, 255, 255, .5);
-          transition: transform .3s ease;
-        }
-
-        .lp-problem-card__icon::before {
-          content: "";
-          position: absolute;
-          inset: 2px;
-          border: 1px solid rgba(255, 255, 255, .58);
-          border-radius: 16px;
-          pointer-events: none;
-        }
-
-        .lp-problem-card__icon svg {
-          position: relative;
-          display: block;
-          width: 27px;
-          height: 27px;
-          filter: drop-shadow(0 1px 0 rgba(255, 255, 255, .75));
-        }
-
-        .lp-problem-card__icon--peach {
-          --icon-top: #fffaf5;
-          --icon-bottom: #ffeadc;
-          --icon-border: #f4cfba;
-          --icon-color: #d77750;
-          --icon-base: #dcaf98;
-          --icon-shadow: rgba(175, 104, 71, .19);
-        }
-
-        .lp-problem-card__icon--lavender {
-          --icon-top: #fdfaff;
-          --icon-bottom: #f0e6fa;
-          --icon-border: #dfc7f1;
-          --icon-color: #8650ad;
-          --icon-base: #c7a7de;
-          --icon-shadow: rgba(126, 76, 160, .18);
-        }
-
-        .lp-problem-card__icon--gold {
-          --icon-top: #fffdf4;
-          --icon-bottom: #fff2c9;
-          --icon-border: #eed68d;
-          --icon-color: #b28b2c;
-          --icon-base: #d7bd6e;
-          --icon-shadow: rgba(157, 126, 37, .18);
-        }
-
-        .lp-problem-card__number {
-          color: #76869e;
-          font-size: 12px;
-          font-weight: 650;
-          line-height: 1;
-          letter-spacing: .1em;
-          font-variant-numeric: tabular-nums;
-        }
-
-        .lp-problem-card__title {
-          margin: 0;
-          color: var(--lp-ink);
-          font-size: clamp(19px, 1.7vw, 22px);
-          font-weight: 700;
-          line-height: 1.35;
-          letter-spacing: -.025em;
-          overflow-wrap: anywhere;
-          text-wrap: pretty;
-        }
-
-        .lp-problem-card__description {
-          margin: 12px 0 24px;
-          color: var(--lp-muted);
-          font-size: 15px;
-          line-height: 1.8;
-          overflow-wrap: anywhere;
-        }
-
-        .lp-problem-card__solution {
-          margin-top: auto;
-          padding: 17px 18px;
-          border: 1px solid rgba(66, 150, 112, .13);
-          border-radius: 17px;
-          background: linear-gradient(135deg, #f3faf6, #edf7f3);
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85);
-        }
-
-        .lp-problem-card__solution-label {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 8px;
-          color: #26744f;
-          font-size: 12px;
-          font-weight: 750;
-          line-height: 1.5;
-          letter-spacing: .015em;
-        }
-
-        .lp-problem-card__check {
-          display: grid;
-          flex: 0 0 auto;
-          place-items: center;
-          width: 23px;
-          height: 23px;
-          border-radius: 50%;
-          color: #26744f;
-          background: #deeee5;
-        }
-
-        .lp-problem-card__solution-text {
-          margin: 0;
-          color: #465f56;
-          font-size: 14px;
-          line-height: 1.75;
-          overflow-wrap: anywhere;
-        }
-
-        .lp-problems__cta {
-          position: relative;
-          isolation: isolate;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          justify-content: center;
-          width: 100%;
-          min-width: 0;
-          height: 100%;
-          min-height: 340px;
-          overflow: hidden;
-          padding: clamp(26px, 2.8vw, 38px);
-          border: 1px solid rgba(255, 255, 255, .45);
-          border-radius: 26px;
-          color: #fff;
-          background:
-            radial-gradient(
-              circle at 100% 0%,
-              rgba(182, 166, 255, .4),
-              transparent 53%
-            ),
-            linear-gradient(140deg, #344ea1, #514bb6 55%, #7653c3);
-          box-shadow:
-            0 20px 42px -22px rgba(69, 67, 153, .55),
-            inset 0 1px 0 rgba(255, 255, 255, .3);
-          transition: transform .3s ease, box-shadow .3s ease;
-        }
-
-        .lp-problems__cta::before,
-        .lp-problems__cta::after {
-          content: "";
-          position: absolute;
-          z-index: -1;
-          width: 260px;
-          height: 260px;
-          right: -145px;
-          bottom: -130px;
-          border: 1px solid rgba(255, 255, 255, .14);
-          border-radius: 50%;
-          pointer-events: none;
-        }
-
-        .lp-problems__cta::after {
-          width: 350px;
-          height: 350px;
-          right: -190px;
-          bottom: -175px;
-        }
-
-        .lp-problems__cta-icon {
-          display: grid;
-          place-items: center;
-          width: 60px;
-          height: 60px;
-          margin-bottom: 28px;
-          border: 1px solid rgba(255, 255, 255, .26);
-          border-radius: 20px;
-          background: rgba(255, 255, 255, .12);
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2);
-        }
-
-        .lp-problems__cta-title {
-          max-width: 320px;
-          margin: 0;
-          color: #fff;
-          font-size: clamp(25px, 2.4vw, 32px);
-          font-weight: 700;
-          line-height: 1.25;
-          letter-spacing: -.035em;
-          text-wrap: balance;
-        }
-
-        .lp-problems__cta-action {
-          width: 100%;
-          min-width: 0;
-          margin-top: 30px;
-        }
-
-        .lp-problems .lp-problems__cta-button {
-          position: relative;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 9px;
-          width: 100%;
-          max-width: 100%;
-          min-width: 0;
-          min-height: 56px;
-          height: auto;
-          padding: 15px 18px;
-          overflow: hidden;
-          border: 1px solid #ffffff80;
-          border-radius: 18px;
-          color: #2B1245;
-          background: linear-gradient(to right, #FF8A3D, #FFC93C);
-          box-shadow:
-            0 5px 0 -1px #d97932,
-            0 16px 30px -13px #ff8a3d80,
-            inset 0 1px 0 #ffffff80;
-          font-family: inherit;
-          font-size: 15.5px;
-          font-weight: 700;
-          line-height: 1.5;
-          text-align: center;
-          text-decoration: none;
-          white-space: normal;
-          overflow-wrap: anywhere;
-          cursor: pointer;
-          transition:
-            transform .3s cubic-bezier(.22, 1, .36, 1),
-            box-shadow .3s ease,
-            filter .3s ease;
-        }
-
-        .lp-problems__cta-button:focus-visible {
-          outline: 3px solid #fff;
-          outline-offset: 5px;
-        }
-
-        @supports (backdrop-filter: blur(16px)) {
-          .lp-problem-card {
-            background: rgba(255, 255, 255, .78);
-            backdrop-filter: blur(16px);
-          }
-
-          .lp-problems__cta-icon {
-            backdrop-filter: blur(12px);
-          }
-        }
-
-        @media (min-width: 768px) {
-          .lp-problems__grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 22px;
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .lp-problems__grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 24px;
-          }
-        }
-
-        @media (hover: hover) and (pointer: fine) {
-          .lp-problem-card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(103, 142, 218, .38);
-            box-shadow:
-              0 24px 44px -24px rgba(38, 74, 139, .32),
-              inset 0 1px 0 #fff;
-          }
-
-          .lp-problem-card:hover::before {
-            opacity: 1;
-          }
-
-          .lp-problem-card:hover .lp-problem-card__icon {
-            transform: translateY(-3px) rotate(-3deg);
-          }
-
-          .lp-problems__cta:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 26px 48px -23px rgba(69, 67, 153, .65);
-          }
-
-          .lp-problems .lp-problems__cta-button:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.05);
-            box-shadow:
-              0 5px 0 -1px #d97932,
-              0 22px 34px -14px #ff8a3d99,
-              inset 0 1px 0 #ffffff80;
-          }
-        }
-
-        @media (max-width: 767px) {
-          .lp-problems__header h2 {
-            letter-spacing: -.035em;
-          }
-
-          .lp-problem-card {
-            border-radius: 22px;
-          }
-
-          .lp-problem-card__top {
-            margin-bottom: 20px;
-          }
-
-          .lp-problems__cta {
-            min-height: 300px;
-            border-radius: 22px;
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .lp-problems *,
-          .lp-problems *::before,
-          .lp-problems *::after {
-            animation: none !important;
-            transition: none !important;
-          }
-
-          .lp-problems__item,
-          .lp-problems__pill {
-            opacity: 1 !important;
-            transform: none !important;
-          }
-
-          .lp-problem-card:hover .lp-problem-card__icon {
-            transform: none;
-          }
-        }
-      `}</style>
-
-      <Container>
-        <div className="lp-problems__header">
-          <Reveal className="lp-problems__pill">
-            <Pill>Common landing page problems</Pill>
-          </Reveal>
-
-          <SectionHead
-            title="Getting Clicks, but Not Enough Enquiries?"
-            text="Your landing page is where visitors decide whether your offer is right for them. If the message is unclear or the next step feels difficult, interested people may leave before connecting with you."
-          />
-
-          <div className="lp-problems__divider" aria-hidden="true" />
-        </div>
-
-        <div className="lp-problems__grid">
-          {problems.map(([title, description, improvement], index) => (
-            <Reveal
-              key={title}
-              delay={Math.min(index * 70, 350)}
-              className="lp-problems__item"
-            >
-              <article className="lp-problem-card">
-                <div className="lp-problem-card__top">
-                  <span
-                    className={`lp-problem-card__icon lp-problem-card__icon--${
-                      iconThemes[index % iconThemes.length]
-                    }`}
-                  >
-                    <ProblemIcon index={index} />
-                  </span>
-
-                  <span
-                    className="lp-problem-card__number"
-                    aria-hidden="true"
-                  >
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                </div>
-
-                <h3 className="lp-problem-card__title">
-                  {title}
-                </h3>
-
-                <p className="lp-problem-card__description">
-                  {description}
-                </p>
-
-                <div className="lp-problem-card__solution">
-                  <div className="lp-problem-card__solution-label">
-                    <span className="lp-problem-card__check">
-                      <CheckIcon />
-                    </span>
-
-                    <span>What We Improve:</span>
-                  </div>
-
-                  <p className="lp-problem-card__solution-text">
-                    {improvement}
-                  </p>
-                </div>
-              </article>
-            </Reveal>
-          ))}
-
-          <Reveal delay={350} className="lp-problems__item">
-            <div className="lp-problems__cta">
-              <span className="lp-problems__cta-icon">
-                <SparkIcon />
-              </span>
-
-              <h3 className="lp-problems__cta-title">
-                Ready to turn more visits into conversations?
-              </h3>
-
-              <div className="lp-problems__cta-action">
-                <Button className="lp-problems__cta-button">
-                  Get More Enquiries
-                </Button>
+    <section className="landing-comparison" aria-labelledby={headingId}>
+      <style>{styles}</style>
+
+      <div className="comparison-container">
+        <header className="comparison-header">
+          <span className="comparison-eyebrow">
+            Common Landing Page Problems &amp; Solutions
+          </span>
+          <h2 id={headingId}>
+            Getting Clicks, but{' '}
+            <span>Not Enough Enquiries?</span>
+          </h2>
+          <p>
+            Your landing page is where visitors decide whether your offer is
+            right for them. If the message is unclear or the next step feels
+            difficult, interested people may leave before connecting with you.
+          </p>
+        </header>
+
+        <div className="comparison-board">
+          <div className="comparison-column-headings">
+            <div className="comparison-cell comparison-column-heading">
+              <div className="comparison-column-title">
+                <StatusIcon />
+                <h3>What Holds Visitors Back</h3>
               </div>
+              <p>Common landing page problems.</p>
             </div>
-          </Reveal>
+            <div className="comparison-cell comparison-cell--solution comparison-column-heading">
+              <div className="comparison-column-title">
+                <StatusIcon solution />
+                <h3>How We Improve the Experience</h3>
+              </div>
+              <p>A clearer path from interest to enquiry.</p>
+            </div>
+          </div>
+
+          <ul className="comparison-list">
+            {problems.map(([title, description, improvement], index) => {
+              const solution = solutionContent[title] || {
+                title: 'Create a Clearer Visitor Experience',
+                description: improvement,
+              }
+
+              return (
+                <li className="comparison-pair" key={title}>
+                  <article className="comparison-cell comparison-item">
+                    <Reveal
+                      delay={Math.min(index * 50, 200)}
+                      className="comparison-reveal"
+                    >
+                      <div className="comparison-item-inner">
+                        <StatusIcon />
+                        <div className="comparison-copy">
+                          <span className="comparison-mobile-label">
+                            <span className="comparison-number">
+                              {String(index + 1).padStart(2, '0')}
+                            </span>
+                            The Problem
+                          </span>
+                          <h3>{title}</h3>
+                          <p>{description}</p>
+                        </div>
+                      </div>
+                    </Reveal>
+                  </article>
+
+                  <article className="comparison-cell comparison-cell--solution comparison-item">
+                    <Reveal
+                      delay={Math.min(index * 50 + 60, 260)}
+                      className="comparison-reveal"
+                    >
+                      <div className="comparison-item-inner">
+                        <StatusIcon solution />
+                        <div className="comparison-copy">
+                          <span className="comparison-mobile-label">
+                            <span className="comparison-number">
+                              {String(index + 1).padStart(2, '0')}
+                            </span>
+                            Our Solution
+                          </span>
+                          <h3>{solution.title}</h3>
+                          <p>{solution.description}</p>
+                        </div>
+                      </div>
+                    </Reveal>
+                  </article>
+                </li>
+              )
+            })}
+          </ul>
         </div>
-      </Container>
+
+        <div className="comparison-cta">
+          <h3>Ready to turn more visits into conversations?</h3>
+          <div className="comparison-cta-action">
+            <Button className="comparison-cta-button">
+              Yes! Help Me Increase My Revenue
+            </Button>
+          </div>
+        </div>
+      </div>
     </section>
   )
 }
