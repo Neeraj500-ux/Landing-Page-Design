@@ -1,6 +1,8 @@
+import { useEffect, useRef, useState } from 'react'
 import { services } from '../data'
 import { Button, Check, Container, Reveal, SectionHead } from './ui'
 
+/* ---------- Icons (unchanged, just cleaner) ---------- */
 function ServiceIcon({ index }) {
   const icons = [
     <>
@@ -49,6 +51,182 @@ function ServiceIcon({ index }) {
   )
 }
 
+/* ---------- Cool animated background (sparkles) ---------- */
+function Sparkles() {
+  const sparkles = Array.from({ length: 14 })
+  return (
+    <div className="lp-services__sparkles" aria-hidden="true">
+      {sparkles.map((_, i) => (
+        <span
+          key={i}
+          className="lp-services__sparkle"
+          style={{
+            left: `${(i * 37) % 100}%`,
+            top: `${(i * 53) % 100}%`,
+            animationDelay: `${(i % 7) * 0.9}s`,
+            animationDuration: `${6 + (i % 5)}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+/* ---------- Animated orb (aurora) ---------- */
+function AuroraOrb() {
+  return (
+    <div className="lp-services__aurora" aria-hidden="true">
+      <span className="lp-services__aurora-orb lp-services__aurora-orb--1" />
+      <span className="lp-services__aurora-orb lp-services__aurora-orb--2" />
+      <span className="lp-services__aurora-orb lp-services__aurora-orb--3" />
+    </div>
+  )
+}
+
+/* ---------- Main component ---------- */
+export default function Services() {
+  const baseUrl = import.meta.env.BASE_URL || '/'
+  const imageUrl = `${baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`}images/Neeraj6.png`
+
+  // Track mouse for subtle parallax on the media card
+  const mediaRef = useRef(null)
+  const [tilt, setTilt] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const node = mediaRef.current
+    if (!node) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const hoverFine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    if (reduce || !hoverFine) return
+
+    const handleMove = (e) => {
+      const rect = node.getBoundingClientRect()
+      const px = (e.clientX - rect.left) / rect.width - 0.5
+      const py = (e.clientY - rect.top) / rect.height - 0.5
+      setTilt({ x: px * 6, y: py * -6 })
+    }
+    const handleLeave = () => setTilt({ x: 0, y: 0 })
+
+    node.addEventListener('mousemove', handleMove)
+    node.addEventListener('mouseleave', handleLeave)
+    return () => {
+      node.removeEventListener('mousemove', handleMove)
+      node.removeEventListener('mouseleave', handleLeave)
+    }
+  }, [])
+
+  return (
+    <section
+      id="get"
+      className="lp-services"
+      aria-label="Landing page services and deliverables"
+    >
+      <style>{styles}</style>
+
+      {/* Cool new backdrop layers */}
+      <AuroraOrb />
+      <Sparkles />
+
+      <Container className="lp-services__container">
+        <div className="lp-services__header">
+          <SectionHead
+            title="From Your First Headline to the Final Form—Every Part Has a Purpose."
+            text="We bring your message, design and functionality together to create a landing page that supports a clear business goal."
+          />
+        </div>
+
+        <Reveal className="lp-services__media-reveal">
+          <figure
+            ref={mediaRef}
+            className="lp-services__media"
+            style={{
+              transform: `perspective(1200px) rotateY(${tilt.x}deg) rotateX(${tilt.y}deg)`,
+            }}
+          >
+            <div className="lp-services__image-stage">
+              <img
+                src={imageUrl}
+                alt="Responsive landing page design displayed on desktop and mobile"
+                loading="lazy"
+                decoding="async"
+                className="lp-services__image"
+              />
+            </div>
+          </figure>
+        </Reveal>
+
+        <div className="lp-services__grid">
+          {services.map(([title, description, items], index) => (
+            <Reveal
+              key={title}
+              delay={(index % 3) * 80}
+              className="lp-services__card-reveal"
+            >
+              <article
+                className={`lp-services__card lp-services__card--${index}`}
+                aria-labelledby={`lp-service-title-${index}`}
+                style={{ '--card-index': index }}
+              >
+                <div className="lp-services__card-top">
+                  <span className="lp-services__icon">
+                    <ServiceIcon index={index} />
+                  </span>
+
+                  <span className="lp-services__number" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                </div>
+
+                <h3
+                  id={`lp-service-title-${index}`}
+                  className="lp-services__title"
+                >
+                  {title}
+                </h3>
+
+                <p className="lp-services__description">{description}</p>
+
+                <div className="lp-services__details">
+                  <p className="lp-services__list-label">
+                    {index === 4
+                      ? 'Available Within the Agreed Scope:'
+                      : 'What’s Included:'}
+                  </p>
+
+                  <ul className="lp-services__list">
+                    {items.map((item) => (
+                      <li key={item} className="lp-services__list-item">
+                        <span
+                          className="lp-services__check"
+                          aria-hidden="true"
+                        >
+                          <Check />
+                        </span>
+
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal className="lp-services__cta">
+          <Button
+            variant="dark"
+            className="site-cta--preserve-color lp-services__button"
+          >
+            Plan My Landing Page
+          </Button>
+        </Reveal>
+      </Container>
+    </section>
+  )
+}
+
+/* ---------- Styles (same palette + new cool layers) ---------- */
 const styles = `
   .lp-services {
     --services-ink: #302045;
@@ -71,6 +249,7 @@ const styles = `
     font-family: Inter, ui-sans-serif, system-ui, -apple-system,
       BlinkMacSystemFont, "Segoe UI", sans-serif;
     scroll-margin-top: 90px;
+    overflow: hidden;
   }
 
   .lp-services,
@@ -80,7 +259,83 @@ const styles = `
     box-sizing: border-box;
   }
 
+  /* ===== Aurora orbs ===== */
+  .lp-services__aurora {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .lp-services__aurora-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: .55;
+    will-change: transform;
+  }
+  .lp-services__aurora-orb--1 {
+    width: 420px; height: 420px;
+    top: -120px; left: -120px;
+    background: radial-gradient(circle, #c6a6ff 0%, transparent 70%);
+    animation: auroraFloat1 16s ease-in-out infinite;
+  }
+  .lp-services__aurora-orb--2 {
+    width: 500px; height: 500px;
+    top: 30%; right: -180px;
+    background: radial-gradient(circle, #ffd6b8 0%, transparent 70%);
+    animation: auroraFloat2 20s ease-in-out infinite;
+  }
+  .lp-services__aurora-orb--3 {
+    width: 380px; height: 380px;
+    bottom: -160px; left: 30%;
+    background: radial-gradient(circle, #d8bfe9 0%, transparent 70%);
+    animation: auroraFloat3 18s ease-in-out infinite;
+  }
+  @keyframes auroraFloat1 {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50%     { transform: translate(60px, 40px) scale(1.1); }
+  }
+  @keyframes auroraFloat2 {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50%     { transform: translate(-50px, 60px) scale(1.08); }
+  }
+  @keyframes auroraFloat3 {
+    0%,100% { transform: translate(0,0) scale(1); }
+    50%     { transform: translate(40px, -50px) scale(1.12); }
+  }
+
+  /* ===== Sparkles ===== */
+  .lp-services__sparkles {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .lp-services__sparkle {
+    position: absolute;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #b794e0;
+    box-shadow: 0 0 8px 2px #b794e080;
+    opacity: 0;
+    animation: sparkleFloat 8s linear infinite;
+  }
+  .lp-services__sparkle:nth-child(even) {
+    background: #f0b27a;
+    box-shadow: 0 0 8px 2px #f0b27a80;
+  }
+  @keyframes sparkleFloat {
+    0%   { opacity: 0; transform: translateY(0) scale(.6); }
+    20%  { opacity: .9; }
+    80%  { opacity: .6; }
+    100% { opacity: 0; transform: translateY(-140px) scale(1); }
+  }
+
   .lp-services .lp-services__container {
+    position: relative;
+    z-index: 1;
     width: 100%;
     max-width: 1200px;
     min-width: 0;
@@ -118,8 +373,7 @@ const styles = `
     overflow-wrap: break-word;
   }
 
-  /* Image: natural proportions, centered, no fixed height. */
-
+  /* ===== Media ===== */
   .lp-services__media-reveal {
     width: 100%;
     max-width: 1020px;
@@ -140,7 +394,8 @@ const styles = `
     box-shadow:
       inset 0 1px 0 #fff,
       0 24px 55px -36px #63418085;
-    transition: box-shadow .5s ease;
+    transition: box-shadow .5s ease, transform .3s ease;
+    transform-style: preserve-3d;
   }
 
   .lp-services__image-stage {
@@ -173,11 +428,6 @@ const styles = `
     transition: transform .85s var(--services-ease);
   }
 
-  /*
-    Scale from .975 to 1: a gentle zoom while keeping the
-    entire image inside its frame, including on hover.
-  */
-
   .lp-services__image-stage::after {
     content: "";
     position: absolute;
@@ -199,8 +449,7 @@ const styles = `
       opacity .35s ease;
   }
 
-  /* Cards */
-
+  /* ===== Cards ===== */
   .lp-services__grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -243,7 +492,21 @@ const styles = `
       transform .4s var(--services-ease),
       border-color .4s ease,
       box-shadow .4s ease;
+    overflow: hidden;
   }
+
+  /* Soft top-shine that fades on hover */
+  .lp-services__card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, #ffffffb0 0%, transparent 22%);
+    pointer-events: none;
+    opacity: .8;
+    transition: opacity .4s ease;
+  }
+  .lp-services__card:hover::before { opacity: .35; }
 
   .lp-services__card--1,
   .lp-services__card--4 {
@@ -316,6 +579,7 @@ const styles = `
     font-size: 11px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
+    transition: background .3s ease, color .3s ease, border-color .3s ease;
   }
 
   .lp-services .lp-services__title {
@@ -369,6 +633,11 @@ const styles = `
     color: #6c597a;
     font-size: 14px;
     line-height: 1.65;
+    transition: transform .25s var(--services-ease), color .25s ease;
+  }
+  .lp-services__list-item:hover {
+    transform: translateX(4px);
+    color: var(--tile-ink);
   }
 
   .lp-services__list-item > span:last-child {
@@ -387,6 +656,11 @@ const styles = `
     border-radius: 7px;
     color: var(--tile-ink);
     background: linear-gradient(145deg, #fff, var(--card-tint));
+    transition: transform .3s var(--services-ease), box-shadow .3s ease;
+  }
+  .lp-services__list-item:hover .lp-services__check {
+    transform: scale(1.12) rotate(-6deg);
+    box-shadow: 0 4px 10px -6px var(--tile-ink);
   }
 
   .lp-services__check svg {
@@ -397,8 +671,7 @@ const styles = `
     color: inherit;
   }
 
-  /* CTA: keep the existing Button colors and behavior. */
-
+  /* ===== CTA ===== */
   .lp-services__cta {
     display: flex;
     justify-content: center;
@@ -470,13 +743,11 @@ const styles = `
     transform: translateY(1px);
   }
 
-  /* Two columns on tablets; three on larger desktops. */
-
+  /* ===== Responsive ===== */
   @media (min-width: 700px) {
     .lp-services__grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
     .lp-services .lp-services__button {
       width: auto;
       min-width: 280px;
@@ -491,79 +762,66 @@ const styles = `
   }
 
   @media (max-width: 699px) {
-    .lp-services__header h2 {
-      max-width: 24ch;
-    }
-
-    .lp-services__card {
-      border-radius: 22px;
-    }
-
+    .lp-services__header h2 { max-width: 24ch; }
+    .lp-services__card { border-radius: 22px; }
     .lp-services__media {
       box-shadow:
         inset 0 1px 0 #fff,
         0 18px 34px -27px #63418080;
     }
+    .lp-services__aurora-orb { filter: blur(50px); opacity: .4; }
   }
 
   @media (max-width: 359px) {
-    .lp-services .lp-services__container {
-      padding-inline: 14px;
-    }
-
-    .lp-services__header h2 {
-      font-size: 26px;
-    }
-
-    .lp-services__card {
-      padding: 20px 18px;
-    }
-
+    .lp-services .lp-services__container { padding-inline: 14px; }
+    .lp-services__header h2 { font-size: 26px; }
+    .lp-services__card { padding: 20px 18px; }
     .lp-services .lp-services__button {
       padding-inline: 18px;
       font-size: 14px;
     }
   }
 
+  /* ===== Hover ===== */
   @media (hover: hover) and (pointer: fine) {
     .lp-services__media:hover {
       box-shadow:
         inset 0 1px 0 #fff,
         0 28px 58px -34px #63418090;
     }
-
     .lp-services__media:hover .lp-services__image {
-    transform: scale(1.04);
+      transform: scale(1.04);
     }
-
     .lp-services__media:hover .lp-services__image-stage::after {
       opacity: 1;
       transform: translateX(120%);
     }
-
     .lp-services__card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-6px);
       border-color: #d7c0e8;
       box-shadow:
         inset 0 1px 0 #fff,
         0 4px 0 -2px #e5d6f0,
-        0 24px 42px -28px #63418080;
+        0 28px 48px -28px #63418090;
     }
-
     .lp-services__card:hover .lp-services__icon {
-      transform: translateY(-2px) rotate(-3deg);
+      transform: translateY(-3px) rotate(-4deg);
     }
-
+    .lp-services__card:hover .lp-services__number {
+      background: #fff;
+      color: var(--tile-ink);
+      border-color: var(--tile-border);
+    }
     .lp-services .lp-services__button:hover {
       transform: translateY(-2px);
       box-shadow: 0 22px 34px -20px #634180aa;
     }
-
     .lp-services__button:hover::after {
       transform: translateX(140%);
     }
   }
 
+  /* ===== Reduced motion ===== */
   @media (prefers-reduced-motion: reduce) {
     .lp-services *,
     .lp-services *::before,
@@ -571,139 +829,29 @@ const styles = `
       animation: none !important;
       transition: none !important;
     }
-
+    .lp-services__aurora-orb,
+    .lp-services__sparkle {
+      animation: none !important;
+      opacity: .25;
+    }
+    .lp-services__sparkle { display: none; }
     .lp-services__media-reveal,
     .lp-services__card-reveal,
     .lp-services__cta {
       opacity: 1 !important;
       transform: none !important;
     }
-
     .lp-services .lp-services__image,
     .lp-services__media:hover .lp-services__image,
     .lp-services__card:hover,
     .lp-services__card:hover .lp-services__icon,
-    .lp-services .lp-services__button:hover {
-      transform: none;
+    .lp-services .lp-services__button:hover,
+    .lp-services__media {
+      transform: none !important;
     }
-
     .lp-services__image-stage::after,
     .lp-services__button::after {
       display: none;
     }
   }
 `
-
-export default function Services() {
-  const baseUrl = import.meta.env.BASE_URL || '/'
-  const imageUrl = `${
-    baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`
-  }images/Neeraj6.png`
-
-  return (
-    <section
-      id="get"
-      className="lp-services"
-      aria-label="Landing page services and deliverables"
-    >
-      <style>{styles}</style>
-
-      <Container className="lp-services__container">
-        <div className="lp-services__header">
-          <SectionHead
-            title="From Your First Headline to the Final Form—Every Part Has a Purpose."
-            text="We bring your message, design and functionality together to create a landing page that supports a clear business goal."
-          />
-        </div>
-
-        <Reveal className="lp-services__media-reveal">
-          <figure className="lp-services__media">
-            <div className="lp-services__image-stage">
-              <img
-                src={imageUrl}
-                alt="Responsive landing page design displayed on desktop and mobile"
-                loading="lazy"
-                decoding="async"
-                className="lp-services__image"
-              />
-            </div>
-          </figure>
-        </Reveal>
-
-        <div className="lp-services__grid">
-          {services.map(([title, description, items], index) => (
-            <Reveal
-              key={title}
-              delay={(index % 3) * 80}
-              className="lp-services__card-reveal"
-            >
-              <article
-                className={`lp-services__card lp-services__card--${index}`}
-                aria-labelledby={`lp-service-title-${index}`}
-              >
-                <div className="lp-services__card-top">
-                  <span className="lp-services__icon">
-                    <ServiceIcon index={index} />
-                  </span>
-
-                  <span
-                    className="lp-services__number"
-                    aria-hidden="true"
-                  >
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                </div>
-
-                <h3
-                  id={`lp-service-title-${index}`}
-                  className="lp-services__title"
-                >
-                  {title}
-                </h3>
-
-                <p className="lp-services__description">
-                  {description}
-                </p>
-
-                <div className="lp-services__details">
-                  <p className="lp-services__list-label">
-                    {index === 4
-                      ? 'Available Within the Agreed Scope:'
-                      : 'What’s Included:'}
-                  </p>
-
-                  <ul className="lp-services__list">
-                    {items.map((item) => (
-                      <li
-                        key={item}
-                        className="lp-services__list-item"
-                      >
-                        <span
-                          className="lp-services__check"
-                          aria-hidden="true"
-                        >
-                          <Check />
-                        </span>
-
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </article>
-            </Reveal>
-          ))}
-        </div>
-
-        <Reveal className="lp-services__cta">
-          <Button
-            variant="dark"
-            className="site-cta--preserve-color lp-services__button"
-          >
-            Plan My Landing Page
-          </Button>
-        </Reveal>
-      </Container>
-    </section>
-  )
-}

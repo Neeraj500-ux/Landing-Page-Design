@@ -1,5 +1,5 @@
 import { audiences } from '../data'
-import { Button, Check, Container, Reveal, SectionHead } from './ui'
+import { Button, Container, Reveal, SectionHead } from './ui'
 
 const baseUrl = import.meta.env.BASE_URL || '/'
 const imageBase = `${baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`}images/`
@@ -116,9 +116,6 @@ const styles = `
     margin-inline: auto;
   }
 
-  /* A consistent frame keeps all three images aligned.
-     Contain preserves the entire image without cropping. */
-
   .expert-audience__frame {
     position: relative;
     isolation: isolate;
@@ -219,59 +216,6 @@ const styles = `
     overflow-wrap: break-word;
   }
 
-  .expert-audience .expert-audience__list-label {
-    margin: 23px 0 0;
-    color: #543d66;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.5;
-  }
-
-  .expert-audience .expert-audience__list {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 12px 20px;
-    margin: 13px 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .expert-audience__list-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 9px;
-    min-width: 0;
-    color: #6c597a;
-    font-size: 14px;
-    line-height: 1.65;
-  }
-
-  .expert-audience__list-item > span:last-child {
-    min-width: 0;
-    overflow-wrap: break-word;
-  }
-
-  .expert-audience__check {
-    display: grid;
-    flex: 0 0 21px;
-    place-items: center;
-    width: 21px;
-    height: 21px;
-    margin-top: 1px;
-    border: 1px solid #e5d5ef;
-    border-radius: 7px;
-    color: var(--row-icon);
-    background: linear-gradient(145deg, #fff, var(--row-tint));
-  }
-
-  .expert-audience__check svg {
-    display: block;
-    width: 13px;
-    height: 13px;
-    margin: 0;
-    color: inherit;
-  }
-
   .expert-audience .expert-audience__goals {
     margin: 23px 0 0;
     padding: 16px 18px;
@@ -369,12 +313,6 @@ const styles = `
   .expert-audience .expert-audience__button:focus-visible {
     outline: 3px solid #a577d9;
     outline-offset: 5px;
-  }
-
-  @media (min-width: 560px) {
-    .expert-audience .expert-audience__list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
   }
 
   @media (min-width: 768px) and (max-width: 1023px) {
@@ -547,27 +485,6 @@ export default function Audience() {
                 <p className="expert-audience__description">
                   {audience.p}
                 </p>
-
-                <p className="expert-audience__list-label">
-                  Ideal for:
-                </p>
-
-                <ul className="expert-audience__list">
-                  {audience.l.map((item) => (
-                    <li
-                      key={item}
-                      className="expert-audience__list-item"
-                    >
-                      <span
-                        className="expert-audience__check"
-                        aria-hidden="true"
-                      >
-                        <Check />
-                      </span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
 
                 <p className="expert-audience__goals">
                   <strong>Page goals: </strong>

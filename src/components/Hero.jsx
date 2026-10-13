@@ -1120,9 +1120,7 @@ export default function Hero() {
 
             <Reveal delay={140}>
               <p className="premium-hero__subtitle">
-                We Build Complete Funnel Systems With High-Converting Landing
-                Pages, Automation, Custom Tracking, and Analytics to Turn More
-                Clicks Into Customers.
+                We dont just Build Landing Pages We Build Complete Funnel With High-Converting Pages, Automation, Custom Tracking, and Analytics.
               </p>
             </Reveal>
           </div>
