@@ -19,11 +19,11 @@ export default function App() {
         <Problems />
         <Process />
         <Audience />
-        <Services />
-        <Benefits />
-        <Work />
-        
-        <Why />
+        {/* <Services /> */}
+        {/* <Benefits /> */}
+        {/* <Work />  */}
+
+        <Why/>
         <FAQ />
         <Contact />
       </main>
