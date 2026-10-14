@@ -62,25 +62,6 @@ const items = [
   },
 ]
 
-const proofPoints = [
-  {
-    icon: 'offer',
-    title: 'Make Your Offer Clear',
-    description: 'Focused messaging and custom design showcase your expertise.',
-  },
-  {
-    icon: 'enquiry',
-    title: 'Make Enquiries Easy',
-    description: 'Simple forms and clear calls to action guide visitors forward.',
-  },
-  {
-    icon: 'leads',
-    title: 'Keep Leads Moving',
-    description:
-      'Automated follow-ups keep conversations going, while tracking helps you understand results.',
-  },
-]
-
 const numberFormatter = new Intl.NumberFormat('en-US')
 
 /* ==================== Motion hooks ==================== */
@@ -373,6 +354,21 @@ const styles = `
   --c-red: #b83e51;
   --c-green: #20734e;
   --c-purple: #7542a4;
+
+  /* Shared button look (yellow gradient + dark purple text) */
+  --btn-text: #3b0f4d;
+  --btn-bg: linear-gradient(180deg, #ffe985 0%, #ffd53d 48%, #ffb81c 100%);
+  --btn-bg-hover: linear-gradient(180deg, #fff0a0 0%, #ffdf5c 48%, #ffc236 100%);
+  --btn-border: #f2a900;
+  --btn-shadow:
+    0 8px 18px #ffa80040,
+    inset 0 1px 0 #ffffffb3,
+    inset 0 -3px 0 #e09600;
+  --btn-shadow-hover:
+    0 14px 26px #ffa80055,
+    inset 0 1px 0 #ffffffcc,
+    inset 0 -3px 0 #e09600;
+
   --c-ease: cubic-bezier(.22, 1, .36, 1);
   --c-ease-spring: cubic-bezier(.34, 1.56, .64, 1);
   position: relative;
@@ -616,18 +612,20 @@ const styles = `
   --cell-accent: var(--c-red);
   --cell-border: #efd6de;
   --cell-tint: #fff1f5;
+  --cell-hover: #e6c3cd;
   position: relative;
   min-width: 0;
   border: 1px solid var(--cell-border);
   border-radius: 24px;
   background: linear-gradient(130deg, #fffffff0, var(--cell-tint));
-  box-shadow: 0 10px 28px #44226008, inset 0 1px 0 #fff;
+  box-shadow: 0 1px 2px #4422600a, 0 12px 30px #44226009, inset 0 1px 0 #fff;
 }
 
 .comparison-cell--solution {
   --cell-accent: var(--c-green);
   --cell-border: #cfe5da;
   --cell-tint: #eef9f2;
+  --cell-hover: #b7dbc8;
 }
 
 .comparison-group-heading {
@@ -697,6 +695,8 @@ const styles = `
 .comparison-copy {
   flex: 1;
   min-width: 0;
+  padding-top: 2px;
+  padding-right: 40px;
 }
 
 .comparison-number {
@@ -711,38 +711,30 @@ const styles = `
   border: 1px solid var(--cell-border);
   border-radius: 9px;
   color: var(--cell-accent);
-  background: #ffffffb8;
-  font-size: 13px;
+  background: #ffffffd9;
+  box-shadow: 0 3px 8px #4422600a;
+  font-size: 12.5px;
   font-weight: 750;
+  letter-spacing: .02em;
   font-variant-numeric: tabular-nums;
 }
 
-.comparison-label {
-  display: block;
-  min-height: 20px;
-  padding-right: 44px;
-  margin-bottom: 8px;
-  color: var(--cell-accent);
-  font-size: 10px;
-  font-weight: 750;
-  line-height: 1.6;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-}
 
 .comparison-copy h3 {
   margin: 0;
   font-size: clamp(18px, 1.6vw, 21px);
   font-weight: 750;
-  line-height: 1.35;
-  letter-spacing: -.025em;
+  line-height: 1.32;
+  letter-spacing: -.028em;
+  text-wrap: balance;
 }
 
 .comparison-copy p {
-  margin: 9px 0 0;
+  margin: 8px 0 0;
   color: var(--c-muted);
   font-size: 14.5px;
   line-height: 1.7;
+  text-wrap: pretty;
 }
 
 .comparison-link {
@@ -794,38 +786,40 @@ const styles = `
   justify-content: center;
 }
 
-.landing-comparison .comparison-cta-button {
+/* ---------- Unified yellow button (all CTA buttons) ---------- */
+
+.landing-comparison a.comparison-cta-button {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   max-width: 100%;
   min-height: 56px;
-  padding: 17px 28px;
-  border: 1px solid #ffffff55;
-  border-radius: 16px;
-  color: #fff;
-  background: linear-gradient(135deg, #9a5ad4, #7542a4 55%, #6a359b);
-  box-shadow:
-    0 10px 24px #7542a42a,
-    inset 0 1px 0 #ffffff50,
-    inset 0 -1px 0 #4b226850;
+  padding: 17px 30px;
+  border: 1px solid var(--btn-border);
+  border-radius: 14px;
+  color: var(--btn-text);
+  background: var(--btn-bg);
+  box-shadow: var(--btn-shadow);
   font-family: inherit;
-  font-size: 15px;
-  font-weight: 750;
+  font-size: 16px;
+  font-weight: 800;
   line-height: 1.45;
+  letter-spacing: -.005em;
   text-align: center;
   text-decoration: none;
+  text-shadow: 0 1px 0 #ffffff55;
   overflow-wrap: anywhere;
   transition:
     transform 350ms var(--c-ease),
     box-shadow 350ms ease,
+    background 350ms ease,
     border-color 350ms ease;
 }
 
-.landing-comparison .comparison-cta-button:focus-visible {
-  outline: 3px solid #7542a4;
-  outline-offset: 5px;
+.landing-comparison a.comparison-cta-button:focus-visible {
+  outline: 3px solid var(--btn-text);
+  outline-offset: 4px;
 }
 
 .comparison-cta-note {
@@ -987,17 +981,23 @@ const styles = `
 .comparison-proof-bar--strong { width: 90%; background: #bfa4d6; }
 .comparison-proof-bar--short { width: 64%; }
 
+/* Phone mock "Learn more" button: same yellow style */
 .comparison-proof-ad-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   padding: 10px;
+  border: 1px solid var(--btn-border);
   border-radius: 9px;
-  color: #fff;
-  background: linear-gradient(135deg, #9a5ad4, #7542a4);
+  color: var(--btn-text);
+  background: var(--btn-bg);
+  box-shadow:
+    0 4px 10px #ffa80040,
+    inset 0 1px 0 #ffffffb3,
+    inset 0 -2px 0 #e09600;
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .comparison-proof-ad-button svg { width: 13px; height: 13px; }
@@ -1029,8 +1029,7 @@ const styles = `
 
 .comparison-proof-note > div { min-width: 0; }
 
-.comparison-proof-note-icon,
-.comparison-proof-icon {
+.comparison-proof-note-icon {
   display: grid;
   place-items: center;
   flex: 0 0 40px;
@@ -1171,57 +1170,6 @@ const styles = `
 
 .comparison-proof-lead strong { color: var(--c-ink); }
 
-.comparison-proof-list {
-  display: grid;
-  gap: 12px;
-  margin: 26px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.comparison-proof-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 15px;
-  padding: 17px 18px;
-  border: 1px solid #e5d9f1;
-  border-radius: 20px;
-  background: linear-gradient(140deg, #fffffff2, #f8f2fbd9);
-  box-shadow: inset 0 1px 0 #fff;
-  transition:
-    transform 400ms var(--c-ease),
-    box-shadow 400ms ease,
-    border-color 350ms ease;
-}
-
-.comparison-proof-icon svg {
-  width: 20px;
-  height: 20px;
-  transition: transform 500ms var(--c-ease);
-  overflow: visible;
-}
-
-.comparison-proof-icon {
-  animation: comparison-icon-bob 5.6s ease-in-out infinite;
-}
-
-.comparison-proof-item-copy { min-width: 0; }
-
-.comparison-proof-item h3 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 750;
-  line-height: 1.45;
-  letter-spacing: -.015em;
-}
-
-.comparison-proof-item p {
-  margin: 6px 0 0;
-  color: var(--c-muted);
-  font-size: 13.5px;
-  line-height: 1.7;
-}
-
 .comparison-proof-tagline {
   display: flex;
   flex-wrap: wrap;
@@ -1249,7 +1197,8 @@ const styles = `
 
   .comparison-item:hover {
     transform: translate3d(0, -3px, 0);
-    box-shadow: 0 16px 32px #44226010, inset 0 1px 0 #fff;
+    border-color: var(--cell-hover);
+    box-shadow: 0 18px 36px #44226014, inset 0 1px 0 #fff;
   }
 
   .comparison-item:hover .comparison-status {
@@ -1264,10 +1213,11 @@ const styles = `
     transform: rotate(7deg);
   }
 
-  .landing-comparison .comparison-cta-button:hover {
+  .landing-comparison a.comparison-cta-button:hover {
     transform: translate3d(0, -3px, 0);
-    border-color: #ffffff95;
-    box-shadow: 0 15px 30px #7542a438, inset 0 1px 0 #ffffff70;
+    border-color: var(--btn-border);
+    background: var(--btn-bg-hover);
+    box-shadow: var(--btn-shadow-hover);
   }
 
   .comparison-proof-visual:hover {
@@ -1275,35 +1225,21 @@ const styles = `
     box-shadow: 0 28px 55px #7542a41c, inset 0 1px 0 #fff;
   }
 
-  .comparison-proof-item:hover {
-    transform: translate3d(0, -2px, 0);
-    border-color: #cfb6e2;
-    box-shadow: 0 10px 22px #7542a40d;
-  }
-
-  .comparison-proof-item:hover .comparison-proof-icon {
-    animation: comparison-icon-jump 700ms var(--c-ease-spring) 1;
-  }
-
-  .comparison-proof-item:hover .comparison-proof-icon svg {
-    transform: rotate(-8deg);
-  }
 }
 
 /* Touch feedback instead of hover on phones and tablets */
 
 @media (hover: none) {
-  .comparison-item:active,
-  .comparison-proof-item:active {
+  .comparison-item:active {
     transform: scale(.985);
   }
 
-  .landing-comparison .comparison-cta-button:active {
+  .landing-comparison a.comparison-cta-button:active {
     transform: scale(.98);
   }
 }
 
-.landing-comparison .comparison-cta-button:active {
+.landing-comparison a.comparison-cta-button:active {
   transform: translate3d(0, 0, 0);
 }
 
@@ -1353,13 +1289,24 @@ const styles = `
     margin-bottom: 54px;
   }
 
+  /* Intro heading block: centered on mobile */
+  .comparison-intro-left { text-align: center; }
+
   .comparison-intro-eyebrow {
-    margin-bottom: 16px;
+    justify-content: center;
+    margin-bottom: 14px;
     font-size: 11px;
-    letter-spacing: .09em;
+    letter-spacing: .1em;
   }
 
-  .comparison-intro h2,
+  .comparison-intro h2 {
+    max-width: 17em;
+    margin-inline: auto;
+    font-size: clamp(28px, 8vw, 36px);
+    line-height: 1.16;
+    letter-spacing: -.032em;
+  }
+
   .comparison-header h2 {
     font-size: clamp(28px, 7.6vw, 38px);
     line-height: 1.18;
@@ -1371,10 +1318,14 @@ const styles = `
   }
 
   .comparison-intro-card p { font-size: 15px; line-height: 1.75; }
-  .comparison-intro-action { margin-top: 24px; }
+  .comparison-intro-action {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
 
-  .landing-comparison .comparison-intro-button,
-  .comparison-cta-action .comparison-cta-button {
+  .landing-comparison a.comparison-intro-button,
+  .comparison-cta-action a.comparison-cta-button {
     width: 100%;
     max-width: 360px;
   }
@@ -1427,9 +1378,9 @@ const styles = `
   }
 
   .comparison-number { top: 13px; right: 13px; }
-  .comparison-label { padding-right: 46px; }
+  .comparison-copy { padding-right: 34px; }
   .comparison-copy h3 { font-size: 18px; }
-  .comparison-copy p { font-size: 14.5px; }
+  .comparison-copy p { font-size: 14.5px; line-height: 1.65; }
 
   .comparison-cta {
     gap: 25px;
@@ -1439,10 +1390,10 @@ const styles = `
 
   .comparison-cta h3 { font-size: clamp(24px, 6.5vw, 30px); }
 
-  .landing-comparison .comparison-cta-button {
+  .landing-comparison a.comparison-cta-button {
     min-height: 56px;
     padding: 16px 18px;
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .comparison-proof { margin-top: 54px; gap: 34px; }
@@ -1504,23 +1455,6 @@ const styles = `
   .comparison-proof-title { font-size: clamp(28px, 7.2vw, 36px); }
   .comparison-proof-lead { font-size: 16px; }
 
-  .comparison-proof-list {
-    gap: 34px;
-    margin-top: 34px;
-  }
-
-  .comparison-proof-item {
-    gap: 14px;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .comparison-proof-item h3 { font-size: 15px; }
-  .comparison-proof-item p { font-size: 14px; }
-
   .comparison-proof-tagline {
     gap: 5px 8px;
     margin-top: 34px;
@@ -1558,10 +1492,10 @@ const styles = `
   }
 
   .comparison-group-title h3 { font-size: 18px; }
+  .comparison-copy { padding-right: 30px; }
   .comparison-copy h3 { font-size: 17px; }
   .comparison-eyebrow::before { display: none; }
   .comparison-cta { padding: 32px 16px 36px; }
-  .comparison-proof-item { gap: 10px; }
   .comparison-proof-stat-label { letter-spacing: .08em; }
 }
 
@@ -1584,13 +1518,10 @@ const styles = `
   .comparison-intro-card:hover,
   .comparison-item:hover,
   .comparison-proof-visual:hover,
-  .comparison-proof-item:hover,
   .comparison-item:hover .comparison-status svg,
-  .comparison-proof-item:hover .comparison-proof-icon svg,
-  .landing-comparison .comparison-cta-button:hover,
-  .landing-comparison .comparison-cta-button:active,
-  .comparison-item:active,
-  .comparison-proof-item:active {
+  .landing-comparison a.comparison-cta-button:hover,
+  .landing-comparison a.comparison-cta-button:active,
+  .comparison-item:active {
     transform: none !important;
   }
 }
@@ -1716,9 +1647,6 @@ export default function Problems() {
                         <StatusIcon />
 
                         <div className="comparison-copy">
-                          <span className="comparison-label">
-                            Problem {number}
-                          </span>
                           <h3>{problem.title}</h3>
                           <p>{problem.description}</p>
                         </div>
@@ -1739,9 +1667,6 @@ export default function Problems() {
                         <StatusIcon solution />
 
                         <div className="comparison-copy">
-                          <span className="comparison-label">
-                            Solution {number}
-                          </span>
                           <h3>{solution.title}</h3>
                           <p>{solution.description}</p>
                         </div>
@@ -1819,20 +1744,6 @@ export default function Problems() {
               enquiry.
             </p>
 
-            <ul className="comparison-proof-list">
-              {proofPoints.map(({ icon, title, description }) => (
-                <li className="comparison-proof-item" key={title}>
-                  <span className="comparison-proof-icon" aria-hidden="true">
-                    <Icon type={icon} />
-                  </span>
-
-                  <div className="comparison-proof-item-copy">
-                    <h3>{title}</h3>
-                    <p>{description}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
 
             <ul className="comparison-proof-tagline">
               <li>Clear Messaging.</li>

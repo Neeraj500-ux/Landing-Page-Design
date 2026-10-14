@@ -5,12 +5,28 @@ const baseUrl = import.meta.env.BASE_URL || '/'
 const imageBase = `${baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`}images/`
 
 const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
   .expert-audience {
     --audience-ink: #302045;
-    --audience-muted: #776684;
-    --audience-purple: #793fca;
-    --audience-border: #e9dff3;
+    --audience-muted: #6c607e;
+    --audience-purple: #7542a4;
+    --audience-border: #e4d8f3;
     --audience-ease: cubic-bezier(.22, 1, .36, 1);
+
+    /* Yellow button look (same as Problems.jsx) */
+    --btn-text: #3b0f4d;
+    --btn-bg: linear-gradient(180deg, #ffe985 0%, #ffd53d 48%, #ffb81c 100%);
+    --btn-bg-hover: linear-gradient(180deg, #fff0a0 0%, #ffdf5c 48%, #ffc236 100%);
+    --btn-border: #f2a900;
+    --btn-shadow:
+      0 8px 18px #ffa80040,
+      inset 0 1px 0 #ffffffb3,
+      inset 0 -3px 0 #e09600;
+    --btn-shadow-hover:
+      0 14px 26px #ffa80055,
+      inset 0 1px 0 #ffffffcc,
+      inset 0 -3px 0 #e09600;
 
     position: relative;
     isolation: isolate;
@@ -25,6 +41,8 @@ const styles = `
       linear-gradient(180deg, #fff, #fcfaff 55%, #fff);
     font-family: Inter, ui-sans-serif, system-ui, -apple-system,
       BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
     scroll-margin-top: 90px;
   }
 
@@ -54,10 +72,12 @@ const styles = `
     max-width: 23ch;
     margin-inline: auto;
     color: var(--audience-ink);
+    font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui,
+      -apple-system, "Segoe UI", sans-serif;
     font-size: clamp(28px, 4vw, 46px);
     font-weight: 800;
     line-height: 1.16;
-    letter-spacing: -.04em;
+    letter-spacing: -.035em;
     text-wrap: balance;
     overflow-wrap: break-word;
   }
@@ -128,10 +148,11 @@ const styles = `
     background: linear-gradient(145deg, #fff, var(--row-tint));
     box-shadow:
       inset 0 1px 0 #fff,
-      0 20px 45px -32px #63418080;
+      0 22px 48px -30px #63418090;
     transition:
-      transform .4s var(--audience-ease),
-      box-shadow .4s ease;
+      transform .45s var(--audience-ease),
+      box-shadow .45s ease,
+      border-color .35s ease;
   }
 
   .expert-audience__image-stage {
@@ -172,36 +193,38 @@ const styles = `
   .expert-audience__badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
     max-width: 100%;
-    padding: 8px 13px;
-    border: 1px solid #dfccf0;
+    padding: 9px 16px;
+    border: 1px solid #ddcdf0;
     border-radius: 999px;
-    color: #7542a3;
-    background: linear-gradient(135deg, #fff, #f2e8fc);
-    box-shadow: inset 0 1px 0 #fff;
-    font-size: 12px;
+    color: #6b3b8c;
+    background: linear-gradient(180deg, #ffffffe6, #f6effbc0);
+    box-shadow: 0 8px 24px #68428a0d, inset 0 1px 0 #fff;
+    font-size: 12.5px;
     font-weight: 700;
     line-height: 1.5;
   }
 
   .expert-audience__badge::before {
     content: "";
-    flex: 0 0 6px;
-    width: 6px;
-    height: 6px;
+    flex: 0 0 8px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: #a575ca;
-    box-shadow: 0 0 0 3px #a575ca14;
+    background: linear-gradient(135deg, #a066d6, #7542a4);
+    box-shadow: 0 0 0 4px #8750b814;
   }
 
   .expert-audience .expert-audience__title {
     max-width: 27ch;
-    margin: 16px 0 0;
+    margin: 18px 0 0;
     color: var(--audience-ink);
-    font-size: clamp(24px, 2.65vw, 33px);
-    font-weight: 750;
-    line-height: 1.23;
+    font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui,
+      -apple-system, "Segoe UI", sans-serif;
+    font-size: clamp(25px, 2.8vw, 35px);
+    font-weight: 800;
+    line-height: 1.2;
     letter-spacing: -.035em;
     text-wrap: balance;
     overflow-wrap: break-word;
@@ -210,29 +233,41 @@ const styles = `
   .expert-audience .expert-audience__description {
     margin: 16px 0 0;
     color: var(--audience-muted);
-    font-size: clamp(15px, 1.4vw, 16px);
+    font-size: clamp(15px, 1.4vw, 16.5px);
     line-height: 1.8;
     text-wrap: pretty;
     overflow-wrap: break-word;
   }
 
   .expert-audience .expert-audience__goals {
-    margin: 23px 0 0;
-    padding: 16px 18px;
-    border: 1px solid #e7dcef;
-    border-left: 3px solid #b48bd4;
-    border-radius: 15px;
-    color: #705b80;
-    background: linear-gradient(110deg, #f6effb, #fffaf6);
-    font-size: 14px;
+    position: relative;
+    margin: 24px 0 0;
+    padding: 18px 20px 18px 22px;
+    border: 1px solid #e4d8f3;
+    border-radius: 18px;
+    color: #6c607e;
+    background: linear-gradient(130deg, #fffffff0, #f7f0fcd8);
+    box-shadow: 0 12px 30px #44226009, inset 0 1px 0 #fff;
+    font-size: 14.5px;
     line-height: 1.75;
     text-wrap: pretty;
     overflow-wrap: break-word;
   }
 
+  .expert-audience .expert-audience__goals::before {
+    content: "";
+    position: absolute;
+    top: 16px;
+    bottom: 16px;
+    left: 0;
+    width: 4px;
+    border-radius: 0 4px 4px 0;
+    background: linear-gradient(180deg, #a066d6, #7542a4);
+  }
+
   .expert-audience__goals strong {
-    color: #543d66;
-    font-weight: 700;
+    color: var(--audience-purple);
+    font-weight: 800;
   }
 
   .expert-audience__cta {
@@ -244,7 +279,9 @@ const styles = `
     text-align: center;
   }
 
-  .expert-audience .expert-audience__button {
+  /* ---------- CTA button (yellow, same as Problems.jsx) ---------- */
+
+  .expert-audience .expert-audience__button.expert-audience__button {
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -255,41 +292,34 @@ const styles = `
     min-width: 0;
     min-height: 56px;
     height: auto;
-    padding: 16px 25px;
+    padding: 17px 30px;
     overflow: hidden;
-    border: 1px solid #ffffff45;
-    border-radius: 17px;
-    color: #fff;
-    background: linear-gradient(135deg, #9859de, #793fca 55%, #7238bd);
-    box-shadow:
-      0 5px 0 -1px #582b97,
-      0 18px 30px -17px #7941bc99,
-      inset 0 1px 0 #ffffff40;
+    border: 1px solid var(--btn-border);
+    border-radius: 14px;
+    color: var(--btn-text);
+    background: var(--btn-bg);
+    box-shadow: var(--btn-shadow);
+    filter: none;
     font-family: inherit;
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.5;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.45;
+    letter-spacing: -.005em;
     text-align: center;
     text-decoration: none;
+    text-shadow: 0 1px 0 #ffffff55;
     white-space: normal;
     overflow-wrap: anywhere;
     cursor: pointer;
     transition:
-      transform .3s var(--audience-ease),
-      box-shadow .3s ease,
-      filter .3s ease;
+      transform 350ms var(--audience-ease),
+      box-shadow 350ms ease,
+      background 350ms ease,
+      border-color 350ms ease;
   }
 
-  .expert-audience__button::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(
-      110deg, transparent 25%, #ffffff35 50%, transparent 75%
-    );
-    transform: translateX(-140%);
-    transition: transform .8s var(--audience-ease);
+  .expert-audience .expert-audience__button::after {
+    content: none;
   }
 
   .expert-audience__button > span {
@@ -303,16 +333,13 @@ const styles = `
     height: 20px;
   }
 
-  .expert-audience .expert-audience__button:active {
-    transform: translateY(3px);
-    box-shadow:
-      0 2px 0 -1px #582b97,
-      0 10px 18px -14px #7941bc99;
+  .expert-audience .expert-audience__button.expert-audience__button:active {
+    transform: translate3d(0, 0, 0);
   }
 
-  .expert-audience .expert-audience__button:focus-visible {
-    outline: 3px solid #a577d9;
-    outline-offset: 5px;
+  .expert-audience .expert-audience__button.expert-audience__button:focus-visible {
+    outline: 3px solid var(--btn-text);
+    outline-offset: 4px;
   }
 
   @media (min-width: 768px) and (max-width: 1023px) {
@@ -346,10 +373,18 @@ const styles = `
       order: 1;
     }
 
-    .expert-audience .expert-audience__button {
+    .expert-audience .expert-audience__button.expert-audience__button {
       width: auto;
       min-width: 300px;
-      padding-inline: 30px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .expert-audience .expert-audience__button.expert-audience__button {
+      width: 100%;
+      max-width: 360px;
+      padding: 16px 18px;
+      font-size: 15px;
     }
   }
 
@@ -367,34 +402,30 @@ const styles = `
     }
 
     .expert-audience .expert-audience__goals {
-      padding: 14px;
-    }
-
-    .expert-audience .expert-audience__button {
-      padding-inline: 16px;
-      font-size: 14px;
+      padding: 14px 14px 14px 18px;
     }
   }
 
   @media (hover: hover) and (pointer: fine) {
     .expert-audience__frame:hover {
-      transform: translateY(-3px);
+      transform: translateY(-4px);
+      border-color: #ccb0e2;
       box-shadow:
         inset 0 1px 0 #fff,
-        0 26px 48px -30px #63418085;
+        0 28px 52px -30px #63418095;
     }
 
-    .expert-audience .expert-audience__button:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.04);
-      box-shadow:
-        0 5px 0 -1px #582b97,
-        0 23px 34px -17px #7941bcaa,
-        inset 0 1px 0 #ffffff40;
+    .expert-audience .expert-audience__button.expert-audience__button:hover {
+      transform: translate3d(0, -3px, 0);
+      border-color: var(--btn-border);
+      background: var(--btn-bg-hover);
+      box-shadow: var(--btn-shadow-hover);
     }
+  }
 
-    .expert-audience__button:hover::after {
-      transform: translateX(140%);
+  @media (hover: none) {
+    .expert-audience .expert-audience__button.expert-audience__button:active {
+      transform: scale(.98);
     }
   }
 
@@ -414,8 +445,9 @@ const styles = `
     }
 
     .expert-audience__frame:hover,
-    .expert-audience .expert-audience__button:hover {
-      transform: none;
+    .expert-audience .expert-audience__button.expert-audience__button:hover,
+    .expert-audience .expert-audience__button.expert-audience__button:active {
+      transform: none !important;
     }
   }
 `
@@ -500,7 +532,7 @@ export default function Audience() {
             variant="dark"
             className="expert-audience__button"
           >
-             Yes! Let's Grow My Revenue 
+            Yes! Let's Grow My Revenue
           </Button>
         </Reveal>
       </Container>

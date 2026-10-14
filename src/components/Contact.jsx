@@ -10,9 +10,30 @@ const points = [
 ]
 
 const css = `
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
   .content-contact {
-    --ct-ink: #28143f;
-    --ct-muted: #716580;
+    --ct-ink: #302045;
+    --ct-muted: #6c607e;
+    --ct-purple: #7542a4;
+    --ct-line: #e4d8f3;
+
+    /* Yellow button look (same as Problems.jsx) */
+    --btn-text: #3b0f4d;
+    --btn-bg: linear-gradient(180deg, #ffe985 0%, #ffd53d 48%, #ffb81c 100%);
+    --btn-bg-hover: linear-gradient(180deg, #fff0a0 0%, #ffdf5c 48%, #ffc236 100%);
+    --btn-border: #f2a900;
+    --btn-shadow:
+      0 8px 18px #ffa80040,
+      inset 0 1px 0 #ffffffb3,
+      inset 0 -3px 0 #e09600;
+    --btn-shadow-hover:
+      0 14px 26px #ffa80055,
+      inset 0 1px 0 #ffffffcc,
+      inset 0 -3px 0 #e09600;
+
+    --ct-ease: cubic-bezier(.22, 1, .36, 1);
+
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -22,8 +43,10 @@ const css = `
       radial-gradient(ellipse at 4% 12%, #eee3ff 0, transparent 42%),
       radial-gradient(ellipse at 100% 88%, #e8dcfa 0, transparent 43%),
       linear-gradient(135deg, #fff 0%, #fcfaff 48%, #f5effc 100%);
-    font-family: inherit;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+      BlinkMacSystemFont, "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   .content-contact,
@@ -106,17 +129,19 @@ const css = `
     max-width: 620px;
     margin: 0;
     color: var(--ct-ink);
+    font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui,
+      -apple-system, "Segoe UI", sans-serif;
     font-size: clamp(30px, 4vw, 52px);
-    font-weight: 750;
+    font-weight: 800;
     line-height: 1.12;
-    letter-spacing: -.045em;
+    letter-spacing: -.035em;
     overflow-wrap: break-word;
     text-wrap: balance;
   }
 
   .content-contact .ct-title-accent {
-    color: #743ab4;
-    background: linear-gradient(110deg, #512080, #8c50cc);
+    color: var(--ct-purple);
+    background: linear-gradient(110deg, #6a359b, #9a5ad4 55%, #6a359b);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -128,6 +153,7 @@ const css = `
     color: var(--ct-muted);
     font-size: clamp(15px, 1.4vw, 17px);
     line-height: 1.85;
+    text-wrap: pretty;
   }
 
   /* Discussion card */
@@ -137,17 +163,14 @@ const css = `
     isolation: isolate;
     margin-top: 32px;
     padding: clamp(22px, 3vw, 32px);
-    border: 1px solid rgba(133, 93, 178, .16);
+    border: 1px solid var(--ct-line);
     border-radius: 24px;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, .94),
-      rgba(246, 240, 254, .82)
-    );
+    background: linear-gradient(150deg, #ffffffee, #f8f2fdd0);
     box-shadow:
       0 16px 45px -30px rgba(73, 34, 117, .3),
       inset 0 1px 0 #fff;
     transition:
+      transform .45s var(--ct-ease),
       border-color .35s ease,
       box-shadow .35s ease;
   }
@@ -162,7 +185,7 @@ const css = `
     opacity: 0;
     background: radial-gradient(
       ellipse at 12% 0%,
-      rgba(180, 139, 230, .1),
+      rgba(180, 139, 230, .12),
       transparent 65%
     );
     transition: opacity .45s ease;
@@ -180,7 +203,7 @@ const css = `
     place-items: center;
     width: 44px;
     height: 44px;
-    border: 1px solid #e8dcf7;
+    border: 1px solid #ddcdf0;
     border-radius: 14px;
     color: #7441ae;
     background: linear-gradient(145deg, #fff, #eee3fb);
@@ -211,11 +234,14 @@ const css = `
     min-width: 0;
     margin: 0;
     color: var(--ct-ink);
-    font-size: clamp(18px, 1.8vw, 21px);
-    font-weight: 700;
-    line-height: 1.45;
+    font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui,
+      -apple-system, "Segoe UI", sans-serif;
+    font-size: clamp(19px, 1.9vw, 23px);
+    font-weight: 800;
+    line-height: 1.35;
     letter-spacing: -.025em;
     overflow-wrap: break-word;
+    text-wrap: balance;
   }
 
   .content-contact .ct-discussion-intro {
@@ -255,17 +281,17 @@ const css = `
     width: 22px;
     height: 22px;
     margin-top: 1px;
-    border: 1px solid #e5d7f5;
+    border: 1px solid #cfe5da;
     border-radius: 50%;
-    color: #7b43b8;
-    background: linear-gradient(145deg, #fff, #f0e7fb);
+    color: #20734e;
+    background: linear-gradient(145deg, #fff, #e1f3e8);
     transition:
       border-color .3s ease,
       box-shadow .3s ease;
   }
 
   .content-contact .ct-check svg {
-    transition: transform .45s cubic-bezier(.22, 1, .36, 1);
+    transition: transform .45s var(--ct-ease);
   }
 
   /* Form */
@@ -275,7 +301,7 @@ const css = `
     min-width: 0;
     margin: 0;
     padding: clamp(22px, 3vw, 38px);
-    border: 1px solid rgba(137, 100, 181, .2);
+    border: 1px solid #e1d2ef;
     border-radius: 28px;
     background: linear-gradient(
       155deg,
@@ -313,7 +339,7 @@ const css = `
   }
 
   .content-contact .ct-form-card:focus-within {
-    border-color: rgba(137, 100, 181, .36);
+    border-color: rgba(137, 100, 181, .4);
     box-shadow:
       0 30px 70px -35px rgba(75, 34, 122, .36),
       0 8px 24px -16px rgba(75, 34, 122, .18),
@@ -339,7 +365,7 @@ const css = `
     margin: 0;
     color: #4c365f;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 650;
     line-height: 1.5;
   }
 
@@ -363,7 +389,8 @@ const css = `
     line-height: 1.5;
     transition:
       border-color .2s ease,
-      box-shadow .2s ease;
+      box-shadow .2s ease,
+      background .2s ease;
   }
 
   .content-contact .ct-field::placeholder {
@@ -374,7 +401,7 @@ const css = `
   .content-contact .ct-field:focus {
     border-color: #9564c5;
     background: #fff;
-    box-shadow: 0 0 0 4px rgba(130, 73, 190, .1);
+    box-shadow: 0 0 0 4px rgba(130, 73, 190, .12);
   }
 
   .content-contact .ct-field:-webkit-autofill {
@@ -415,72 +442,60 @@ const css = `
     resize: vertical;
   }
 
-  .content-contact .ct-submit {
+  /* ---------- Submit button (yellow, same as Problems.jsx) ---------- */
+
+  .content-contact button.ct-submit {
     position: relative;
-    isolation: isolate;
-    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
     width: 100%;
+    max-width: 100%;
     min-height: 56px;
     margin: 2px 0 0;
-    padding: 15px 20px;
-    border: 1px solid rgba(78, 28, 132, .14);
+    padding: 17px 30px;
+    border: 1px solid var(--btn-border);
     border-radius: 14px;
-    color: #fff;
-    background: linear-gradient(115deg, #4b1d78, #7137aa 60%, #8b4fc2);
-    box-shadow:
-      0 12px 24px -12px rgba(100, 43, 158, .65),
-      inset 0 1px 0 rgba(255, 255, 255, .2);
+    color: var(--btn-text);
+    background: var(--btn-bg);
+    box-shadow: var(--btn-shadow);
     font: inherit;
-    font-size: 15px;
-    font-weight: 650;
-    line-height: 1.5;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.45;
+    letter-spacing: -.005em;
     text-align: center;
+    text-shadow: 0 1px 0 #ffffff55;
     cursor: pointer;
     transition:
-      transform .25s ease,
-      box-shadow .25s ease;
+      transform 350ms var(--ct-ease),
+      box-shadow 350ms ease,
+      background 350ms ease,
+      border-color 350ms ease;
   }
 
-  .content-contact .ct-submit::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    opacity: 0;
-    background: linear-gradient(
-      110deg,
-      transparent,
-      rgba(255, 255, 255, .12),
-      transparent
-    );
-    transition: opacity .3s ease;
-  }
-
-  .content-contact .ct-submit > span {
+  .content-contact button.ct-submit > span {
     min-width: 0;
+    overflow-wrap: anywhere;
   }
 
-  .content-contact .ct-submit svg {
+  .content-contact button.ct-submit svg {
     display: block;
     flex: 0 0 auto;
     transform-box: view-box;
     transform-origin: 50% 50%;
-    transition: transform .3s ease;
+    transition: transform 350ms var(--ct-ease);
   }
 
-  .content-contact .ct-submit:focus-visible,
+  .content-contact button.ct-submit:focus-visible,
   .content-contact .ct-privacy a:focus-visible {
-    outline: 3px solid #ac7ed8;
+    outline: 3px solid var(--btn-text);
     outline-offset: 4px;
   }
 
-  .content-contact .ct-submit:active {
-    transform: translateY(1px);
+  .content-contact button.ct-submit:active {
+    transform: translate3d(0, 0, 0);
   }
 
   .content-contact .ct-form-note {
@@ -490,6 +505,7 @@ const css = `
     font-size: 13px;
     line-height: 1.7;
     text-align: center;
+    text-wrap: pretty;
   }
 
   .content-contact .ct-privacy {
@@ -525,18 +541,20 @@ const css = `
     width: 72px;
     height: 72px;
     margin: 0 auto 24px;
-    border: 1px solid #ddcbed;
+    border: 1px solid #cfe5da;
     border-radius: 24px;
-    color: #7941b1;
-    background: linear-gradient(145deg, #fff, #ebddfa);
-    box-shadow: 0 12px 28px -16px rgba(95, 42, 152, .4);
+    color: #20734e;
+    background: linear-gradient(145deg, #fff, #e1f3e8);
+    box-shadow: 0 12px 28px -16px rgba(32, 115, 78, .4);
   }
 
   .content-contact .ct-success h3 {
     margin: 0;
     color: var(--ct-ink);
+    font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui,
+      -apple-system, "Segoe UI", sans-serif;
     font-size: clamp(22px, 2.5vw, 28px);
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1.35;
     letter-spacing: -.03em;
   }
@@ -592,7 +610,8 @@ const css = `
 
   @media (hover: hover) and (pointer: fine) {
     .content-contact .ct-discussion:hover {
-      border-color: rgba(133, 93, 178, .3);
+      transform: translate3d(0, -4px, 0);
+      border-color: #ccb0e2;
       box-shadow:
         0 22px 48px -30px rgba(73, 34, 117, .35),
         inset 0 1px 0 #fff;
@@ -614,8 +633,8 @@ const css = `
     }
 
     .content-contact .ct-point:hover .ct-check {
-      border-color: #cdb0e9;
-      box-shadow: 0 0 0 3px rgba(133, 93, 178, .06);
+      border-color: #b7dbc8;
+      box-shadow: 0 0 0 3px rgba(32, 115, 78, .08);
     }
 
     .content-contact .ct-point:hover .ct-check svg {
@@ -626,21 +645,27 @@ const css = `
       border-color: #cbb5df;
     }
 
-    .content-contact .ct-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 16px 30px -12px rgba(100, 43, 158, .55);
+    .content-contact button.ct-submit:hover {
+      transform: translate3d(0, -3px, 0);
+      border-color: var(--btn-border);
+      background: var(--btn-bg-hover);
+      box-shadow: var(--btn-shadow-hover);
     }
 
-    .content-contact .ct-submit:hover::before {
-      opacity: 1;
-    }
-
-    .content-contact .ct-submit:hover svg {
-      transform: rotate(-12deg);
+    .content-contact button.ct-submit:hover svg {
+      transform: translateX(4px);
     }
 
     .content-contact .ct-privacy a:hover {
       color: #4b1d78;
+    }
+  }
+
+  /* Touch feedback */
+
+  @media (hover: none) {
+    .content-contact button.ct-submit:active {
+      transform: scale(.98);
     }
   }
 
@@ -693,6 +718,11 @@ const css = `
       border-radius: 12px;
     }
 
+    .content-contact button.ct-submit {
+      padding: 16px 18px;
+      font-size: 15px;
+    }
+
     .content-contact .ct-success {
       min-height: 340px;
     }
@@ -720,17 +750,17 @@ const css = `
     .content-contact .ct-point,
     .content-contact .ct-form-card,
     .content-contact .ct-field,
-    .content-contact .ct-submit,
-    .content-contact .ct-submit::before,
-    .content-contact .ct-submit svg,
+    .content-contact button.ct-submit,
+    .content-contact button.ct-submit svg,
     .content-contact .ct-privacy a {
       transition: none;
     }
 
+    .content-contact .ct-discussion:hover,
     .content-contact .ct-point:hover .ct-check svg,
-    .content-contact .ct-submit:hover,
-    .content-contact .ct-submit:hover svg,
-    .content-contact .ct-submit:active {
+    .content-contact button.ct-submit:hover,
+    .content-contact button.ct-submit:hover svg,
+    .content-contact button.ct-submit:active {
       transform: none;
     }
   }
@@ -1032,7 +1062,7 @@ export default function Contact() {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="1.8"
+                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     aria-hidden="true"

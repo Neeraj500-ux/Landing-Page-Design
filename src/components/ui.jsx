@@ -17,9 +17,10 @@ export const SectionHead = ({ title, text, center = true, light = false }) => (
     {text && <p className={`mt-5 text-base leading-relaxed sm:text-lg ${light ? 'text-white/70' : 'text-ink/65'}`}>{text}</p>}
   </Reveal>
 )
+// Every button now uses the same yellow style from index.css (.site-cta).
+// The `variant` prop is still accepted so existing code keeps working, but it no longer changes the look.
 export const Button = ({ href = '#contact', children, variant = 'primary', className = '' }) => {
-  const v = variant === 'primary' ? 'bg-gradient-to-r from-amber to-sun text-ink shadow-[0_10px_28px_-10px_rgba(255,138,61,.8)] hover:brightness-105' : variant === 'dark' ? 'bg-gradient-to-r from-[#6D35C9] to-[#9B5CF0] text-white shadow-[0_10px_28px_-10px_rgba(109,53,201,.7)] hover:brightness-110' : 'border border-white/30 text-white hover:bg-white/10'
-  return <a href={href} className={`site-cta group inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold transition duration-300 hover:-translate-y-0.5 ${v} ${className}`}>{children}<span aria-hidden className="transition group-hover:translate-x-1">→</span></a>
+  return <a href={href} className={`site-cta group ${className}`}>{children}<span aria-hidden>→</span></a>
 }
 export const Check = () => <svg className="mt-1 h-4 w-4 shrink-0 text-cobalt" viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0L3.3 9.7a1 1 0 1 1 1.4-1.4l3.8 3.8 6.8-6.8a1 1 0 0 1 1.4 0Z" /></svg>
 export const Card = ({ children, className = '' }) => <div className={`rounded-[1.75rem] border border-white/80 bg-white/90 p-7 shadow-card transition duration-300 hover:-translate-y-1 hover:border-cobalt/30 hover:shadow-[0_24px_48px_-20px_rgba(109,53,201,.4)] ${className}`}>{children}</div>

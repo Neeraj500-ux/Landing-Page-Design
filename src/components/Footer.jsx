@@ -105,10 +105,7 @@ export default function Footer() {
           </p>
 
           <a href="#contact" className="site-footer__cta">
-            <span className="site-footer__cta-text">
-              Yes! Let's Grow My Revenue 
-            </span>
-            <span className="site-footer__cta-shine" aria-hidden="true" />
+            <span> Yes! Let's Grow My Revenue </span>
           </a>
         </div>
 
@@ -144,6 +141,20 @@ const styles = `
   --ftr-violet-deep:#6D35C9;
   --ftr-orange:#FF8A3D;
   --ftr-ease:cubic-bezier(.22,1,.36,1);
+
+  /* Yellow button look (same as Problems.jsx) */
+  --btn-text:#3b0f4d;
+  --btn-bg:linear-gradient(180deg,#ffe985 0%,#ffd53d 48%,#ffb81c 100%);
+  --btn-bg-hover:linear-gradient(180deg,#fff0a0 0%,#ffdf5c 48%,#ffc236 100%);
+  --btn-border:#f2a900;
+  --btn-shadow:
+    0 8px 18px #ffa80040,
+    inset 0 1px 0 #ffffffb3,
+    inset 0 -3px 0 #e09600;
+  --btn-shadow-hover:
+    0 14px 26px #ffa80055,
+    inset 0 1px 0 #ffffffcc,
+    inset 0 -3px 0 #e09600;
 
   position:relative;
   isolation:isolate;
@@ -338,75 +349,56 @@ const styles = `
   line-height:1.6;
 }
 
-/* ---------- CTA button ---------- */
-.site-footer__cta{
+/* ---------- CTA button (yellow, same as Problems.jsx) ---------- */
+.site-footer a.site-footer__cta{
   position:relative;
-  isolation:isolate;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:10px;
-  min-height:54px;
-  padding:14px 26px;
-  overflow:hidden;
+  max-width:100%;
+  min-height:56px;
+  padding:17px 30px;
+  border:1px solid var(--btn-border);
   border-radius:14px;
-  border:1px solid rgba(255,255,255,.18);
-  background:
-    linear-gradient(135deg,#6D35C9 0%,#9B5CF0 60%,#B78BDD 100%);
-  color:#fff;
-  font-size:14px;
-  font-weight:700;
+  color:var(--btn-text);
+  background:var(--btn-bg);
+  box-shadow:var(--btn-shadow);
+  font-family:inherit;
+  font-size:16px;
+  font-weight:800;
+  line-height:1.45;
   letter-spacing:-.005em;
-  line-height:1.4;
   text-align:center;
   text-decoration:none;
-  white-space:normal;
+  text-shadow:0 1px 0 #ffffff55;
   overflow-wrap:anywhere;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.28),
-    0 14px 30px -18px rgba(109,53,201,.75),
-    0 24px 48px -30px rgba(0,0,0,.6);
-  transition:transform .3s var(--ftr-ease), box-shadow .3s ease, border-color .3s ease;
+  transition:
+    transform 350ms var(--ftr-ease),
+    box-shadow 350ms ease,
+    background 350ms ease,
+    border-color 350ms ease;
 }
-.site-footer__cta-text{
-  position:relative;
-  z-index:2;
-  min-width:0;
-}
-
-/* animated shine sweep */
-.site-footer__cta-shine{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:linear-gradient(
-    110deg,
-    transparent 25%,
-    rgba(255,255,255,.32) 50%,
-    transparent 75%
-  );
-  transform:translateX(-140%);
-  transition:transform .9s var(--ftr-ease);
-  z-index:1;
-}
-
-.site-footer__cta:hover{
-  transform:translateY(-2px);
-  border-color:rgba(255,255,255,.32);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.32),
-    0 20px 36px -18px rgba(109,53,201,.85),
-    0 30px 60px -30px rgba(0,0,0,.65);
-}
-.site-footer__cta:hover .site-footer__cta-shine{
-  transform:translateX(140%);
-}
-.site-footer__cta:focus-visible{
+.site-footer a.site-footer__cta:focus-visible{
   outline:3px solid var(--ftr-orange);
   outline-offset:4px;
 }
-.site-footer__cta:active{
-  transform:translateY(0);
+.site-footer a.site-footer__cta:active{
+  transform:translate3d(0,0,0);
+}
+
+/* Hover only on devices with accurate hover input */
+@media (hover:hover) and (pointer:fine){
+  .site-footer a.site-footer__cta:hover{
+    transform:translate3d(0,-3px,0);
+    border-color:var(--btn-border);
+    background:var(--btn-bg-hover);
+    box-shadow:var(--btn-shadow-hover);
+  }
+}
+
+/* Touch feedback */
+@media (hover:none){
+  .site-footer a.site-footer__cta:active{transform:scale(.98)}
 }
 
 /* ============================================================
@@ -431,6 +423,15 @@ const styles = `
 /* ============================================================
    RESPONSIVE
 ============================================================ */
+
+/* Mobile — full-width button */
+@media (max-width:639px){
+  .site-footer a.site-footer__cta{
+    width:100%;
+    padding:16px 18px;
+    font-size:15px;
+  }
+}
 
 /* Tablet — 2 columns */
 @media (min-width:640px){
@@ -457,7 +458,7 @@ const styles = `
     gap:24px;
   }
 
-  .site-footer__cta{
+  .site-footer a.site-footer__cta{
     flex:0 0 auto;
     min-width:280px;
   }
@@ -477,7 +478,6 @@ const styles = `
   .site-footer__logo-mark{width:38px;height:38px;border-radius:10px}
   .site-footer__logo-mark img{width:26px;height:26px}
   .site-footer__logo-text{font-size:17px}
-  .site-footer__cta{padding:12px 18px;font-size:13px;min-height:50px;width:100%}
   .site-footer__copyright{font-size:12.5px}
 }
 
@@ -491,9 +491,9 @@ const styles = `
   }
   .site-footer__logo:hover,
   .site-footer__link:hover,
-  .site-footer__cta:hover{
+  .site-footer a.site-footer__cta:hover,
+  .site-footer a.site-footer__cta:active{
     transform:none !important;
   }
-  .site-footer__cta-shine{display:none}
 }
 `

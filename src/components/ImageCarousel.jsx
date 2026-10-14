@@ -56,13 +56,6 @@ const ROW_MASK = cx(
   "motion-reduce:[mask-image:none] motion-reduce:[-webkit-mask-image:none]"
 );
 
-const GLASS_BUTTON = cx(
-  "border border-white/20 text-white",
-  "bg-[linear-gradient(135deg,rgba(255,255,255,0.16),rgba(255,255,255,0.04))]",
-  "shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_14px_30px_-14px_rgba(8,1,18,0.8)]",
-  "backdrop-blur-[18px] backdrop-saturate-150"
-);
-
 const ICON_BUTTON = cx(
   "grid h-[42px] w-[42px] shrink-0 cursor-pointer place-items-center rounded-full md:h-11 md:w-11",
   "border border-white/25 text-white",
@@ -106,17 +99,6 @@ const iconProps = {
   focusable: false,
 };
 
-const PauseIcon = () => (
-  <svg {...iconProps}>
-    <rect x="6" y="5" width="4" height="14" rx="1" />
-    <rect x="14" y="5" width="4" height="14" rx="1" />
-  </svg>
-);
-const PlayIcon = () => (
-  <svg {...iconProps}>
-    <path d="M7 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L8.5 4.64A1 1 0 0 0 7 5.5Z" />
-  </svg>
-);
 const ExpandIcon = () => (
   <svg {...iconProps}>
     <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
@@ -214,7 +196,7 @@ function GalleryCard({ item, interactive, reverse, onOpen }) {
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
       className={cx(
-        "group/card relative m-0 w-[var(--card)] shrink-0 rounded-[18px] hover:z-[1] md:rounded-[22px]",
+        "group/card relative m-0 w-[var(--card)] shrink-0 rounded-[20px] hover:z-[1] md:rounded-[24px]",
         "[--rx:0deg] [--ry:0deg] [--mx:50%] [--my:50%]",
         "[transform:perspective(1100px)_rotateX(var(--rx))_rotateY(var(--ry))]",
         "[transition:transform_450ms_cubic-bezier(0.22,1,0.36,1)]",
@@ -231,17 +213,17 @@ function GalleryCard({ item, interactive, reverse, onOpen }) {
         tabIndex={interactive ? 0 : -1}
         aria-label={`Enlarge ${item.alt}`}
         className={cx(
-          "relative block w-full cursor-zoom-in overflow-hidden rounded-[inherit] border-0 p-2 pb-2.5 text-left text-inherit md:p-2.5 md:pb-3",
+          "relative block w-full cursor-zoom-in overflow-hidden rounded-[inherit] border-0 p-2.5 pb-3 text-left text-inherit md:p-3 md:pb-3.5",
           "[-webkit-tap-highlight-color:transparent]",
-          "[background:linear-gradient(160deg,rgba(255,255,255,0.16),rgba(255,255,255,0.04)_48%,rgba(255,255,255,0.08)),rgba(30,12,52,0.62)]",
-          "shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(0,0,0,0.16),0_26px_46px_-24px_rgba(6,1,14,0.9)]",
+          "[background:linear-gradient(160deg,rgba(255,255,255,0.18),rgba(255,255,255,0.04)_48%,rgba(255,255,255,0.09)),rgba(30,12,52,0.62)]",
+          "shadow-[inset_0_1px_0_rgba(255,255,255,0.24),inset_0_-1px_0_rgba(0,0,0,0.16),0_28px_50px_-26px_rgba(6,1,14,0.92)]",
           "[transition:box-shadow_400ms_ease,transform_450ms_cubic-bezier(0.22,1,0.36,1)]",
           "group-hover/card:-translate-y-1.5",
-          "group-hover/card:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.16),0_34px_54px_-24px_rgba(6,1,14,0.95),0_0_46px_-12px_rgba(188,143,255,0.6)]",
+          "group-hover/card:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.16),0_36px_56px_-24px_rgba(6,1,14,0.95),0_0_50px_-12px_rgba(188,143,255,0.65)]",
           "motion-reduce:transition-none motion-reduce:group-hover/card:translate-y-0",
           // Gradient hairline border
           "before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:rounded-[inherit] before:p-px before:content-['']",
-          "before:[background:linear-gradient(150deg,rgba(255,255,255,0.55),rgba(255,255,255,0.06)_42%,rgba(188,143,255,0.42))]",
+          "before:[background:linear-gradient(150deg,rgba(255,255,255,0.6),rgba(255,255,255,0.06)_42%,rgba(188,143,255,0.45))]",
           "before:[-webkit-mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)]",
           "before:[-webkit-mask-composite:xor]",
           "before:[mask:linear-gradient(#000_0_0)_content-box_exclude,linear-gradient(#000_0_0)]",
@@ -258,7 +240,7 @@ function GalleryCard({ item, interactive, reverse, onOpen }) {
           </span>
         </BrowserBar>
 
-        <span className="relative block aspect-[16/10] overflow-hidden rounded-[10px] bg-[linear-gradient(160deg,rgba(19,6,36,0.6),rgba(19,6,36,0.3))] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] md:rounded-xl">
+        <span className="relative mt-1 block aspect-[16/10] overflow-hidden rounded-[11px] bg-[linear-gradient(160deg,rgba(19,6,36,0.6),rgba(19,6,36,0.3))] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.09)] md:rounded-[14px]">
           <img
             src={item.src}
             alt={interactive ? item.alt : ""}
@@ -291,11 +273,10 @@ function CarouselRow({
     <div
       tabIndex={0}
       role="region"
-      aria-label={`Landing page gallery. ${
-        reverse ? "Moves left to right." : "Moves right to left."
-      } Focus to pause.`}
+      aria-label={`Landing page gallery. ${reverse ? "Moves left to right." : "Moves right to left."
+        } Focus to pause.`}
       className={cx(
-        "group/row w-full min-w-0 overflow-hidden py-4",
+        "group/row w-full min-w-0 overflow-hidden py-5",
         // Row-level sizing tokens, shared by the cards inside
         "[--gap:14px] [--card:260px] min-[381px]:[--card:min(80vw,310px)]",
         "md:[--gap:20px] md:[--card:clamp(280px,44vw,400px)]",
@@ -308,8 +289,8 @@ function CarouselRow({
         revealed
           ? "translate-x-0 opacity-100"
           : reverse
-          ? "-translate-x-[7vw] opacity-0"
-          : "translate-x-[7vw] opacity-0",
+            ? "-translate-x-[7vw] opacity-0"
+            : "translate-x-[7vw] opacity-0",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#ffd76a]",
         // Reduced motion: static, swipeable row
         "motion-reduce:translate-x-0 motion-reduce:overflow-x-auto motion-reduce:opacity-100 motion-reduce:transition-none motion-reduce:snap-x motion-reduce:snap-proximity"
@@ -321,7 +302,7 @@ function CarouselRow({
           reverse
             ? "animate-[cc-scroll_44s_linear_-18s_infinite_reverse] md:animate-[cc-scroll_58s_linear_-18s_infinite_reverse]"
             : "animate-[cc-scroll_40s_linear_infinite] md:animate-[cc-scroll_52s_linear_infinite]",
-          // Pause: manual toggle, off-screen, hover, focus, press
+          // Pause: off-screen, hover, focus, press
           paused && "[animation-play-state:paused]",
           "group-hover/row:[animation-play-state:paused] group-focus-within/row:[animation-play-state:paused] group-active/row:[animation-play-state:paused]",
           "motion-reduce:transform-none motion-reduce:animate-none motion-reduce:will-change-auto"
@@ -511,7 +492,6 @@ export default function ImageCarousel() {
 
   const [inView, setInView] = useState(false); // pauses motion off-screen
   const [revealed, setRevealed] = useState(false); // one-time entrance
-  const [paused, setPaused] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
 
   useEffect(() => {
@@ -650,7 +630,7 @@ export default function ImageCarousel() {
                 "bg-[linear-gradient(100deg,#f2a93b_0%,#ffd76a_32%,#fff3c4_50%,#ffd76a_68%,#f2a93b_100%)]",
                 "[background-position:100%_0] [background-size:220%_100%]",
                 revealed &&
-                  "animate-[cc-shimmer_2.8s_cubic-bezier(0.22,1,0.36,1)_0.6s_both]",
+                "animate-[cc-shimmer_2.8s_cubic-bezier(0.22,1,0.36,1)_0.6s_both]",
                 "motion-reduce:animate-none motion-reduce:[background-position:0_0]"
               )}
             >
@@ -672,53 +652,33 @@ export default function ImageCarousel() {
           <p
             style={stagger(2)}
             className={cx(
-              "m-0 max-w-[44ch] font-normal leading-[1.65] text-white/80",
+              "m-0 max-w-[44ch] font-normal leading-[1.7] text-white/80",
               "[font-size:clamp(16px,1.4vw,19px)] [text-wrap:pretty]",
               reveal(revealed)
             )}
           >
-            Explore Custom Landing Pages Built For Coaches, Consultants &amp;
-            Trainers.
+            Stop Wasting Ad Spend on Low Conversion Pages.
+            Invest in a High-Converting Automated Funnel.
           </p>
 
-          <div
+          <p
             style={stagger(3)}
             className={cx(
-              "mt-5 flex flex-wrap items-center gap-x-[18px] gap-y-3 md:mt-[26px] motion-reduce:hidden",
+              "m-0 mt-5 hidden text-[13px] leading-normal tracking-[0.01em] text-white/55 md:mt-6 md:block",
               reveal(revealed)
             )}
           >
-            <button
-              type="button"
-              onClick={() => setPaused((value) => !value)}
-              className={cx(
-                "group/pill inline-flex cursor-pointer items-center gap-3 rounded-2xl py-[7px] pl-[7px] pr-5 text-sm font-medium",
-                GLASS_BUTTON,
-                "transition-[transform,border-color,box-shadow] duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
-                "hover:border-[rgba(255,215,106,0.55)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_14px_30px_-14px_rgba(8,1,18,0.8),0_0_28px_-8px_rgba(255,215,106,0.45)]",
-                "active:scale-[0.97]",
-                FOCUS_RING
-              )}
-            >
-              <span className="grid h-[34px] w-[34px] place-items-center rounded-[11px] bg-[linear-gradient(135deg,#ffd76a,#f2a93b)] text-[#130624] transition-transform duration-[350ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/pill:-rotate-[8deg] group-hover/pill:scale-[1.06] [&>svg]:h-4 [&>svg]:w-4">
-                {paused ? <PlayIcon /> : <PauseIcon />}
-              </span>
-              <span>{paused ? "Play gallery" : "Pause gallery"}</span>
-            </button>
-
-            <p className="m-0 hidden text-[13px] leading-normal text-white/55 md:block">
-              Hover to pause. Select a design to enlarge it.
-            </p>
-          </div>
+            Hover to pause. Select a design to enlarge it.
+          </p>
         </div>
       </header>
 
-      <div className="grid w-full min-w-0 gap-1">
+      <div className="grid w-full min-w-0 gap-0.5">
         <CarouselRow
           images={topImages}
           offset={0}
           revealed={revealed}
-          paused={paused || !inView}
+          paused={!inView}
           onOpen={setActiveIndex}
         />
         <CarouselRow
@@ -726,7 +686,7 @@ export default function ImageCarousel() {
           offset={topImages.length}
           reverse
           revealed={revealed}
-          paused={paused || !inView}
+          paused={!inView}
           onOpen={setActiveIndex}
         />
       </div>

@@ -7,22 +7,22 @@ const focusLines = Array(4).fill(
 
 const points = [
   {
-    text: 'Communicate your offer clearly.',
+    text: ' Communicate Your Offer Clearly.',
     icon: 'target',
     tone: 'peach',
   },
   {
-    text: 'Custom pixel tracking to optimize your ads.',
+    text: 'Custom Pixel Tracking To Optimize Your Ads.',
     icon: 'scan-eye',
     tone: 'purple',
   },
   {
-    text: 'Make enquiries and bookings simple.',
+    text: 'Make Enquiries And Bookings Simple.',
     icon: 'calendar',
     tone: 'gold',
   },
   {
-    text: 'Build credibility with relevant proof.',
+    text: '- Build Credibility With Relevant Proof.',
     icon: 'shield',
     tone: 'purple',
   },
@@ -161,6 +161,7 @@ const styles = `
   .premium-hero {
     --hero-ink: #2a1a40;
     --hero-body: #5f4d73;
+    --hero-heading-grey: #343434;
     --hero-violet: #7c3aed;
     --hero-violet-deep: #5b21b6;
     --hero-gutter: clamp(16px, 4vw, 36px);
@@ -293,7 +294,7 @@ const styles = `
 
   .premium-hero .premium-hero__title {
     max-width: 1000px;
-    margin: clamp(24px, 3vw, 36px) auto 0;
+    margin: clamp(18px, 2.4vw, 28px) auto 0;
     font-size: clamp(30px, 4.9vw, 62px);
     font-weight: 800;
     line-height: 1.14;
@@ -317,14 +318,21 @@ const styles = `
     animation: premiumHeroGradient 9s ease-in-out infinite alternate;
   }
 
+  /* ---------- Subtitle heading (refined) ----------
+     Dark grey #343434, medium weight, controlled width,
+     tighter spacing. One fluid clamp() scales 320px -> 1440px+. */
   .premium-hero .premium-hero__subtitle {
-    max-width: 920px;
-    margin: clamp(18px, 2.4vw, 26px) auto 0;
-    color: var(--hero-violet-deep);
-    font-size: clamp(16px, 1.6vw, 20.5px);
+    width: 100%;
+    max-width: 800px;
+    margin: clamp(12px, 1.6vw, 18px) auto 0;
+    padding-inline: 0;
+    color: var(--hero-heading-grey);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+      BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: clamp(15px, 0.9vw + 11px, 19px);
     font-weight: 650;
-    line-height: 1.65;
-    letter-spacing: -.012em;
+    line-height: 1.6;
+    letter-spacing: -.01em;
     text-wrap: balance;
   }
 
@@ -332,7 +340,7 @@ const styles = `
     width: 100%;
     max-width: 1060px;
     min-width: 0;
-    margin: clamp(26px, 3.2vw, 36px) auto 0;
+    margin: clamp(18px, 2.4vw, 28px) auto 0;
   }
 
   .premium-hero__promise {
@@ -486,34 +494,64 @@ const styles = `
     justify-content: center;
   }
 
-  .premium-hero .premium-hero__button {
+  /* ---------- Amber Glow button ----------
+     Yellow-amber gradient, dark purple bold text, glossy top highlight,
+     darker amber 3D bottom edge and a soft warm glow. */
+  .premium-hero .premium-hero__button.premium-hero__button {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
     max-width: 100%;
     min-height: 58px;
-    padding: 17px 30px;
-    border: 1px solid #ffffff55;
-    border-radius: 999px;
-    color: #fff;
-    background:
-      linear-gradient(180deg, #ffffff25, transparent 55%),
-      linear-gradient(110deg, #7c3aed, #5b21b6);
+    padding: 16px clamp(20px, 4vw, 34px);
+    border: 1px solid #f3b01f;
+    border-radius: 16px;
+    color: #2e0c4d;
+    background: linear-gradient(
+      180deg, #ffee82 0%, #ffe04e 48%, #ffca30 100%
+    );
     box-shadow:
-      inset 0 1px 0 #ffffff66,
-      0 5px 0 -1px #5b21b6,
-      0 22px 38px -18px #7c3aed99;
+      inset 0 1px 0 #fff8c4,
+      inset 0 -2px 4px #f5b2144d,
+      0 5px 0 0 #d18f0a,
+      0 16px 28px -10px #f5b323a0;
     font-family: inherit;
-    font-size: clamp(15px, 1.4vw, 17px);
-    font-weight: 750;
-    line-height: 1.5;
+    font-size: clamp(15px, 1.4vw, 17.5px);
+    font-weight: 800;
+    line-height: 1.4;
+    letter-spacing: -.01em;
+    text-shadow: 0 1px 0 #ffffff80;
     white-space: normal;
     text-align: center;
     text-decoration: none;
+    cursor: pointer;
     transition:
-      transform .3s var(--hero-ease),
-      box-shadow .3s var(--hero-ease);
+      transform .25s var(--hero-ease),
+      box-shadow .25s var(--hero-ease),
+      filter .25s var(--hero-ease);
+  }
+
+  /* glossy top shine */
+  .premium-hero .premium-hero__button.premium-hero__button::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 50% 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(180deg, #ffffff40, #ffffff00);
+  }
+
+  .premium-hero .premium-hero__button.premium-hero__button:active {
+    transform: translateY(4px);
+    box-shadow:
+      inset 0 1px 0 #fff8c4,
+      inset 0 -2px 4px #f5b2144d,
+      0 1px 0 0 #d18f0a,
+      0 8px 16px -8px #f5b323a0;
   }
 
   .premium-hero__showcase {
@@ -521,19 +559,21 @@ const styles = `
     margin-top: clamp(48px, 6vw, 76px);
   }
 
-  /* Intro heading — slightly reduced from the original 46px / 53px. */
+  /* Intro heading — refined: smaller size, lighter weight (800 -> 700),
+     Title Case kept, softer tracking and slightly roomier line-height
+     so it supports the content below instead of overpowering it. */
   .premium-hero .premium-hero__intro {
     width: 100%;
-    max-width: 1100px;
+    max-width: 960px;
     margin: 0 auto;
     padding: 0;
     color: #2b2045;
     font-family: "Bricolage Grotesque", sans-serif;
     font-style: normal;
-    font-size: 41px;
-    font-weight: 800;
-    line-height: 48px;
-    letter-spacing: -0.035em;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 45px;
+    letter-spacing: -0.028em;
     font-optical-sizing: auto;
     font-synthesis: none;
     text-align: center;
@@ -726,7 +766,7 @@ const styles = `
   .premium-hero__marquee:focus-visible,
   .premium-hero .premium-hero__button:focus-visible {
     outline: 3px solid #a98af0;
-    outline-offset: 4px;
+    outline-offset: 6px;
   }
 
   @keyframes premiumHeroEnter {
@@ -756,9 +796,13 @@ const styles = `
 
   /* ============ Tablet ============ */
   @media (max-width: 1023px) {
+    .premium-hero .premium-hero__subtitle {
+      max-width: 660px;
+    }
+
     .premium-hero .premium-hero__intro {
-      font-size: 36px;
-      line-height: 43px;
+      font-size: 32px;
+      line-height: 40px;
     }
 
     .premium-hero .premium-hero__points {
@@ -800,14 +844,21 @@ const styles = `
     }
 
     .premium-hero .premium-hero__title {
-      margin-top: 24px;
+      margin-top: 18px;
       font-size: clamp(28px, 7vw, 46px);
       line-height: 1.2;
       letter-spacing: -.034em;
     }
 
     .premium-hero .premium-hero__subtitle {
-      font-size: clamp(16px, 3.6vw, 19px);
+      max-width: 100%;
+      margin-top: 12px;
+      line-height: 1.55;
+      letter-spacing: -.005em;
+    }
+
+    .premium-hero__focus-slot {
+      margin-top: 18px;
     }
 
     .premium-hero__focus-marquee {
@@ -834,9 +885,9 @@ const styles = `
     }
 
     .premium-hero .premium-hero__intro {
-      font-size: 31px;
-      line-height: 38px;
-      letter-spacing: -.03em;
+      font-size: 27px;
+      line-height: 35px;
+      letter-spacing: -.024em;
     }
 
     /* 2 x 2 grid on mobile */
@@ -894,8 +945,8 @@ const styles = `
     }
 
     .premium-hero .premium-hero__intro {
-      font-size: 27px;
-      line-height: 33px;
+      font-size: 24px;
+      line-height: 31px;
     }
 
     .premium-hero .premium-hero__points {
@@ -948,8 +999,8 @@ const styles = `
     }
 
     .premium-hero .premium-hero__intro {
-      font-size: 24px;
-      line-height: 30px;
+      font-size: 21px;
+      line-height: 28px;
     }
 
     .premium-hero .premium-hero__points {
@@ -998,12 +1049,14 @@ const styles = `
       transform: rotate(-6deg) scale(1.08);
     }
 
-    .premium-hero .premium-hero__button:hover {
+    .premium-hero .premium-hero__button.premium-hero__button:hover {
       transform: translateY(-3px);
+      filter: brightness(1.04) saturate(1.05);
       box-shadow:
-        inset 0 1px 0 #ffffff66,
-        0 5px 0 -1px #5b21b6,
-        0 30px 46px -18px #7c3aedb3;
+        inset 0 1px 0 #fff8c4,
+        inset 0 -2px 4px #f5b2144d,
+        0 8px 0 0 #d18f0a,
+        0 24px 38px -12px #f5b323c0;
     }
 
     .premium-hero__promise:hover .premium-hero__focus-track,
@@ -1073,6 +1126,54 @@ const styles = `
       display: none;
     }
   }
+
+  /* ===== Intro heading FINAL override (beats any global h2 / old CSS) ===== */
+  section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro,
+  section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro .premium-hero__intro-accent {
+    font-family: "Bricolage Grotesque", sans-serif !important;
+    font-size: 36px !important;
+    font-weight: 600 !important;
+    line-height: 45px !important;
+    letter-spacing: -0.02em !important;
+    text-transform: none !important;
+  }
+
+  section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro {
+    max-width: 920px !important;
+  }
+
+  @media (max-width: 1023px) {
+    section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro,
+    section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro .premium-hero__intro-accent {
+      font-size: 32px !important;
+      line-height: 40px !important;
+    }
+  }
+
+  @media (max-width: 767px) {
+    section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro,
+    section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro .premium-hero__intro-accent {
+      font-size: 26px !important;
+      line-height: 34px !important;
+      letter-spacing: -0.015em !important;
+    }
+  }
+
+  @media (max-width: 479px) {
+    section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro,
+    section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro .premium-hero__intro-accent {
+      font-size: 23px !important;
+      line-height: 31px !important;
+    }
+  }
+
+  @media (max-width: 359px) {
+    section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro,
+    section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro .premium-hero__intro-accent {
+      font-size: 21px !important;
+      line-height: 28px !important;
+    }
+  }
 `
 
 export default function Hero() {
@@ -1095,7 +1196,7 @@ export default function Hero() {
               <div className="premium-hero__pill">
                 <p className="premium-hero__eyebrow">
                   <span>
-                    More Than Landing Pages. We Build Complete Funnels.
+                     Dont just landing pages. We build complete funnels
                   </span>
                 </p>
               </div>
@@ -1120,7 +1221,9 @@ export default function Hero() {
 
             <Reveal delay={140}>
               <p className="premium-hero__subtitle">
-                We dont just Build Landing Pages We Build Complete Funnel With High-Converting Pages, Automation, Custom Tracking, and Analytics.
+                We Don’t Just Build Landing Pages. We Build Complete Funnels
+                With High-Converting Pages, Automation, Custom Tracking, and
+                Analytics.
               </p>
             </Reveal>
           </div>
