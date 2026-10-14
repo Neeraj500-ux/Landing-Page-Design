@@ -206,47 +206,56 @@ const styles = `
 .site-footer__logo{
   display:inline-flex;
   align-items:center;
-  gap:14px;
-  padding:10px 22px 10px 12px;
-  border-radius:16px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.10);
+  gap:16px;
+  padding:14px 28px 14px 22px;
+  border-radius:18px;
+  background:linear-gradient(145deg,#14091f 0%,#1d0d30 100%);
+  border:1px solid rgba(255,138,61,.38);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.06),
-    0 12px 30px -18px rgba(0,0,0,.5);
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 16px 34px -18px rgba(0,0,0,.7);
   text-decoration:none;
-  transition:border-color .3s ease, background .3s ease, transform .3s var(--ftr-ease);
+  transition:border-color .3s ease, box-shadow .3s ease, transform .3s var(--ftr-ease);
 }
 .site-footer__logo:hover{
-  border-color:rgba(155,92,240,.45);
-  background:rgba(155,92,240,.08);
-  transform:translateY(-1px);
+  border-color:rgba(255,138,61,.7);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    0 20px 38px -16px rgba(0,0,0,.75),
+    0 0 26px -10px rgba(255,138,61,.45);
+  transform:translateY(-2px);
+}
+.site-footer__logo:focus-visible{
+  outline:3px solid var(--ftr-orange);
+  outline-offset:4px;
 }
 
+/* Logo shown directly on the dark card (no white tile).
+   The PNG has transparent padding, so a fixed-size box crops it neatly. */
 .site-footer__logo-mark{
-  display:grid;
-  place-items:center;
+  position:relative;
+  display:block;
   flex:0 0 auto;
-  width:44px;
-  height:44px;
-  border-radius:12px;
-  background:linear-gradient(145deg,#ffffff,#EDE3FA);
-  box-shadow:
-    inset 0 1px 0 #fff,
-    0 6px 14px -6px rgba(109,53,201,.55);
+  width:54px;
+  height:34px;
   overflow:hidden;
 }
 .site-footer__logo-mark img{
+  position:absolute;
+  top:50%;
+  left:50%;
   display:block;
-  width:32px;
-  height:32px;
+  width:62px;
+  height:62px;
+  max-width:none;
   object-fit:contain;
+  transform:translate(-50%,-50%);
 }
 
 .site-footer__logo-text{
   color:#fff;
   font-weight:800;
-  font-size:clamp(18px,1.6vw,20px);
+  font-size:clamp(19px,1.7vw,22px);
   letter-spacing:-.02em;
   line-height:1;
   white-space:nowrap;
@@ -474,10 +483,10 @@ const styles = `
 /* Small mobile — tighten */
 @media (max-width:359px){
   .site-footer{padding-top:40px}
-  .site-footer__logo{padding:8px 16px 8px 10px;gap:10px;border-radius:14px}
-  .site-footer__logo-mark{width:38px;height:38px;border-radius:10px}
-  .site-footer__logo-mark img{width:26px;height:26px}
-  .site-footer__logo-text{font-size:17px}
+  .site-footer__logo{padding:11px 20px 11px 16px;gap:12px;border-radius:15px}
+  .site-footer__logo-mark{width:44px;height:28px}
+  .site-footer__logo-mark img{width:51px;height:51px}
+  .site-footer__logo-text{font-size:18px}
   .site-footer__copyright{font-size:12.5px}
 }
 
