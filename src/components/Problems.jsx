@@ -286,7 +286,7 @@ function RevenueButton({ intro = false }) {
         intro ? 'comparison-intro-button' : ''
       }`}
     >
-      <span>Yes! Help Me Increase My Revenue</span>
+      <span> Yes! Let's Grow My Revenue </span>
     </a>
   )
 }

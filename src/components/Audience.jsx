@@ -500,7 +500,7 @@ export default function Audience() {
             variant="dark"
             className="expert-audience__button"
           >
-            Discuss My Landing Page
+             Yes! Let's Grow My Revenue 
           </Button>
         </Reveal>
       </Container>

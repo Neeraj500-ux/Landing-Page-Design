@@ -1,15 +1,13 @@
-import Hero from './components/Hero'
-import Problems from './components/Problems'
-import Audience from './components/Audience'
-import Services from './components/Services'
-import Benefits from './components/Benefits'
-import Work from './components/Work'
-import Process from './components/Process'
-import Why from './components/Why'
-import FAQ from './components/FAQ'
-import Contact from './components/Contact'
-import Footer from './components/Footer'
-import StickyCta from './components/StickyCta'
+import Hero from './components/Hero';
+import Problems from './components/Problems';
+import Audience from './components/Audience';
+import Process from './components/Process';
+import Why from './components/Why';
+import FAQ from './components/FAQ';
+import Contact from './components/Contact';
+import Footer from './components/Footer';
+import StickyCta from './components/StickyCta';
+import ImageCarousel from './components/ImageCarousel.jsx';
 
 export default function App() {
   return (
@@ -17,18 +15,16 @@ export default function App() {
       <main>
         <Hero />
         <Problems />
+        <ImageCarousel />
         <Process />
         <Audience />
-        {/* <Services /> */}
-        {/* <Benefits /> */}
-        {/* <Work />  */}
-
-        <Why/>
+        <Why />
         <FAQ />
         <Contact />
       </main>
+
       <Footer />
       <StickyCta />
     </>
-  )
+  );
 }

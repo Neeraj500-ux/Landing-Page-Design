@@ -1185,7 +1185,7 @@ export default function Hero() {
           <Reveal delay={290} className="premium-hero__actions-slot">
             <div className="premium-hero__actions">
               <Button className="site-cta--revenue premium-hero__button">
-                Yes! Help Me Increase My Revenue
+                 Yes! Let's Grow My Revenue 
               </Button>
             </div>
           </Reveal>

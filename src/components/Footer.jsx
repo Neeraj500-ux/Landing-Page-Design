@@ -106,7 +106,7 @@ export default function Footer() {
 
           <a href="#contact" className="site-footer__cta">
             <span className="site-footer__cta-text">
-             Yes! Help Me Increase My Revenue
+              Yes! Let's Grow My Revenue 
             </span>
             <span className="site-footer__cta-shine" aria-hidden="true" />
           </a>

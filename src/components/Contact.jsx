@@ -1024,7 +1024,7 @@ export default function Contact() {
                 </label>
 
                 <button type="submit" className="ct-submit site-cta--revenue">
-                  <span>Yes! Help Me Increase My Revenue</span>
+                  <span> Yes! Let's Grow My Revenue </span>
 
                   <svg
                     width="19"
