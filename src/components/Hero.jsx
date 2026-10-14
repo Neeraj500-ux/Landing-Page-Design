@@ -889,10 +889,18 @@ const styles = `
       margin-top: 24px;
     }
 
-    .premium-hero .premium-hero__button {
+    /* Bigger, easier-to-read button on phones.
+       Text scales with the screen: ~16.5px (320px) -> 20px (400px+). */
+    .premium-hero .premium-hero__button.premium-hero__button {
       width: 100%;
       min-width: 0;
-      padding-inline: 20px;
+      min-height: 64px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      font-size: clamp(16.5px, 5vw, 20px);
+      font-weight: 800;
+      line-height: 1.3;
+      letter-spacing: -.012em;
     }
 
     .premium-hero .premium-hero__intro {

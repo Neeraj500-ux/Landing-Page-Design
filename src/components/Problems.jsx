@@ -355,19 +355,25 @@ const styles = `
   --c-green: #20734e;
   --c-purple: #7542a4;
 
-  /* Shared button look (yellow gradient + dark purple text) */
-  --btn-text: #3b0f4d;
-  --btn-bg: linear-gradient(180deg, #ffe985 0%, #ffd53d 48%, #ffb81c 100%);
-  --btn-bg-hover: linear-gradient(180deg, #fff0a0 0%, #ffdf5c 48%, #ffc236 100%);
-  --btn-border: #f2a900;
+  /* Amber Glow button look (same as the Hero.jsx button) */
+  --btn-text: #2e0c4d;
+  --btn-bg: linear-gradient(180deg, #ffee82 0%, #ffe04e 48%, #ffca30 100%);
+  --btn-border: #f3b01f;
   --btn-shadow:
-    0 8px 18px #ffa80040,
-    inset 0 1px 0 #ffffffb3,
-    inset 0 -3px 0 #e09600;
+    inset 0 1px 0 #fff8c4,
+    inset 0 -2px 4px #f5b2144d,
+    0 5px 0 0 #d18f0a,
+    0 16px 28px -10px #f5b323a0;
+  --btn-shadow-active:
+    inset 0 1px 0 #fff8c4,
+    inset 0 -2px 4px #f5b2144d,
+    0 1px 0 0 #d18f0a,
+    0 8px 16px -8px #f5b323a0;
   --btn-shadow-hover:
-    0 14px 26px #ffa80055,
-    inset 0 1px 0 #ffffffcc,
-    inset 0 -3px 0 #e09600;
+    inset 0 1px 0 #fff8c4,
+    inset 0 -2px 4px #f5b2144d,
+    0 8px 0 0 #d18f0a,
+    0 24px 38px -12px #f5b323c0;
 
   --c-ease: cubic-bezier(.22, 1, .36, 1);
   --c-ease-spring: cubic-bezier(.34, 1.56, .64, 1);
@@ -552,7 +558,7 @@ const styles = `
 
 .comparison-intro-card p + p { margin-top: 16px; }
 .comparison-intro-card strong { color: var(--c-ink); font-weight: 750; }
-.comparison-intro-action { margin-top: 28px; }
+.comparison-intro-action { margin-top: 28px; padding-bottom: 5px; }
 
 /* ---------- Header ---------- */
 
@@ -784,42 +790,63 @@ const styles = `
   width: 100%;
   display: flex;
   justify-content: center;
+  padding-bottom: 5px;
 }
 
-/* ---------- Unified yellow button (all CTA buttons) ---------- */
+/* ---------- Amber Glow button (same as the Hero.jsx button) ----------
+   Yellow gradient, dark purple bold text, glossy top shine,
+   3D amber bottom edge and a soft warm glow. */
 
 .landing-comparison a.comparison-cta-button {
   position: relative;
+  overflow: hidden;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   max-width: 100%;
-  min-height: 56px;
-  padding: 17px 30px;
+  min-height: 58px;
+  padding: 16px clamp(20px, 4vw, 34px);
   border: 1px solid var(--btn-border);
-  border-radius: 14px;
+  border-radius: 16px;
   color: var(--btn-text);
   background: var(--btn-bg);
   box-shadow: var(--btn-shadow);
   font-family: inherit;
-  font-size: 16px;
+  font-size: clamp(15px, 1.4vw, 17.5px);
   font-weight: 800;
-  line-height: 1.45;
-  letter-spacing: -.005em;
+  line-height: 1.4;
+  letter-spacing: -.01em;
   text-align: center;
   text-decoration: none;
-  text-shadow: 0 1px 0 #ffffff55;
+  text-shadow: 0 1px 0 #ffffff80;
   overflow-wrap: anywhere;
+  cursor: pointer;
   transition:
-    transform 350ms var(--c-ease),
-    box-shadow 350ms ease,
-    background 350ms ease,
-    border-color 350ms ease;
+    transform .25s var(--c-ease),
+    box-shadow .25s var(--c-ease),
+    filter .25s var(--c-ease);
+}
+
+/* glossy top shine */
+.landing-comparison a.comparison-cta-button::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 50% 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, #ffffff40, #ffffff00);
 }
 
 .landing-comparison a.comparison-cta-button:focus-visible {
-  outline: 3px solid var(--btn-text);
-  outline-offset: 4px;
+  outline: 3px solid #a98af0;
+  outline-offset: 6px;
+}
+
+.landing-comparison a.comparison-cta-button:active {
+  transform: translateY(4px);
+  box-shadow: var(--btn-shadow-active);
 }
 
 .comparison-cta-note {
@@ -981,7 +1008,7 @@ const styles = `
 .comparison-proof-bar--strong { width: 90%; background: #bfa4d6; }
 .comparison-proof-bar--short { width: 64%; }
 
-/* Phone mock "Learn more" button: same yellow style */
+/* Phone mock "Learn more" button: same amber look, scaled down */
 .comparison-proof-ad-button {
   display: flex;
   align-items: center;
@@ -993,9 +1020,9 @@ const styles = `
   color: var(--btn-text);
   background: var(--btn-bg);
   box-shadow:
-    0 4px 10px #ffa80040,
-    inset 0 1px 0 #ffffffb3,
-    inset 0 -2px 0 #e09600;
+    inset 0 1px 0 #fff8c4,
+    0 3px 0 0 #d18f0a,
+    0 8px 12px -6px #f5b323a0;
   font-size: 10px;
   font-weight: 800;
 }
@@ -1214,9 +1241,9 @@ const styles = `
   }
 
   .landing-comparison a.comparison-cta-button:hover {
-    transform: translate3d(0, -3px, 0);
+    transform: translateY(-3px);
     border-color: var(--btn-border);
-    background: var(--btn-bg-hover);
+    filter: brightness(1.04) saturate(1.05);
     box-shadow: var(--btn-shadow-hover);
   }
 
@@ -1233,14 +1260,6 @@ const styles = `
   .comparison-item:active {
     transform: scale(.985);
   }
-
-  .landing-comparison a.comparison-cta-button:active {
-    transform: scale(.98);
-  }
-}
-
-.landing-comparison a.comparison-cta-button:active {
-  transform: translate3d(0, 0, 0);
 }
 
 /* ---------- Tablet ---------- */
@@ -1327,7 +1346,7 @@ const styles = `
   .landing-comparison a.comparison-intro-button,
   .comparison-cta-action a.comparison-cta-button {
     width: 100%;
-    max-width: 360px;
+    max-width: 420px;
   }
 
   .comparison-eyebrow {
@@ -1390,10 +1409,14 @@ const styles = `
 
   .comparison-cta h3 { font-size: clamp(24px, 6.5vw, 30px); }
 
+  /* Bigger, easier-to-read button on phones (same as Hero.jsx) */
   .landing-comparison a.comparison-cta-button {
-    min-height: 56px;
-    padding: 16px 18px;
-    font-size: 15px;
+    min-height: 64px;
+    padding: 18px 20px;
+    border-radius: 18px;
+    font-size: clamp(16.5px, 5vw, 20px);
+    line-height: 1.3;
+    letter-spacing: -.012em;
   }
 
   .comparison-proof { margin-top: 54px; gap: 34px; }

@@ -437,8 +437,11 @@ const styles = `
 @media (max-width:639px){
   .site-footer a.site-footer__cta{
     width:100%;
-    padding:16px 18px;
-    font-size:15px;
+    min-height:62px;
+    padding:18px 20px;
+    border-radius:16px;
+    font-size:clamp(16.5px,5vw,19px);
+    line-height:1.3;
   }
 }
 
