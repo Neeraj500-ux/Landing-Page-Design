@@ -1239,7 +1239,7 @@ export default function Hero() {
               <div className="premium-hero__pill">
                 <p className="premium-hero__eyebrow">
                   <span>
-                     Dont just landing pages. We build complete funnels
+                    Dont just landing pages. We build complete funnels
                   </span>
                 </p>
               </div>
@@ -1264,9 +1264,8 @@ export default function Hero() {
 
             <Reveal delay={140}>
               <p className="premium-hero__subtitle">
-                We Don’t Just Build Landing Pages. We Build Complete Funnels
-                With High-Converting Pages, Automation, Custom Tracking, and
-                Analytics.
+                Stop Wasting Ad Spend on Low Conversion Pages.
+                Invest in a High-Converting Automated Funnel.
               </p>
             </Reveal>
           </div>
@@ -1331,7 +1330,7 @@ export default function Hero() {
           <Reveal delay={290} className="premium-hero__actions-slot">
             <div className="premium-hero__actions">
               <Button className="site-cta--revenue premium-hero__button">
-                 Yes! Let's Grow My Revenue 
+                Yes! Let's Grow My Revenue
               </Button>
             </div>
           </Reveal>
