@@ -597,7 +597,11 @@ export default function ImageCarousel() {
       </div>
 
       <header className="mx-auto mb-[clamp(32px,4.5vw,60px)] grid w-[min(1280px,100%)] grid-cols-1 items-end gap-[26px] px-[clamp(20px,4vw,52px)] text-left min-[901px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] min-[901px]:gap-x-[clamp(32px,6vw,104px)] min-[901px]:gap-y-7">
-        {/* The container query keeps the gold phrase on one line at any width */}
+        {/*
+          Headline: sized from the column width (cqw) so that
+          line 1 (white) and line 2 (gold) each stay on ONE line
+          at every screen size, desktop to small phone.
+        */}
         <div className="min-w-0 [container-type:inline-size]">
           <span
             style={stagger(0)}
@@ -616,16 +620,18 @@ export default function ImageCarousel() {
             style={stagger(1)}
             className={cx(
               "m-0 font-bold leading-none tracking-[-0.04em] text-white",
-              "[font-size:clamp(36px,5.4vw,76px)] [font-variation-settings:'opsz'_96] [text-wrap:balance]",
+              "[font-size:clamp(22px,min(10.4cqw,76px),76px)] [font-variation-settings:'opsz'_96]",
               reveal(revealed)
             )}
           >
-            Landing Pages That{" "}
+            <span className="block max-w-full whitespace-nowrap">
+              Landing Pages That
+            </span>
             <span
               className={cx(
-                "mt-[0.06em] block max-w-full whitespace-nowrap pb-[0.08em] font-normal italic leading-[1.02] tracking-[-0.01em]",
+                "mt-[0.06em] block max-w-full whitespace-nowrap pb-[0.1em] font-normal italic leading-[1.04] tracking-[-0.01em]",
                 FONT_ACCENT,
-                "[font-size:clamp(22px,7.6cqw,1.12em)]",
+                "[font-size:min(7.6cqw,0.74em)]",
                 "bg-clip-text text-transparent",
                 "bg-[linear-gradient(100deg,#f2a93b_0%,#ffd76a_32%,#fff3c4_50%,#ffd76a_68%,#f2a93b_100%)]",
                 "[background-position:100%_0] [background-size:220%_100%]",
@@ -653,22 +659,12 @@ export default function ImageCarousel() {
             style={stagger(2)}
             className={cx(
               "m-0 max-w-[44ch] font-normal leading-[1.7] text-white/80",
-              "[font-size:clamp(16px,1.4vw,19px)] [text-wrap:pretty]",
+              "[font-size:clamp(15px,1.4vw,19px)] [text-wrap:pretty]",
               reveal(revealed)
             )}
           >
             Stop Wasting Ad Spend on Low Conversion Pages.
             Invest in a High-Converting Automated Funnel.
-          </p>
-
-          <p
-            style={stagger(3)}
-            className={cx(
-              "m-0 mt-5 hidden text-[13px] leading-normal tracking-[0.01em] text-white/55 md:mt-6 md:block",
-              reveal(revealed)
-            )}
-          >
-            Hover to pause. Select a design to enlarge it.
           </p>
         </div>
       </header>
