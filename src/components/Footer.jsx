@@ -1,4 +1,4 @@
-import { Container } from './ui'
+import { Button, Container } from './ui'
 
 /* ----------------------------------------------------------------
    Data — swap these with your real values when ready
@@ -104,9 +104,7 @@ export default function Footer() {
             © 2026 Creative Crew. All rights reserved.
           </p>
 
-          <a href="#contact" className="site-footer__cta">
-            <span> Yes! Let's Grow My Revenue </span>
-          </a>
+          <Button className="site-footer__cta">Yes! Let's Grow My Revenue</Button>
         </div>
 
         {/* ============ DISCLAIMERS ============ */}
@@ -358,58 +356,6 @@ const styles = `
   line-height:1.6;
 }
 
-/* ---------- CTA button (yellow, same as Problems.jsx) ---------- */
-.site-footer a.site-footer__cta{
-  position:relative;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  max-width:100%;
-  min-height:56px;
-  padding:17px 30px;
-  border:1px solid var(--btn-border);
-  border-radius:14px;
-  color:var(--btn-text);
-  background:var(--btn-bg);
-  box-shadow:var(--btn-shadow);
-  font-family:inherit;
-  font-size:16px;
-  font-weight:800;
-  line-height:1.45;
-  letter-spacing:-.005em;
-  text-align:center;
-  text-decoration:none;
-  text-shadow:0 1px 0 #ffffff55;
-  overflow-wrap:anywhere;
-  transition:
-    transform 350ms var(--ftr-ease),
-    box-shadow 350ms ease,
-    background 350ms ease,
-    border-color 350ms ease;
-}
-.site-footer a.site-footer__cta:focus-visible{
-  outline:3px solid var(--ftr-orange);
-  outline-offset:4px;
-}
-.site-footer a.site-footer__cta:active{
-  transform:translate3d(0,0,0);
-}
-
-/* Hover only on devices with accurate hover input */
-@media (hover:hover) and (pointer:fine){
-  .site-footer a.site-footer__cta:hover{
-    transform:translate3d(0,-3px,0);
-    border-color:var(--btn-border);
-    background:var(--btn-bg-hover);
-    box-shadow:var(--btn-shadow-hover);
-  }
-}
-
-/* Touch feedback */
-@media (hover:none){
-  .site-footer a.site-footer__cta:active{transform:scale(.98)}
-}
-
 /* ============================================================
    DISCLAIMERS
 ============================================================ */
@@ -437,11 +383,6 @@ const styles = `
 @media (max-width:639px){
   .site-footer a.site-footer__cta{
     width:100%;
-    min-height:62px;
-    padding:18px 20px;
-    border-radius:16px;
-    font-size:clamp(16.5px,5vw,19px);
-    line-height:1.3;
   }
 }
 

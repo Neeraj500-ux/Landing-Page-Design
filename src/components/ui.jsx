@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { ArrowUpRight } from 'lucide-react'
 export function Reveal({ children, delay = 0, className = '' }) {
   const ref = useRef(null)
   useEffect(() => {
@@ -20,7 +21,21 @@ export const SectionHead = ({ title, text, center = true, light = false }) => (
 // Every button now uses the same yellow style from index.css (.site-cta).
 // The `variant` prop is still accepted so existing code keeps working, but it no longer changes the look.
 export const Button = ({ href = '#contact', children, variant = 'primary', className = '' }) => {
-  return <a href={href} className={`site-cta group ${className}`}>{children}<span aria-hidden>→</span></a>
+  return (
+    <a
+      href={href}
+      onClick={() => window.dispatchEvent(new Event('open-contact-popup'))}
+      className={`site-cta site-cta--revenue premium-hero__button ${className}`}
+    >
+      {children}
+      <ArrowUpRight
+        className="premium-hero__button-arrow"
+        size={19}
+        strokeWidth={2.5}
+        aria-hidden="true"
+      />
+    </a>
+  )
 }
 export const Check = () => <svg className="mt-1 h-4 w-4 shrink-0 text-cobalt" viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0L3.3 9.7a1 1 0 1 1 1.4-1.4l3.8 3.8 6.8-6.8a1 1 0 0 1 1.4 0Z" /></svg>
 export const Card = ({ children, className = '' }) => <div className={`rounded-[1.75rem] border border-white/80 bg-white/90 p-7 shadow-card transition duration-300 hover:-translate-y-1 hover:border-cobalt/30 hover:shadow-[0_24px_48px_-20px_rgba(109,53,201,.4)] ${className}`}>{children}</div>

@@ -683,64 +683,7 @@ const styles = `
   }
 
   .lp-services .lp-services__button {
-    position: relative;
-    isolation: isolate;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
     width: min(100%, 350px);
-    max-width: 100%;
-    min-width: 0;
-    min-height: 56px;
-    height: auto;
-    padding: 16px 25px;
-    overflow: hidden;
-    border-radius: 17px;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.5;
-    text-align: center;
-    text-decoration: none;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    box-shadow: 0 16px 30px -20px #63418099;
-    transition:
-      transform .3s var(--services-ease),
-      box-shadow .3s ease;
-  }
-
-  .lp-services__button > span {
-    min-width: 0;
-    white-space: normal;
-  }
-
-  .lp-services__button svg {
-    flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-  }
-
-  .lp-services__button::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(
-      110deg, transparent 25%, #ffffff28 50%, transparent 75%
-    );
-    transform: translateX(-140%);
-    transition: transform .85s var(--services-ease);
-  }
-
-  .lp-services .lp-services__button:focus-visible {
-    outline: 3px solid #a577d9;
-    outline-offset: 5px;
-  }
-
-  .lp-services .lp-services__button:active {
-    transform: translateY(1px);
   }
 
   /* ===== Responsive ===== */
@@ -751,7 +694,6 @@ const styles = `
     .lp-services .lp-services__button {
       width: auto;
       min-width: 280px;
-      padding-inline: 30px;
     }
   }
 
@@ -776,10 +718,6 @@ const styles = `
     .lp-services .lp-services__container { padding-inline: 14px; }
     .lp-services__header h2 { font-size: 26px; }
     .lp-services__card { padding: 20px 18px; }
-    .lp-services .lp-services__button {
-      padding-inline: 18px;
-      font-size: 14px;
-    }
   }
 
   /* ===== Hover ===== */
@@ -811,13 +749,6 @@ const styles = `
       background: #fff;
       color: var(--tile-ink);
       border-color: var(--tile-border);
-    }
-    .lp-services .lp-services__button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 22px 34px -20px #634180aa;
-    }
-    .lp-services__button:hover::after {
-      transform: translateX(140%);
     }
   }
 

@@ -279,67 +279,8 @@ const styles = `
     text-align: center;
   }
 
-  /* ---------- CTA button (yellow, same as Problems.jsx) ---------- */
-
   .expert-audience .expert-audience__button.expert-audience__button {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
     width: min(100%, 350px);
-    max-width: 100%;
-    min-width: 0;
-    min-height: 56px;
-    height: auto;
-    padding: 17px 30px;
-    overflow: hidden;
-    border: 1px solid var(--btn-border);
-    border-radius: 14px;
-    color: var(--btn-text);
-    background: var(--btn-bg);
-    box-shadow: var(--btn-shadow);
-    filter: none;
-    font-family: inherit;
-    font-size: 16px;
-    font-weight: 800;
-    line-height: 1.45;
-    letter-spacing: -.005em;
-    text-align: center;
-    text-decoration: none;
-    text-shadow: 0 1px 0 #ffffff55;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    cursor: pointer;
-    transition:
-      transform 350ms var(--audience-ease),
-      box-shadow 350ms ease,
-      background 350ms ease,
-      border-color 350ms ease;
-  }
-
-  .expert-audience .expert-audience__button::after {
-    content: none;
-  }
-
-  .expert-audience__button > span {
-    min-width: 0;
-    white-space: normal;
-  }
-
-  .expert-audience__button svg {
-    flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-  }
-
-  .expert-audience .expert-audience__button.expert-audience__button:active {
-    transform: translate3d(0, 0, 0);
-  }
-
-  .expert-audience .expert-audience__button.expert-audience__button:focus-visible {
-    outline: 3px solid var(--btn-text);
-    outline-offset: 4px;
   }
 
   @media (min-width: 768px) and (max-width: 1023px) {
@@ -383,8 +324,6 @@ const styles = `
     .expert-audience .expert-audience__button.expert-audience__button {
       width: 100%;
       max-width: 360px;
-      padding: 16px 18px;
-      font-size: 15px;
     }
   }
 
@@ -415,18 +354,6 @@ const styles = `
         0 28px 52px -30px #63418095;
     }
 
-    .expert-audience .expert-audience__button.expert-audience__button:hover {
-      transform: translate3d(0, -3px, 0);
-      border-color: var(--btn-border);
-      background: var(--btn-bg-hover);
-      box-shadow: var(--btn-shadow-hover);
-    }
-  }
-
-  @media (hover: none) {
-    .expert-audience .expert-audience__button.expert-audience__button:active {
-      transform: scale(.98);
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {

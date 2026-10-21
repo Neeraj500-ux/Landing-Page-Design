@@ -23,11 +23,13 @@ export default function App() {
         <Audience />
         <Why />
         <FAQ />
-        <Contact />
       </main>
 
       <Footer />
       <StickyCta />
+
+      {/* Global contact popup — render only once */}
+      <Contact />
     </>
   );
 }

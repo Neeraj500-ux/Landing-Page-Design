@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { Button } from './ui'
 
 /* ==================== Content ==================== */
 
@@ -260,13 +261,12 @@ function Connector() {
 
 function RevenueButton({ intro = false }) {
   return (
-    <a
-      href="#contact"
+    <Button
       className={`site-cta--revenue comparison-cta-button ${intro ? 'comparison-intro-button' : ''
         }`}
     >
-      <span> Yes! Let's Grow My Revenue </span>
-    </a>
+      Yes! Let's Grow My Revenue
+    </Button>
   )
 }
 
@@ -791,60 +791,8 @@ const styles = `
   padding-bottom: 5px;
 }
 
-/* ---------- Amber Glow button (same as the Hero.jsx button) ----------
-   Yellow gradient, dark purple bold text, glossy top shine,
-   3D amber bottom edge and a soft warm glow. */
-
+/* CTA width is section-specific; its visual treatment comes from the shared Hero CTA. */
 .landing-comparison a.comparison-cta-button {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  max-width: 100%;
-  min-height: 58px;
-  padding: 16px clamp(20px, 4vw, 34px);
-  border: 1px solid var(--btn-border);
-  border-radius: 16px;
-  color: var(--btn-text);
-  background: var(--btn-bg);
-  box-shadow: var(--btn-shadow);
-  font-family: inherit;
-  font-size: clamp(15px, 1.4vw, 17.5px);
-  font-weight: 800;
-  line-height: 1.4;
-  letter-spacing: -.01em;
-  text-align: center;
-  text-decoration: none;
-  text-shadow: 0 1px 0 #ffffff80;
-  overflow-wrap: anywhere;
-  cursor: pointer;
-  transition:
-    transform .25s var(--c-ease),
-    box-shadow .25s var(--c-ease),
-    filter .25s var(--c-ease);
-}
-
-/* glossy top shine */
-.landing-comparison a.comparison-cta-button::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 50% 0;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(180deg, #ffffff40, #ffffff00);
-}
-
-.landing-comparison a.comparison-cta-button:focus-visible {
-  outline: 3px solid #a98af0;
-  outline-offset: 6px;
-}
-
-.landing-comparison a.comparison-cta-button:active {
-  transform: translateY(4px);
-  box-shadow: var(--btn-shadow-active);
 }
 
 .comparison-cta-note {
@@ -1238,13 +1186,6 @@ const styles = `
     transform: rotate(7deg);
   }
 
-  .landing-comparison a.comparison-cta-button:hover {
-    transform: translateY(-3px);
-    border-color: var(--btn-border);
-    filter: brightness(1.04) saturate(1.05);
-    box-shadow: var(--btn-shadow-hover);
-  }
-
   .comparison-proof-visual:hover {
     transform: translate3d(0, -4px, 0);
     box-shadow: 0 28px 55px #7542a41c, inset 0 1px 0 #fff;
@@ -1406,16 +1347,6 @@ const styles = `
   }
 
   .comparison-cta h3 { font-size: clamp(24px, 6.5vw, 30px); }
-
-  /* Bigger, easier-to-read button on phones (same as Hero.jsx) */
-  .landing-comparison a.comparison-cta-button {
-    min-height: 64px;
-    padding: 18px 20px;
-    border-radius: 18px;
-    font-size: clamp(16.5px, 5vw, 20px);
-    line-height: 1.3;
-    letter-spacing: -.012em;
-  }
 
   .comparison-proof { margin-top: 54px; gap: 34px; }
 
