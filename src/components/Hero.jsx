@@ -1,12 +1,6 @@
 ﻿
 import { useEffect, useRef, useState } from 'react'
-import {
-  Pause,
-  Play,
-  ScanEye,
-  Volume2,
-  VolumeX,
-} from 'lucide-react'
+import { ScanEye } from 'lucide-react'
 import { Button } from './ui'
 
 const focusLines = Array(4).fill(
@@ -206,127 +200,21 @@ function useTilt() {
   }
 }
 
-/* Responsive hero video with playback and sound controls */
-function HeroVideo({ src, poster }) {
-  const videoRef = useRef(null)
-  const wasPlaying = useRef(false)
-  const [playing, setPlaying] = useState(false)
-  const [muted, setMuted] = useState(true)
-  const [ratio, setRatio] = useState(4 / 3)
-
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return undefined
-
-    video.muted = true
-
-    const reducedMotion =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    if (!reducedMotion) {
-      video.play().catch(() => {})
-    }
-
-    if (typeof IntersectionObserver === 'undefined') {
-      return () => {}
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) {
-          wasPlaying.current = !video.paused
-
-          if (!video.paused) video.pause()
-        } else if (wasPlaying.current) {
-          wasPlaying.current = false
-          video.play().catch(() => {})
-        }
-      },
-      { threshold: 0.25 }
-    )
-
-    observer.observe(video)
-    return () => observer.disconnect()
-  }, [])
-
-  const togglePlay = () => {
-    const video = videoRef.current
-    if (!video) return
-
-    if (video.paused) {
-      video.play().catch(() => {})
-    } else {
-      video.pause()
-    }
-  }
-
-  const toggleSound = () => {
-    const video = videoRef.current
-    if (!video) return
-
-    video.muted = !video.muted
-    setMuted(video.muted)
-  }
-
-  const handleMetadata = (event) => {
-    const { videoWidth, videoHeight } = event.currentTarget
-
-    if (videoWidth && videoHeight) {
-      setRatio(
-        Math.min(Math.max(videoWidth / videoHeight, 0.8), 1.78)
-      )
-    }
-  }
-
+/* Vimeo hero video */
+function HeroVideo() {
   return (
-    <>
-      <figure
-        className="premium-hero__image-wrap premium-hero__video-wrap"
-        style={{ '--hero-video-ratio': ratio }}
-      >
-        <video
-          ref={videoRef}
-          className="premium-hero__video"
-          src={src}
-          poster={poster}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-label="Creative Crew landing page preview"
-          onPlay={() => setPlaying(true)}
-          onPause={() => setPlaying(false)}
-          onLoadedMetadata={handleMetadata}
-        />
-      </figure>
-
-      <div className="premium-hero__video-controls">
-        <button
-          type="button"
-          className="premium-hero__video-btn"
-          onClick={togglePlay}
-          aria-label={playing ? 'Pause video' : 'Play video'}
-        >
-          {playing ? (
-            <Pause size={18} fill="currentColor" strokeWidth={0} />
-          ) : (
-            <Play size={18} fill="currentColor" strokeWidth={0} />
-          )}
-        </button>
-
-        <button
-          type="button"
-          className="premium-hero__video-btn"
-          onClick={toggleSound}
-          aria-label={muted ? 'Turn sound on' : 'Mute video'}
-          aria-pressed={!muted}
-        >
-          {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-        </button>
-      </div>
-    </>
+    <figure
+      className="premium-hero__image-wrap premium-hero__video-wrap"
+      style={{ '--hero-video-ratio': '16 / 9' }}
+    >
+      <iframe
+        className="premium-hero__video premium-hero__vimeo"
+        src="https://player.vimeo.com/video/1234072596?autoplay=1&muted=1&loop=1&autopause=0&background=1"
+        title="Creative Crew landing page preview"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowFullScreen
+      />
+    </figure>
   )
 }
 
@@ -701,6 +589,7 @@ const styles = `
     width: 100%;
     height: 100%;
     max-width: 100%;
+    border: 0;
     object-fit: cover;
     background: var(--dark-1);
     transition: scale .8s var(--hero-ease);
@@ -1585,13 +1474,6 @@ const styles = `
 `
 
 export default function Hero() {
-  const baseUrl = import.meta.env.BASE_URL || '/'
-  const normalizedBase = baseUrl.endsWith('/')
-    ? baseUrl
-    : `${baseUrl}/`
-
-  const heroImage = `${normalizedBase}images/Neeraj2.png`
-  const heroVideo = `${normalizedBase}videos/Neeraj.mp4`
   const tilt = useTilt()
 
   return (
@@ -1693,7 +1575,7 @@ export default function Hero() {
               onPointerLeave={tilt.onPointerLeave}
             >
               <div className="premium-hero__visual">
-                <HeroVideo src={heroVideo} poster={heroImage} />
+                <HeroVideo />
               </div>
 
               <div className="premium-hero__panel">
