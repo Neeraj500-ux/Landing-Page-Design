@@ -1,5 +1,4 @@
-﻿
-import { useEffect, useRef, useState } from 'react'
+﻿import { useCallback, useEffect, useRef, useState } from 'react'
 import { ScanEye } from 'lucide-react'
 import { Button } from './ui'
 
@@ -130,6 +129,49 @@ function Icon({ name, className = '' }) {
   )
 }
 
+/* Small icons used by the video controls */
+function ControlIcon({ name }) {
+  const shapes = {
+    play: <path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor" />,
+    pause: (
+      <>
+        <rect x="6.5" y="5" width="4" height="14" rx="1" fill="currentColor" />
+        <rect x="13.5" y="5" width="4" height="14" rx="1" fill="currentColor" />
+      </>
+    ),
+    volume: (
+      <>
+        <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4Z" fill="currentColor" />
+        <path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" />
+      </>
+    ),
+    muted: (
+      <>
+        <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4Z" fill="currentColor" />
+        <path d="m16 9.5 5 5m0-5-5 5" />
+      </>
+    ),
+    expand: <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />,
+  }
+
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {shapes[name]}
+    </svg>
+  )
+}
+
 /* Reveal elements when they enter the viewport */
 function Reveal({ children, delay = 0, className = '' }) {
   const ref = useRef(null)
@@ -200,20 +242,137 @@ function useTilt() {
   }
 }
 
-/* Vimeo hero video */
+/* Vimeo hero video with custom play, sound and fullscreen controls */
+const VIMEO_SRC =
+  'https://player.vimeo.com/video/1234072596?autoplay=1&muted=1&loop=1&autopause=0&controls=0&playsinline=1&dnt=1&title=0&byline=0&portrait=0'
+
 function HeroVideo() {
+  const wrapRef = useRef(null)
+  const frameRef = useRef(null)
+  const [playing, setPlaying] = useState(true)
+  const [muted, setMuted] = useState(true)
+
+  const post = useCallback((method, value) => {
+    const win = frameRef.current?.contentWindow
+    if (!win) return
+    win.postMessage(
+      JSON.stringify(value === undefined ? { method } : { method, value }),
+      '*'
+    )
+  }, [])
+
+  /* Keep the button state in sync with the player */
+  useEffect(() => {
+    const onMessage = (event) => {
+      if (!String(event.origin).includes('vimeo.com')) return
+
+      let data = event.data
+      if (typeof data === 'string') {
+        try {
+          data = JSON.parse(data)
+        } catch {
+          return
+        }
+      }
+
+      if (data?.event === 'play') setPlaying(true)
+      if (data?.event === 'pause') setPlaying(false)
+    }
+
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [])
+
+  const onLoad = () => {
+    post('addEventListener', 'play')
+    post('addEventListener', 'pause')
+  }
+
+  const togglePlay = () => {
+    post(playing ? 'pause' : 'play')
+    setPlaying(!playing)
+  }
+
+  const toggleMute = () => {
+    post('setVolume', muted ? 1 : 0)
+    setMuted(!muted)
+  }
+
+  const goFullscreen = () => {
+    const frame = frameRef.current
+    const wrap = wrapRef.current
+    const target = frame || wrap
+
+    try {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.()
+      } else if (target?.requestFullscreen) {
+        target.requestFullscreen()
+      } else if (target?.webkitRequestFullscreen) {
+        target.webkitRequestFullscreen()
+      }
+    } catch {
+      /* Fullscreen is not available on this device */
+    }
+  }
+
   return (
     <figure
+      ref={wrapRef}
       className="premium-hero__image-wrap premium-hero__video-wrap"
       style={{ '--hero-video-ratio': '16 / 9' }}
     >
       <iframe
+        ref={frameRef}
         className="premium-hero__video premium-hero__vimeo"
-        src="https://player.vimeo.com/video/1234072596?autoplay=1&muted=1&loop=1&autopause=0&background=1"
+        src={VIMEO_SRC}
         title="Creative Crew landing page preview"
         allow="autoplay; fullscreen; picture-in-picture"
         allowFullScreen
+        loading="eager"
+        onLoad={onLoad}
       />
+
+      {/* Tap the video itself to play or pause */}
+      <button
+        type="button"
+        className="premium-hero__video-toggle"
+        onClick={togglePlay}
+        aria-label={playing ? 'Pause video' : 'Play video'}
+      />
+
+      <div className="premium-hero__video-controls">
+        <div className="premium-hero__video-group">
+          <button
+            type="button"
+            className="premium-hero__video-btn"
+            onClick={togglePlay}
+            aria-label={playing ? 'Pause video' : 'Play video'}
+            aria-pressed={!playing}
+          >
+            <ControlIcon name={playing ? 'pause' : 'play'} />
+          </button>
+
+          <button
+            type="button"
+            className="premium-hero__video-btn"
+            onClick={toggleMute}
+            aria-label={muted ? 'Unmute video' : 'Mute video'}
+            aria-pressed={!muted}
+          >
+            <ControlIcon name={muted ? 'muted' : 'volume'} />
+          </button>
+        </div>
+
+        <button
+          type="button"
+          className="premium-hero__video-btn"
+          onClick={goFullscreen}
+          aria-label="Toggle fullscreen"
+        >
+          <ControlIcon name="expand" />
+        </button>
+      </div>
     </figure>
   )
 }
@@ -254,7 +413,7 @@ const styles = `
     max-width: 100%;
     min-width: 0;
     overflow-x: clip;
-    padding: var(--hero-top-space, clamp(32px, 5vw, 72px)) 0 clamp(32px, 4vw, 48px);
+    padding: var(--hero-top-space, clamp(28px, 5vw, 72px)) 0 clamp(28px, 4vw, 48px);
     color: var(--ink);
     font-family: Inter, ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -357,7 +516,7 @@ const styles = `
   .premium-hero__stage {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: clamp(30px, 5vw, 48px);
+    gap: clamp(24px, 5vw, 48px);
     align-items: center;
   }
 
@@ -417,7 +576,7 @@ const styles = `
   }
 
   .premium-hero .premium-hero__title {
-    margin-top: clamp(20px, 2.6vw, 28px);
+    margin-top: clamp(16px, 2.4vw, 26px);
     font-family: "Bricolage Grotesque", Inter, sans-serif;
     font-size: clamp(34px, 4.3vw, 54px);
     font-weight: 800;
@@ -447,17 +606,17 @@ const styles = `
   .premium-hero .premium-hero__subtitle {
     width: 100%;
     max-width: 540px;
-    margin-top: clamp(16px, 2vw, 22px);
+    margin-top: clamp(14px, 2vw, 20px);
     color: var(--muted);
     font-size: clamp(15px, .8vw + 12px, 18.5px);
     font-weight: 500;
-    line-height: 1.7;
+    line-height: 1.65;
   }
 
   .premium-hero__focus-slot {
     width: 100%;
     min-width: 0;
-    margin-top: clamp(24px, 3vw, 34px);
+    margin-top: clamp(20px, 3vw, 32px);
   }
 
   /* Promise marquee */
@@ -552,7 +711,7 @@ const styles = `
     width: 100%;
     min-width: 0;
     overflow: hidden;
-    border-radius: clamp(20px, 3vw, 32px);
+    border-radius: clamp(18px, 3vw, 28px);
     background: var(--dark-1);
     box-shadow:
       0 2px 4px #14111f14,
@@ -580,8 +739,18 @@ const styles = `
   }
 
   .premium-hero__video-wrap {
-    aspect-ratio: var(--hero-video-ratio, 4 / 3);
+    aspect-ratio: var(--hero-video-ratio, 16 / 9);
     background: var(--dark-1);
+  }
+
+  .premium-hero__video-wrap::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 1;
+    height: 38%;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent, #14111f8c);
   }
 
   .premium-hero .premium-hero__video {
@@ -590,29 +759,49 @@ const styles = `
     height: 100%;
     max-width: 100%;
     border: 0;
-    object-fit: cover;
     background: var(--dark-1);
-    transition: scale .8s var(--hero-ease);
+  }
+
+  /* Tap area over the video (play / pause) */
+
+  .premium-hero__video-toggle {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .premium-hero__video-controls {
     position: absolute;
-    left: 14px;
-    right: 14px;
-    bottom: 14px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
     z-index: 3;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     pointer-events: none;
+  }
+
+  .premium-hero__video-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .premium-hero__video-btn {
     pointer-events: auto;
     display: inline-grid;
     place-items: center;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     border: 1px solid #ffffff40;
     border-radius: 50%;
@@ -623,12 +812,18 @@ const styles = `
     cursor: pointer;
     transition: transform .25s ease, background .25s ease;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .premium-hero__video-btn:active {
+    transform: scale(.94);
   }
 
   .premium-hero__video-btn:focus-visible,
+  .premium-hero__video-toggle:focus-visible,
   .premium-hero .premium-hero__button:focus-visible {
     outline: 3px solid #a98af0;
-    outline-offset: 4px;
+    outline-offset: 3px;
   }
 
   /* CTA panel */
@@ -637,7 +832,7 @@ const styles = `
     position: relative;
     z-index: 3;
     margin-top: -1px;
-    padding: clamp(18px, 2.6vw, 24px) clamp(16px, 3.2vw, 30px) calc(clamp(18px, 2.6vw, 24px) + 5px);
+    padding: clamp(12px, 2vw, 16px) clamp(12px, 2.4vw, 18px) clamp(14px, 2.2vw, 18px);
     background:
       radial-gradient(80% 90% at 100% 100%, #7c3aed4d, transparent 70%),
       linear-gradient(180deg, var(--dark-1), var(--dark-2));
@@ -660,21 +855,21 @@ const styles = `
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    min-height: 60px;
-    padding: 16px clamp(16px, 4vw, 34px);
+    min-height: 54px;
+    padding: 13px clamp(14px, 4vw, 30px);
     border: 1px solid #f3b01f;
-    border-radius: 16px;
+    border-radius: 14px;
     color: #2e0c4d;
     background: linear-gradient(180deg, #ffee82, #ffe04e 48%, #ffca30);
     box-shadow:
       inset 0 1px 0 #fff8c4,
       inset 0 -2px 4px #f5b2144d,
-      0 5px 0 #d18f0a,
-      0 16px 28px -10px #f5b323a0;
+      0 4px 0 #d18f0a,
+      0 14px 24px -10px #f5b323a0;
     font-family: inherit;
-    font-size: clamp(15px, 1.4vw, 17.5px);
+    font-size: clamp(15px, 1.4vw, 17px);
     font-weight: 800;
-    line-height: 1.4;
+    line-height: 1.35;
     text-align: center;
     text-decoration: none;
     white-space: normal;
@@ -715,7 +910,7 @@ const styles = `
   .premium-hero__showcase {
     width: 100%;
     min-width: 0;
-    margin-top: clamp(54px, 8vw, 96px);
+    margin-top: clamp(44px, 8vw, 96px);
   }
 
   .premium-hero .premium-hero__intro {
@@ -742,7 +937,7 @@ const styles = `
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 20px;
     width: 100%;
-    margin-top: clamp(30px, 4.4vw, 48px);
+    margin-top: clamp(26px, 4.4vw, 48px);
     text-align: left;
   }
 
@@ -856,7 +1051,7 @@ const styles = `
     font-size: clamp(15px, 1.4vw, 17px);
     font-weight: 600;
     line-height: 1.65;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 
   /* Services marquee */
@@ -864,7 +1059,7 @@ const styles = `
   .premium-hero__carousel {
     width: 100%;
     min-width: 0;
-    margin-top: clamp(32px, 4vw, 48px);
+    margin-top: clamp(24px, 4vw, 48px);
   }
 
   .premium-hero__marquee {
@@ -1004,7 +1199,7 @@ const styles = `
       grid-template-columns: repeat(2, minmax(0, 1fr));
       max-width: 760px;
       margin-inline: auto;
-      margin-top: 34px;
+      margin-top: 30px;
     }
 
     .premium-hero__media {
@@ -1016,20 +1211,20 @@ const styles = `
 
   @media (max-width: 767px) {
     .premium-hero {
-      --hero-gutter: 18px;
+      --hero-gutter: 16px;
       --focus-gap: 20px;
-      --service-gap: 12px;
-      padding-top: var(--hero-top-space, 26px);
-      padding-bottom: 32px;
+      --service-gap: 10px;
+      padding-top: var(--hero-top-space, 20px);
+      padding-bottom: 28px;
     }
 
     .premium-hero__stage {
-      gap: 28px;
+      gap: 22px;
     }
 
     .premium-hero .premium-hero__eyebrow {
       gap: 8px;
-      padding: 9px 13px;
+      padding: 8px 14px;
       font-size: 12px;
       line-height: 1.5;
       white-space: normal;
@@ -1037,22 +1232,22 @@ const styles = `
     }
 
     .premium-hero .premium-hero__title {
-      margin-top: 20px;
-      font-size: clamp(28px, 7.7vw, 43px);
+      margin-top: 16px;
+      font-size: clamp(28px, 7.7vw, 40px);
       line-height: 1.12;
       letter-spacing: -.035em;
     }
 
     .premium-hero .premium-hero__subtitle {
       max-width: 480px;
-      margin-top: 15px;
+      margin-top: 12px;
       font-size: 15px;
-      line-height: 1.7;
+      line-height: 1.65;
       text-wrap: pretty;
     }
 
     .premium-hero__focus-slot {
-      margin-top: 23px;
+      margin-top: 18px;
     }
 
     .premium-hero__promise {
@@ -1060,7 +1255,7 @@ const styles = `
     }
 
     .premium-hero__focus-marquee {
-      padding-block: 14px;
+      padding-block: 12px;
       -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
       mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
     }
@@ -1086,105 +1281,99 @@ const styles = `
     }
 
     .premium-hero__card {
-      border-radius: 22px;
+      border-radius: 18px;
       transform: none;
-      box-shadow: 0 22px 46px -25px #5b21b6a6;
-    }
-
-    .premium-hero__video-wrap {
-      aspect-ratio: var(--hero-video-ratio, 4 / 3);
+      box-shadow: 0 20px 40px -24px #5b21b6a6;
     }
 
     .premium-hero__video-controls {
-      left: 12px;
-      right: 12px;
-      bottom: 12px;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
     }
 
     .premium-hero__video-btn {
-      width: 42px;
-      height: 42px;
+      width: 38px;
+      height: 38px;
     }
 
     .premium-hero__panel {
-      padding: 18px 15px 23px;
+      padding: 10px 10px 12px;
     }
 
     .premium-hero .premium-hero__button.premium-hero__button {
-      min-height: 56px;
-      padding: 15px 14px;
+      min-height: 50px;
+      padding: 12px 14px;
       gap: 8px;
-      border-radius: 15px;
-      font-size: clamp(15px, 4.2vw, 17px);
-      line-height: 1.4;
+      border-radius: 13px;
+      font-size: clamp(15px, 4.2vw, 16.5px);
+      line-height: 1.35;
     }
 
     .premium-hero__showcase {
-      margin-top: 54px;
+      margin-top: 44px;
     }
 
     .premium-hero .premium-hero__intro {
-      padding-inline: 2px;
-      font-size: clamp(25px, 6.5vw, 32px);
+      padding-inline: 0;
+      font-size: clamp(24px, 6.4vw, 30px);
       line-height: 1.3;
       letter-spacing: -.02em;
     }
 
     .premium-hero .premium-hero__points {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 13px;
-      margin-top: 28px;
+      gap: 12px;
+      margin-top: 24px;
     }
 
     .premium-hero__point {
-      padding: 19px 15px 22px;
-      border-radius: 20px;
+      padding: 16px 14px 20px;
+      border-radius: 18px;
     }
 
     .premium-hero__point::after {
-      left: 15px;
-      right: 15px;
+      left: 14px;
+      right: 14px;
     }
 
     .premium-hero__point-top {
       align-items: center;
-      gap: 7px;
+      gap: 6px;
     }
 
     .premium-hero__tile {
-      flex-basis: 42px;
-      width: 42px;
-      height: 42px;
-      border-radius: 13px;
+      flex-basis: 40px;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
     }
 
     .premium-hero__tile svg {
-      width: 21px;
-      height: 21px;
+      width: 20px;
+      height: 20px;
     }
 
     .premium-hero__point-number {
-      flex-basis: 30px;
-      width: 30px;
-      height: 30px;
+      flex-basis: 28px;
+      width: 28px;
+      height: 28px;
       border-radius: 9px;
       font-size: 12px;
     }
 
     .premium-hero .premium-hero__point p {
-      margin-top: 17px;
+      margin-top: 14px;
       font-size: clamp(13px, 3.6vw, 14.5px);
-      line-height: 1.6;
+      line-height: 1.55;
     }
 
     .premium-hero__carousel {
-      margin-top: 28px;
+      margin-top: 22px;
     }
 
     .premium-hero__marquee {
-      padding-block: 14px;
-      -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
-      mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+      padding-block: 12px;
     }
 
     .premium-hero__track {
@@ -1193,7 +1382,7 @@ const styles = `
 
     .premium-hero__service {
       gap: 8px;
-      padding: 10px 14px;
+      padding: 9px 14px;
       font-size: 13px;
     }
 
@@ -1207,19 +1396,19 @@ const styles = `
 
   @media (max-width: 479px) {
     .premium-hero {
-      --hero-gutter: 16px;
+      --hero-gutter: 14px;
       --focus-gap: 16px;
-      --service-gap: 10px;
+      --service-gap: 8px;
     }
 
     .premium-hero .premium-hero__eyebrow {
       gap: 7px;
-      padding: 9px 12px;
-      font-size: 11px;
+      padding: 8px 12px;
+      font-size: 11.5px;
     }
 
     .premium-hero .premium-hero__title {
-      font-size: clamp(27px, 7.8vw, 36px);
+      font-size: clamp(26px, 7.8vw, 34px);
     }
 
     .premium-hero .premium-hero__subtitle {
@@ -1227,11 +1416,7 @@ const styles = `
     }
 
     .premium-hero__stage {
-      gap: 25px;
-    }
-
-    .premium-hero__video-wrap {
-      aspect-ratio: var(--hero-video-ratio, 4 / 3);
+      gap: 20px;
     }
 
     .premium-hero .premium-hero__button.premium-hero__button {
@@ -1239,17 +1424,22 @@ const styles = `
     }
 
     .premium-hero .premium-hero__intro {
-      font-size: 24px;
+      font-size: 23px;
       line-height: 1.32;
     }
 
     .premium-hero .premium-hero__points {
-      gap: 12px;
+      gap: 10px;
     }
 
     .premium-hero__point {
-      padding: 16px 12px 19px;
-      border-radius: 18px;
+      padding: 14px 12px 18px;
+      border-radius: 16px;
+    }
+
+    .premium-hero__point::after {
+      left: 12px;
+      right: 12px;
     }
 
     .premium-hero__point-top {
@@ -1257,32 +1447,37 @@ const styles = `
     }
 
     .premium-hero__tile {
-      flex-basis: 38px;
-      width: 38px;
-      height: 38px;
+      flex-basis: 36px;
+      width: 36px;
+      height: 36px;
     }
 
     .premium-hero__tile svg {
-      width: 20px;
-      height: 20px;
+      width: 19px;
+      height: 19px;
     }
 
     .premium-hero__point-number {
-      flex-basis: 27px;
-      width: 27px;
-      height: 27px;
+      flex-basis: 26px;
+      width: 26px;
+      height: 26px;
       font-size: 11px;
     }
 
     .premium-hero .premium-hero__point p {
-      margin-top: 15px;
+      margin-top: 12px;
       font-size: 13px;
-      line-height: 1.55;
+      line-height: 1.5;
     }
 
     .premium-hero__video-btn {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
+    }
+
+    .premium-hero__video-btn svg {
+      width: 18px;
+      height: 18px;
     }
   }
 
@@ -1295,20 +1490,20 @@ const styles = `
     }
 
     .premium-hero .premium-hero__title {
-      font-size: 26px;
+      font-size: 25px;
     }
 
     .premium-hero .premium-hero__intro {
-      font-size: 22px;
+      font-size: 21px;
     }
 
     .premium-hero .premium-hero__points {
       grid-template-columns: minmax(0, 1fr);
-      gap: 12px;
+      gap: 10px;
     }
 
     .premium-hero__point {
-      padding: 18px;
+      padding: 16px;
     }
 
     .premium-hero .premium-hero__point p {
@@ -1316,16 +1511,11 @@ const styles = `
     }
 
     .premium-hero__panel {
-      padding-inline: 12px;
+      padding-inline: 8px;
     }
 
     .premium-hero .premium-hero__button.premium-hero__button {
       font-size: 14px;
-    }
-
-    .premium-hero__video-btn {
-      width: 38px;
-      height: 38px;
     }
   }
 
@@ -1363,10 +1553,6 @@ const styles = `
       box-shadow: 0 40px 70px -28px #5b21b6c4;
     }
 
-    .premium-hero__card:hover .premium-hero__video {
-      scale: 1.025;
-    }
-
     .premium-hero__video-btn:hover {
       background: var(--violet);
       transform: scale(1.06);
@@ -1379,7 +1565,7 @@ const styles = `
     .premium-hero .premium-hero__button.premium-hero__button:hover {
       transform: translateY(-3px);
       filter: brightness(1.04) saturate(1.05);
-      box-shadow: 0 8px 0 #d18f0a, 0 24px 38px -12px #f5b323c0;
+      box-shadow: 0 7px 0 #d18f0a, 0 22px 36px -12px #f5b323c0;
     }
 
     .premium-hero__button:hover .premium-hero__button-arrow {
@@ -1503,7 +1689,8 @@ export default function Hero() {
               <div className="premium-hero__pill">
                 <p className="premium-hero__eyebrow">
                   <span>
-                    Dont just landing pages. We build complete funnels
+                    Don&rsquo;t just build landing pages. We build complete
+                    funnels
                   </span>
                 </p>
               </div>

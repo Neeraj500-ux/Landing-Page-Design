@@ -1,7 +1,5 @@
-
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Container } from './ui'
 
 const points = [
   'High-converting landing pages',
@@ -22,8 +20,8 @@ const initialForm = {
 function CheckIcon() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
@@ -31,7 +29,7 @@ function CheckIcon() {
       <path
         d="m5 12 4 4L19 6"
         stroke="currentColor"
-        strokeWidth="2.2"
+        strokeWidth="2.4"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -42,8 +40,8 @@ function CheckIcon() {
 function CloseIcon() {
   return (
     <svg
-      width="21"
-      height="21"
+      width="20"
+      height="20"
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"
@@ -51,7 +49,7 @@ function CloseIcon() {
       <path
         d="m6 6 12 12M18 6 6 18"
         stroke="currentColor"
-        strokeWidth="1.8"
+        strokeWidth="2"
         strokeLinecap="round"
       />
     </svg>
@@ -59,13 +57,21 @@ function CloseIcon() {
 }
 
 const css = `
-  .ct-popup-root {
-    --ct-purple: #7755e8;
-    --ct-purple-dark: #5135a9;
-    --ct-yellow: #f6d85b;
-    --ct-ink: #171525;
-    --ct-muted: #777487;
-    font-family: inherit;
+  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+  .ct-popup-root,
+  .ct-popup-overlay {
+    --ct-violet: #7c3aed;
+    --ct-violet-deep: #5b21b6;
+    --ct-dark-1: #1b1233;
+    --ct-dark-2: #140d27;
+    --ct-ink: #14111f;
+    --ct-ink-soft: #2a2140;
+    --ct-muted: #5b5870;
+    --ct-line: #e6dffa;
+    --ct-yellow: #ffe04e;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 
   .ct-popup-root *,
@@ -82,60 +88,71 @@ const css = `
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: rgba(16, 12, 32, .74);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    background: rgba(20, 13, 39, .72);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     overflow-y: auto;
     overscroll-behavior: contain;
     animation: ctOverlayIn .22s ease both;
   }
 
+  .ct-popup-overlay *,
+  .ct-popup-overlay *::before,
+  .ct-popup-overlay *::after {
+    box-sizing: border-box;
+  }
+
   .ct-popup-modal {
     position: relative;
     isolation: isolate;
-    width: min(100%, 960px);
+    width: min(100%, 980px);
     max-height: calc(100dvh - 48px);
     display: grid;
-    grid-template-columns: .88fr 1.12fr;
-    overflow: auto;
+    grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+    grid-template-rows: minmax(0, 1fr);
+    overflow: hidden;
     background: #fff;
-    border: 1px solid rgba(255,255,255,.65);
-    border-radius: 24px;
+    border-radius: 26px;
     box-shadow:
-      0 35px 100px rgba(12, 8, 30, .32),
-      0 8px 24px rgba(12, 8, 30, .12);
-    animation: ctModalIn .3s cubic-bezier(.2,.75,.25,1) both;
+      0 40px 100px -20px rgba(20, 13, 39, .55),
+      0 8px 24px rgba(20, 13, 39, .18);
+    animation: ctModalIn .32s cubic-bezier(.22, 1, .36, 1) both;
   }
 
   .ct-popup-close {
     position: absolute;
     z-index: 5;
-    top: 15px;
-    right: 15px;
-    width: 40px;
-    height: 40px;
+    top: 14px;
+    right: 14px;
+    width: 42px;
+    height: 42px;
     display: grid;
     place-items: center;
-    color: #40394f;
-    background: rgba(255,255,255,.94);
-    border: 1px solid #ebe7f5;
+    padding: 0;
+    color: var(--ct-ink-soft);
+    background: #fff;
+    border: 1px solid var(--ct-line);
     border-radius: 50%;
+    box-shadow: 0 6px 16px -8px rgba(91, 33, 182, .35);
     cursor: pointer;
     transition: background .2s, color .2s, transform .2s;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .ct-popup-close:hover {
-    color: var(--ct-purple);
-    background: #f0ebff;
+    color: #fff;
+    background: var(--ct-violet);
     transform: rotate(90deg);
   }
 
   .ct-popup-close:focus-visible,
-  .ct-popup-submit:focus-visible,
-  .ct-popup-done:focus-visible {
-    outline: 3px solid rgba(119,85,232,.45);
+  .ct-popup-root .ct-popup-yellow:focus-visible {
+    outline: 3px solid #a98af0;
     outline-offset: 3px;
   }
+
+  /* Left info panel */
 
   .ct-popup-side {
     position: relative;
@@ -143,39 +160,30 @@ const css = `
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 32px;
+    gap: 28px;
     min-width: 0;
-    padding: 44px 32px 30px;
+    padding: 44px 34px 30px;
     color: #fff;
-    background:
-      radial-gradient(
-        ellipse at 8% 5%,
-        rgba(246,216,91,.20),
-        transparent 35%
-      ),
-      radial-gradient(
-        ellipse at 100% 100%,
-        rgba(153,125,255,.35),
-        transparent 38%
-      ),
-      linear-gradient(145deg, #25194e 0%, #5135a9 58%, #7957e8 100%);
     overflow: hidden;
+    background:
+      radial-gradient(70% 50% at 0% 0%, rgba(255, 224, 78, .18), transparent 70%),
+      radial-gradient(80% 60% at 100% 100%, rgba(139, 92, 246, .5), transparent 70%),
+      linear-gradient(160deg, var(--ct-dark-1), var(--ct-dark-2));
   }
 
   .ct-popup-side::before {
     content: "";
     position: absolute;
     z-index: -1;
-    width: 260px;
-    height: 260px;
-    right: -145px;
-    bottom: -130px;
-    border: 1px solid rgba(255,255,255,.18);
+    right: -150px;
+    bottom: -140px;
+    width: 280px;
+    height: 280px;
+    border: 1px solid rgba(255, 255, 255, .16);
     border-radius: 50%;
     box-shadow:
-      0 0 0 28px rgba(255,255,255,.035),
-      0 0 0 58px rgba(255,255,255,.025),
-      0 0 0 90px rgba(255,255,255,.018);
+      0 0 0 30px rgba(255, 255, 255, .035),
+      0 0 0 62px rgba(255, 255, 255, .025);
     pointer-events: none;
   }
 
@@ -185,33 +193,34 @@ const css = `
     gap: 9px;
     width: fit-content;
     max-width: 100%;
-    padding: 9px 12px;
-    border: 1px solid rgba(255,255,255,.2);
-    border-radius: 100px;
+    padding: 8px 14px;
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: 999px;
     color: #fff;
-    background: rgba(255,255,255,.09);
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.25px;
+    background: rgba(255, 255, 255, .08);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
   }
 
   .ct-popup-dot {
     flex-shrink: 0;
-    width: 7px;
-    height: 7px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--ct-yellow);
-    box-shadow: 0 0 12px rgba(246,216,91,.75);
+    box-shadow: 0 0 12px rgba(255, 224, 78, .8);
   }
 
   .ct-popup-side h2 {
-    margin: 26px 0 15px;
-    max-width: 360px;
+    margin: 22px 0 14px;
+    max-width: 380px;
     color: #fff;
-    font-size: clamp(30px, 3.1vw, 41px);
-    font-weight: 750;
-    line-height: 1.12;
-    letter-spacing: -1.5px;
+    font-family: "Bricolage Grotesque", Inter, sans-serif;
+    font-size: clamp(30px, 3.2vw, 42px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -.03em;
     text-wrap: balance;
   }
 
@@ -221,16 +230,16 @@ const css = `
 
   .ct-popup-side p {
     margin: 0;
-    max-width: 340px;
-    color: rgba(255,255,255,.78);
-    font-size: 13px;
-    line-height: 1.85;
+    max-width: 360px;
+    color: rgba(255, 255, 255, .8);
+    font-size: 15px;
+    line-height: 1.7;
   }
 
   .ct-popup-points {
     display: grid;
-    gap: 16px;
-    margin: 29px 0 0;
+    gap: 14px;
+    margin: 26px 0 0;
     padding: 0;
     list-style: none;
   }
@@ -239,83 +248,84 @@ const css = `
     display: flex;
     align-items: center;
     gap: 12px;
-    color: rgba(255,255,255,.95);
-    font-size: 12px;
+    color: #fff;
+    font-size: 14.5px;
     font-weight: 500;
-    line-height: 1.55;
+    line-height: 1.5;
   }
 
   .ct-popup-check {
     display: grid;
     place-items: center;
     flex-shrink: 0;
-    width: 27px;
-    height: 27px;
+    width: 28px;
+    height: 28px;
     color: var(--ct-yellow);
-    background: rgba(246,216,91,.12);
-    border: 1px solid rgba(246,216,91,.32);
+    background: rgba(255, 224, 78, .12);
+    border: 1px solid rgba(255, 224, 78, .35);
     border-radius: 50%;
   }
 
   .ct-popup-side-note {
-    position: relative;
-    z-index: 1;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255,255,255,.17);
-    color: rgba(255,255,255,.67);
-    font-size: 9px;
-    font-weight: 650;
-    letter-spacing: .7px;
-    line-height: 1.8;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, .16);
+    color: rgba(255, 255, 255, .68);
+    font-size: 12.5px;
+    font-weight: 500;
+    line-height: 1.6;
   }
+
+  /* Form area */
 
   .ct-popup-form-area {
     min-width: 0;
-    padding: 39px 35px 30px;
+    padding: 38px 36px 30px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     background: #fff;
   }
 
   .ct-popup-form-head {
-    padding-right: 37px;
-    margin-bottom: 25px;
+    padding-right: 48px;
+    margin-bottom: 24px;
   }
 
   .ct-popup-form-head small {
     display: inline-block;
-    margin-bottom: 10px;
-    color: var(--ct-purple);
-    font-size: 10px;
-    font-weight: 850;
-    letter-spacing: 1.7px;
+    margin-bottom: 8px;
+    color: var(--ct-violet);
+    font-size: 13px;
+    font-weight: 700;
   }
 
   .ct-popup-form-head h3 {
-    margin: 0 0 9px;
+    margin: 0 0 8px;
     color: var(--ct-ink);
-    font-size: clamp(24px, 2.5vw, 29px);
-    font-weight: 750;
-    letter-spacing: -.9px;
-    line-height: 1.2;
+    font-family: "Bricolage Grotesque", Inter, sans-serif;
+    font-size: clamp(26px, 2.6vw, 32px);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    line-height: 1.15;
   }
 
   .ct-popup-form-head p {
     margin: 0;
     color: var(--ct-muted);
-    font-size: 12px;
-    line-height: 1.8;
+    font-size: 14.5px;
+    line-height: 1.65;
   }
 
   .ct-popup-form {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 17px 13px;
+    gap: 16px 14px;
   }
 
   .ct-popup-field {
     display: flex;
     min-width: 0;
     flex-direction: column;
-    gap: 8px;
+    gap: 7px;
   }
 
   .ct-popup-field.full {
@@ -323,9 +333,10 @@ const css = `
   }
 
   .ct-popup-field label {
-    color: #302d40;
-    font-size: 11px;
-    font-weight: 750;
+    color: var(--ct-ink-soft);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
   }
 
   .ct-popup-field label span {
@@ -340,24 +351,21 @@ const css = `
     width: 100%;
     min-width: 0;
     margin: 0;
-    padding: 12px 13px;
-    border: 1px solid #e6e3ee;
-    border-radius: 10px;
+    padding: 12px 14px;
+    border: 1px solid #e2dcf2;
+    border-radius: 12px;
     outline: none;
-    color: #211e31;
+    color: var(--ct-ink);
     background: #fbfaff;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 15px;
     line-height: 1.5;
-    transition:
-      border-color .2s,
-      box-shadow .2s,
-      background .2s;
+    transition: border-color .2s, box-shadow .2s, background .2s;
   }
 
   .ct-popup-field input,
   .ct-popup-field select {
-    height: 45px;
+    height: 48px;
   }
 
   .ct-popup-field select {
@@ -365,100 +373,140 @@ const css = `
   }
 
   .ct-popup-field textarea {
-    min-height: 91px;
+    min-height: 96px;
     resize: vertical;
   }
 
   .ct-popup-field input:hover,
   .ct-popup-field select:hover,
   .ct-popup-field textarea:hover {
-    border-color: #cfc5f4;
+    border-color: #cdbff3;
   }
 
   .ct-popup-field input:focus,
   .ct-popup-field select:focus,
   .ct-popup-field textarea:focus {
-    border-color: var(--ct-purple);
+    border-color: var(--ct-violet);
     background: #fff;
-    box-shadow: 0 0 0 3px rgba(119,85,232,.11);
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, .13);
   }
 
   .ct-popup-field input::placeholder,
   .ct-popup-field textarea::placeholder {
-    color: #aaa6b7;
+    color: #a7a2b8;
     opacity: 1;
   }
 
-  .ct-popup-submit {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: center;
+  /* Yellow 3D button (same as the hero CTA) */
+
+  .ct-popup-root .ct-popup-yellow,
+  .ct-popup-overlay .ct-popup-yellow {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     width: 100%;
-    min-height: 49px;
-    margin-top: 1px;
-    padding: 13px 18px;
-    border: 1px solid rgba(230,190,47,.3);
-    border-radius: 11px;
-    color: #211b36;
-    background: linear-gradient(105deg, #f7dc64 0%, #f4cb43 100%);
-    box-shadow: 0 6px 17px rgba(231,193,56,.19);
+    min-width: 0;
+    min-height: 56px;
+    margin: 0;
+    padding: 14px clamp(16px, 4vw, 30px);
+    border: 1px solid #f3b01f;
+    border-radius: 16px;
+    color: #2e0c4d;
+    background: linear-gradient(180deg, #ffee82, #ffe04e 48%, #ffca30);
+    box-shadow:
+      inset 0 1px 0 #fff8c4,
+      inset 0 -2px 4px #f5b2144d,
+      0 5px 0 #d18f0a,
+      0 16px 28px -10px #f5b323a0;
     font-family: inherit;
-    font-size: 12px;
-    font-weight: 850;
+    font-size: clamp(15px, 1.4vw, 17px);
+    font-weight: 800;
+    line-height: 1.35;
+    text-align: center;
+    text-decoration: none;
+    white-space: normal;
     cursor: pointer;
-    transition:
-      transform .2s,
-      box-shadow .2s,
-      filter .2s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
-  .ct-popup-submit > span {
-    font-size: 18px;
+  .ct-popup-overlay .ct-popup-yellow::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 50%;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(180deg, #ffffff40, transparent);
+  }
+
+  .ct-popup-overlay .ct-popup-yellow::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -45%;
+    width: 32%;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(100deg, transparent, #ffffff99, transparent);
+    transform: skewX(-20deg);
+    animation: ctShine 5.5s ease-in-out 2s infinite;
+  }
+
+  .ct-popup-overlay .ct-popup-yellow > span {
+    font-size: 19px;
     line-height: 1;
-    transition: transform .2s;
+    transition: transform .25s cubic-bezier(.22, 1, .36, 1);
   }
 
-  .ct-popup-submit:hover {
-    transform: translateY(-2px);
-    filter: saturate(1.06);
-    box-shadow: 0 10px 23px rgba(231,193,56,.3);
+  .ct-popup-overlay .ct-popup-yellow:active {
+    transform: translateY(3px);
+    box-shadow:
+      inset 0 1px 0 #fff8c4,
+      0 2px 0 #d18f0a,
+      0 8px 16px -8px #f5b323a0;
   }
 
-  .ct-popup-submit:hover > span {
-    transform: translateX(3px);
-  }
-
-  .ct-popup-submit:disabled {
+  .ct-popup-overlay .ct-popup-yellow:disabled {
     opacity: .65;
     cursor: not-allowed;
     transform: none;
   }
 
+  .ct-popup-submit {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+  }
+
   .ct-popup-privacy {
     grid-column: 1 / -1;
-    margin: -3px 0 0;
-    color: #928da1;
-    font-size: 10px;
-    line-height: 1.7;
+    margin: 0;
+    color: #8a869a;
+    font-size: 12.5px;
+    line-height: 1.6;
     text-align: center;
   }
 
   .ct-popup-error {
     grid-column: 1 / -1;
     margin: 0;
-    padding: 10px 12px;
+    padding: 11px 14px;
     color: #9d2737;
     background: #fff1f2;
     border: 1px solid #ffd7dc;
-    border-radius: 9px;
-    font-size: 12px;
-    line-height: 1.6;
+    border-radius: 11px;
+    font-size: 13.5px;
+    line-height: 1.55;
   }
 
+  /* Success state */
+
   .ct-popup-success {
-    min-height: 370px;
+    min-height: 380px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -466,46 +514,40 @@ const css = `
   }
 
   .ct-popup-success-icon {
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
     display: grid;
     place-items: center;
     margin-bottom: 22px;
-    border-radius: 17px;
-    color: #4c2fa9;
-    background: #eee8ff;
+    border-radius: 18px;
+    color: var(--ct-violet-deep);
+    background: #efe7ff;
+  }
+
+  .ct-popup-success-icon svg {
+    width: 26px;
+    height: 26px;
   }
 
   .ct-popup-success h3 {
-    margin: 0 0 11px;
+    margin: 0 0 10px;
     color: var(--ct-ink);
-    font-size: 29px;
-    font-weight: 750;
-    letter-spacing: -.8px;
+    font-family: "Bricolage Grotesque", Inter, sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -.03em;
   }
 
   .ct-popup-success p {
-    margin: 0 0 24px;
+    margin: 0 0 26px;
     color: var(--ct-muted);
-    font-size: 13px;
-    line-height: 1.8;
+    font-size: 15px;
+    line-height: 1.7;
   }
 
   .ct-popup-done {
-    padding: 12px 25px;
-    border: 0;
-    border-radius: 10px;
-    color: #211b36;
-    background: var(--ct-yellow);
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 850;
-    cursor: pointer;
-    transition: transform .2s;
-  }
-
-  .ct-popup-done:hover {
-    transform: translateY(-2px);
+    width: auto;
+    min-width: 160px;
   }
 
   @keyframes ctOverlayIn {
@@ -514,44 +556,47 @@ const css = `
   }
 
   @keyframes ctModalIn {
-    from {
-      opacity: 0;
-      transform: translateY(15px) scale(.985);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+    from { opacity: 0; transform: translateY(16px) scale(.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  @media (min-width: 681px) and (max-height: 760px) {
+  @keyframes ctShine {
+    0%, 55% { transform: translateX(0) skewX(-20deg); }
+    100% { transform: translateX(520%) skewX(-20deg); }
+  }
+
+  /* Short desktop screens */
+
+  @media (min-width: 761px) and (max-height: 820px) {
+    .ct-popup-overlay {
+      padding: 16px;
+    }
+
     .ct-popup-modal {
       max-height: calc(100dvh - 32px);
     }
 
     .ct-popup-side {
-      padding-top: 32px;
-      padding-bottom: 24px;
-      gap: 22px;
+      gap: 20px;
+      padding: 30px 30px 22px;
     }
 
     .ct-popup-side h2 {
-      margin-top: 19px;
+      margin-top: 16px;
       font-size: 32px;
     }
 
     .ct-popup-points {
-      gap: 11px;
-      margin-top: 20px;
+      gap: 10px;
+      margin-top: 18px;
     }
 
     .ct-popup-form-area {
-      padding-top: 29px;
-      padding-bottom: 24px;
+      padding: 28px 32px 24px;
     }
 
     .ct-popup-form-head {
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .ct-popup-form {
@@ -559,7 +604,37 @@ const css = `
     }
   }
 
-  @media (max-width: 680px) {
+  @media (min-width: 761px) and (max-height: 700px) {
+    .ct-popup-side p,
+    .ct-popup-side-note {
+      display: none;
+    }
+
+    .ct-popup-form-head p {
+      display: none;
+    }
+
+    .ct-popup-form-head {
+      margin-bottom: 12px;
+    }
+
+    .ct-popup-field input,
+    .ct-popup-field select {
+      height: 44px;
+    }
+
+    .ct-popup-field textarea {
+      min-height: 72px;
+    }
+
+    .ct-popup-overlay .ct-popup-yellow {
+      min-height: 50px;
+    }
+  }
+
+  /* Tablet and mobile: single column, scrolls as one card */
+
+  @media (max-width: 760px) {
     .ct-popup-overlay {
       align-items: flex-start;
       padding: 12px;
@@ -569,36 +644,52 @@ const css = `
       width: 100%;
       max-height: calc(100dvh - 24px);
       grid-template-columns: minmax(0, 1fr);
-      border-radius: 19px;
+      grid-template-rows: auto;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border-radius: 22px;
+    }
+
+    .ct-popup-close {
+      position: sticky;
+      float: right;
+      top: 10px;
+      right: auto;
+      margin: 10px 10px -52px 0;
+      width: 40px;
+      height: 40px;
     }
 
     .ct-popup-side {
-      gap: 20px;
-      padding: 25px 23px 23px;
+      gap: 16px;
+      padding: 24px 20px 22px;
+    }
+
+    .ct-popup-eyebrow {
+      font-size: 11.5px;
+      padding: 7px 12px;
     }
 
     .ct-popup-side h2 {
-      max-width: 440px;
-      margin: 17px 0 9px;
-      padding-right: 8px;
-      font-size: clamp(27px, 6vw, 33px);
-      letter-spacing: -.9px;
+      max-width: 100%;
+      margin: 16px 0 10px;
+      padding-right: 44px;
+      font-size: clamp(26px, 7vw, 34px);
     }
 
     .ct-popup-side p {
-      max-width: 480px;
-      font-size: 12px;
-      line-height: 1.75;
+      max-width: 100%;
+      font-size: 14px;
+      line-height: 1.6;
     }
 
     .ct-popup-points {
-      gap: 10px;
-      margin-top: 18px;
+      gap: 9px;
+      margin-top: 16px;
     }
 
     .ct-popup-points li {
-      gap: 10px;
-      font-size: 12px;
+      font-size: 13.5px;
     }
 
     .ct-popup-check {
@@ -611,36 +702,46 @@ const css = `
     }
 
     .ct-popup-form-area {
-      padding: 25px 23px 23px;
+      padding: 24px 20px 22px;
+      overflow: visible;
     }
 
     .ct-popup-form-head {
-      margin-bottom: 19px;
-      padding-right: 38px;
+      margin-bottom: 18px;
+      padding-right: 0;
     }
 
     .ct-popup-form-head h3 {
       font-size: 25px;
     }
 
+    .ct-popup-form-head p {
+      font-size: 14px;
+    }
+
     .ct-popup-form {
-      gap: 14px 11px;
+      gap: 14px 12px;
+    }
+
+    /* 16px stops iOS from zooming into fields */
+    .ct-popup-field input,
+    .ct-popup-field select,
+    .ct-popup-field textarea {
+      font-size: 16px;
     }
 
     .ct-popup-field input,
     .ct-popup-field select {
-      height: 44px;
+      height: 50px;
     }
 
-    .ct-popup-close {
-      top: 10px;
-      right: 10px;
-      width: 35px;
-      height: 35px;
+    .ct-popup-overlay .ct-popup-yellow {
+      min-height: 54px;
+      border-radius: 14px;
     }
   }
 
-  @media (max-width: 390px) {
+  @media (max-width: 560px) {
     .ct-popup-form {
       grid-template-columns: minmax(0, 1fr);
     }
@@ -652,31 +753,65 @@ const css = `
       grid-column: auto;
     }
 
-    .ct-popup-side {
-      padding: 22px 19px 20px;
+    .ct-popup-points li:nth-child(3) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .ct-popup-overlay {
+      padding: 8px;
     }
 
-    .ct-popup-side h2 {
-      padding-right: 0;
-      font-size: 27px;
+    .ct-popup-modal {
+      max-height: calc(100dvh - 16px);
+      border-radius: 18px;
+    }
+
+    .ct-popup-side {
+      padding: 20px 16px 18px;
     }
 
     .ct-popup-form-area {
-      padding: 23px 19px 21px;
+      padding: 20px 16px 18px;
+    }
+
+    .ct-popup-side h2 {
+      font-size: 25px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .ct-popup-overlay,
-    .ct-popup-modal {
+    .ct-popup-modal,
+    .ct-popup-overlay .ct-popup-yellow::after {
       animation: none;
     }
 
     .ct-popup-close,
-    .ct-popup-submit,
-    .ct-popup-submit > span,
-    .ct-popup-done {
+    .ct-popup-overlay .ct-popup-yellow > span {
       transition: none;
+    }
+  }
+
+  /* Hover effects only on mouse devices */
+
+  @media (hover: hover) and (pointer: fine) {
+    .ct-popup-overlay .ct-popup-yellow {
+      transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+    }
+
+    .ct-popup-overlay .ct-popup-yellow:hover:not(:disabled) {
+      transform: translateY(-3px);
+      filter: brightness(1.04) saturate(1.05);
+      box-shadow:
+        inset 0 1px 0 #fff8c4,
+        0 8px 0 #d18f0a,
+        0 24px 38px -12px #f5b323c0;
+    }
+
+    .ct-popup-overlay .ct-popup-yellow:hover > span {
+      transform: translateX(3px);
     }
   }
 `
@@ -703,7 +838,7 @@ export default function Contact() {
   }, [])
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return undefined
 
     const previousOverflow = document.body.style.overflow
 
@@ -781,7 +916,7 @@ export default function Contact() {
                 <div>
                   <div className="ct-popup-eyebrow">
                     <span className="ct-popup-dot" />
-                    LET'S GROW TOGETHER
+                    Let&rsquo;s grow together
                   </div>
 
                   <h2>
@@ -789,8 +924,8 @@ export default function Contact() {
                   </h2>
 
                   <p id="ct-popup-description">
-                    Tell us about your business. Let's build a smarter growth
-                    system that turns more leads into paying customers.
+                    Tell us about your business. Let&rsquo;s build a smarter
+                    growth system that turns more leads into paying customers.
                   </p>
 
                   <ul className="ct-popup-points">
@@ -806,7 +941,7 @@ export default function Contact() {
                 </div>
 
                 <div className="ct-popup-side-note">
-                  CREATIVE CREW · GROWTH, BUILT AROUND YOUR BUSINESS
+                  Creative Crew &mdash; growth, built around your business.
                 </div>
               </aside>
 
@@ -825,7 +960,7 @@ export default function Contact() {
                     </p>
 
                     <button
-                      className="ct-popup-done"
+                      className="ct-popup-yellow ct-popup-done"
                       type="button"
                       onClick={closePopup}
                     >
@@ -835,11 +970,11 @@ export default function Contact() {
                 ) : (
                   <>
                     <div className="ct-popup-form-head">
-                      <small>GET IN TOUCH</small>
-                      <h3 id="ct-popup-title">Let's talk growth.</h3>
+                      <small>Get in touch</small>
+                      <h3 id="ct-popup-title">Let&rsquo;s talk growth.</h3>
                       <p>
-                        Share a few details and tell us what you'd like to
-                        achieve.
+                        Share a few details and tell us what you&rsquo;d like
+                        to achieve.
                       </p>
                     </div>
 
@@ -966,16 +1101,16 @@ export default function Contact() {
                       )}
 
                       <button
-                        className="ct-popup-submit"
+                        className="ct-popup-yellow ct-popup-submit"
                         type="submit"
                         disabled={isSubmitting}
                       >
                         {isSubmitting
                           ? 'Please wait...'
-                          : "Let's Grow My Revenue"}
+                          : "Yes! Let's Grow My Revenue"}
 
                         {!isSubmitting && (
-                          <span aria-hidden="true">→</span>
+                          <span aria-hidden="true">&rarr;</span>
                         )}
                       </button>
 
