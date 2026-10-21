@@ -159,11 +159,19 @@ const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 
   .premium-hero {
-    --hero-ink: #2a1a40;
-    --hero-body: #5f4d73;
-    --hero-heading-grey: #343434;
-    --hero-violet: #7c3aed;
-    --hero-violet-deep: #5b21b6;
+    /* Palette (from reference): ink + violet/indigo + soft lavender + warm amber CTA */
+    --ink: #14111f;
+    --ink-soft: #2a2140;
+    --muted: #5b5870;
+    --violet: #7c3aed;
+    --violet-deep: #5b21b6;
+    --indigo: #4f46e5;
+    --lav-50: #f7f3ff;
+    --lav-100: #efe7ff;
+    --lav-200: #e0d2ff;
+    --dark-1: #1b1233;
+    --dark-2: #140d27;
+
     --hero-gutter: clamp(16px, 4vw, 36px);
     --hero-ease: cubic-bezier(.22, 1, .36, 1);
     --focus-gap: clamp(22px, 3vw, 44px);
@@ -173,17 +181,17 @@ const styles = `
     isolation: isolate;
     width: 100%;
     min-width: 0;
+    overflow-x: clip;
     padding: var(--hero-top-space, clamp(28px, 4vw, 56px)) 0 32px;
-    color: var(--hero-ink);
+    color: var(--ink);
     font-family: Inter, ui-sans-serif, system-ui, -apple-system,
       BlinkMacSystemFont, "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: 100%;
     background:
-      radial-gradient(60% 46% at 100% 0%, #ece0ff, transparent 70%),
-      radial-gradient(45% 38% at 0% 10%, #fff0e6, transparent 70%),
-      radial-gradient(70% 38% at 82% 62%, #efe6ff, transparent 72%),
-      radial-gradient(50% 36% at 8% 78%, #f4edff, transparent 75%),
+      radial-gradient(55% 42% at 100% 0%, #efe6ff, transparent 70%),
+      radial-gradient(40% 34% at 0% 8%, #f6f0ff, transparent 72%),
+      radial-gradient(60% 36% at 85% 65%, #f3ecff, transparent 72%),
       #fff;
   }
 
@@ -200,10 +208,10 @@ const styles = `
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background-image: radial-gradient(#8b5cf61c 1px, transparent 1px);
+    background-image: radial-gradient(#7c3aed17 1px, transparent 1px);
     background-size: 30px 30px;
-    -webkit-mask-image: linear-gradient(#000a, transparent 60%);
-    mask-image: linear-gradient(#000a, transparent 60%);
+    -webkit-mask-image: linear-gradient(#000a, transparent 55%);
+    mask-image: linear-gradient(#000a, transparent 55%);
   }
 
   .premium-hero .premium-hero__container {
@@ -212,7 +220,6 @@ const styles = `
     min-width: 0;
     margin-inline: auto;
     padding-inline: var(--hero-gutter);
-    text-align: center;
   }
 
   .premium-hero h1,
@@ -221,12 +228,12 @@ const styles = `
   .premium-hero ul,
   .premium-hero figure {
     margin: 0;
+    overflow-wrap: break-word;
   }
 
-  .premium-hero h1,
-  .premium-hero h2,
-  .premium-hero p {
-    overflow-wrap: break-word;
+  .premium-hero ul {
+    padding: 0;
+    list-style: none;
   }
 
   .premium-hero svg {
@@ -237,140 +244,121 @@ const styles = `
   .premium-hero__reveal {
     min-width: 0;
     max-width: 100%;
-    animation: premiumHeroEnter .85s var(--hero-ease) both;
+    animation: premiumHeroEnter .8s var(--hero-ease) both;
     animation-delay: var(--reveal-delay, 0ms);
   }
 
+  /* ---------- Stage: text left, image right ---------- */
   .premium-hero__stage {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    justify-items: center;
+    gap: clamp(28px, 5vw, 44px);
+    align-items: center;
   }
 
-  .premium-hero__head {
-    width: 100%;
-    max-width: 1080px;
+  .premium-hero__copy {
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
   }
 
+  /* Eyebrow pill: light lavender with purple dot (as in reference) */
   .premium-hero__pill {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
+    max-width: 100%;
   }
 
   .premium-hero .premium-hero__eyebrow {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 11px;
     max-width: 100%;
-    padding: 11px 22px;
-    border: 1px solid #ffffff45;
+    padding: 10px 20px;
+    border: 1px solid var(--lav-200);
     border-radius: 999px;
-    color: #fff;
-    background:
-      linear-gradient(180deg, #ffffff24, transparent 55%),
-      linear-gradient(120deg, #2a1a40, #5b3a86);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow:
-      inset 0 1px 0 #ffffff33,
-      0 16px 34px -16px #4c1d95a6;
-    font-size: clamp(12.5px, 1.25vw, 14.5px);
-    font-weight: 650;
+    color: var(--ink-soft);
+    background: linear-gradient(180deg, #f6f1ff, var(--lav-100));
+    box-shadow: inset 0 1px 0 #fff, 0 10px 24px -16px #7c3aed80;
+    font-size: clamp(12.5px, 1.2vw, 14px);
+    font-weight: 600;
     line-height: 1.6;
     text-wrap: balance;
   }
 
   .premium-hero__eyebrow::before {
     content: "";
-    flex: 0 0 7px;
-    width: 7px;
-    height: 7px;
+    flex: 0 0 9px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ffe0cc, #e58a5c);
+    background: linear-gradient(135deg, #8b5cf6, var(--violet-deep));
     animation: premiumHeroPulse 3s ease-in-out infinite;
   }
 
+  /* Heading: dark lead + violet-to-indigo gradient accent */
   .premium-hero .premium-hero__title {
-    max-width: 1000px;
-    margin: clamp(18px, 2.4vw, 28px) auto 0;
-    font-size: clamp(30px, 4.9vw, 62px);
+    margin: clamp(18px, 2.4vw, 26px) 0 0;
+    font-size: clamp(32px, 4.3vw, 54px);
     font-weight: 800;
-    line-height: 1.14;
-    letter-spacing: -.04em;
+    line-height: 1.1;
+    letter-spacing: -.045em;
     text-wrap: balance;
   }
 
   .premium-hero__title-lead {
-    color: var(--hero-ink);
+    display: block;
+    color: var(--ink);
   }
 
   .premium-hero__title-accent {
-    color: var(--hero-violet);
-    background: linear-gradient(
-      105deg, #5b21b6 5%, #8b5cf6 45%, #c05fc0 75%, #e58a5c
-    );
-    background-size: 160% 100%;
+    display: inline;
+    color: var(--violet);
+    background: linear-gradient(100deg, #8b5cf6 0%, #7c3aed 40%, var(--indigo) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: premiumHeroGradient 9s ease-in-out infinite alternate;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
-  /* ---------- Subtitle heading (refined) ----------
-     Dark grey #343434, medium weight, controlled width,
-     tighter spacing. One fluid clamp() scales 320px -> 1440px+. */
   .premium-hero .premium-hero__subtitle {
     width: 100%;
-    max-width: 800px;
-    margin: clamp(12px, 1.6vw, 18px) auto 0;
-    padding-inline: 0;
-    color: var(--hero-heading-grey);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system,
-      BlinkMacSystemFont, "Segoe UI", sans-serif;
-    font-size: clamp(15px, 0.9vw + 11px, 19px);
-    font-weight: 650;
-    line-height: 1.6;
-    letter-spacing: -.01em;
-    text-wrap: balance;
+    max-width: 560px;
+    margin: clamp(14px, 1.8vw, 20px) 0 0;
+    color: var(--muted);
+    font-size: clamp(15px, 0.8vw + 12px, 18px);
+    font-weight: 500;
+    line-height: 1.65;
+    letter-spacing: -.005em;
   }
 
   .premium-hero__focus-slot {
     width: 100%;
-    max-width: 1060px;
     min-width: 0;
-    margin: clamp(16px, 2.2vw, 26px) auto 0;
+    margin-top: clamp(20px, 2.6vw, 30px);
   }
 
-  /* ---------- Promise bar (compact, fully responsive) ---------- */
+  /* ---------- Promise bar ---------- */
   .premium-hero__promise {
     min-width: 0;
     overflow: hidden;
-    border: 1px solid #eadff9;
+    border: 1px solid var(--lav-200);
     border-radius: clamp(14px, 2vw, 20px);
-    text-align: left;
-    background: linear-gradient(
-      110deg, #ffffffd0, #f8f2ffd0 62%, #fff0e6d0
-    );
+    background: linear-gradient(110deg, #ffffffd9, #f7f2ffd9 65%, #fff4ecd9);
     -webkit-backdrop-filter: blur(18px);
     backdrop-filter: blur(18px);
-    box-shadow:
-      inset 0 1px 0 #fff,
-      0 18px 36px -26px #5b21b68c;
+    box-shadow: inset 0 1px 0 #fff, 0 18px 36px -26px #5b21b68c;
   }
 
   .premium-hero__focus-marquee {
     min-width: 0;
     overflow: hidden;
-    /* tighter top and bottom space */
     padding-block: clamp(9px, 1.1vw, 12px);
-    -webkit-mask-image: linear-gradient(
-      90deg, transparent, #000 4%, #000 96%, transparent
-    );
-    mask-image: linear-gradient(
-      90deg, transparent, #000 4%, #000 96%, transparent
-    );
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
   }
 
   .premium-hero__focus-track,
@@ -378,7 +366,6 @@ const styles = `
     display: flex;
     align-items: center;
     width: max-content;
-    gap: 0;
     direction: ltr;
     will-change: transform;
     animation: premiumHeroMarquee 52s linear infinite;
@@ -391,7 +378,6 @@ const styles = `
     gap: var(--focus-gap);
     width: max-content;
     padding: 0 var(--focus-gap) 0 0;
-    list-style: none;
   }
 
   .premium-hero__focus-item {
@@ -399,11 +385,10 @@ const styles = `
     flex: 0 0 auto;
     align-items: center;
     gap: var(--focus-gap);
-    color: #33224a;
-    font-size: clamp(13px, 0.6vw + 10.5px, 18px);
+    color: var(--ink-soft);
+    font-size: clamp(13px, 0.6vw + 10.5px, 17px);
     font-weight: 700;
     line-height: 1.4;
-    letter-spacing: -.005em;
     white-space: nowrap;
   }
 
@@ -417,31 +402,43 @@ const styles = `
     transform: rotate(45deg);
   }
 
-  .premium-hero__visual-slot {
+  /* ---------- Image card (image + dark gradient + button) ---------- */
+  .premium-hero__media {
+    position: relative;
     width: 100%;
-    max-width: 960px;
+    max-width: 560px;
     min-width: 0;
-    margin: clamp(18px, 2.6vw, 28px) auto 0;
+    margin-inline: auto;
+  }
+
+  .premium-hero__card {
+    position: relative;
+    overflow: hidden;
+    border-radius: clamp(22px, 3vw, 32px);
+    background: var(--dark-1);
+    box-shadow:
+      0 2px 4px #14111f14,
+      0 30px 60px -28px #5b21b6a6,
+      0 50px 90px -50px #14111fb3;
   }
 
   .premium-hero__visual {
     position: relative;
     isolation: isolate;
-    padding: clamp(8px, 2.5%, 22px) 0;
+    padding: clamp(14px, 3vw, 26px) clamp(14px, 3vw, 26px) 0;
+    background:
+      radial-gradient(70% 60% at 80% 0%, #ffffff8c, transparent 70%),
+      linear-gradient(165deg, #efe7ff, #ddccfb 60%, #cfb9f6);
   }
 
-  .premium-hero__visual::before {
+  .premium-hero__visual::after {
     content: "";
     position: absolute;
-    inset: 0 0 12% 8%;
-    z-index: -1;
-    border-radius: 50% 50% 0 0 / 46% 46% 0 0;
-    background: linear-gradient(
-      165deg, #e5d9fc, #d8c6fa 38%, #e9defc66 72%, transparent
-    );
-    -webkit-mask-image: linear-gradient(#000 55%, transparent);
-    mask-image: linear-gradient(#000 55%, transparent);
+    inset: auto 0 0 0;
+    height: 40%;
+    z-index: 2;
     pointer-events: none;
+    background: linear-gradient(180deg, transparent, #1b123399 55%, var(--dark-1));
   }
 
   .premium-hero__orb {
@@ -450,28 +447,28 @@ const styles = `
     aspect-ratio: 1;
     border-radius: 50%;
     pointer-events: none;
-    background: radial-gradient(
-      circle at 32% 28%, #fff, #efe6fe 28%, #cdb6f6 68%, #b497ee
-    );
+    background: radial-gradient(circle at 32% 28%, #fff, #efe6fe 28%, #cdb6f6 68%, #b497ee);
     box-shadow: inset -6px -8px 14px #8e63e04d;
     opacity: .72;
     animation: premiumHeroBob 8s ease-in-out infinite alternate;
   }
 
   .premium-hero__orb--a {
-    left: 1%;
-    bottom: 20%;
-    width: clamp(26px, 8%, 56px);
+    left: 3%;
+    bottom: 30%;
+    width: clamp(24px, 8%, 48px);
   }
 
   .premium-hero__orb--b {
-    top: 6%;
-    right: 1%;
-    width: clamp(22px, 6%, 44px);
+    top: 5%;
+    right: 4%;
+    width: clamp(20px, 6%, 38px);
     animation-delay: -3s;
   }
 
   .premium-hero__image-wrap {
+    position: relative;
+    z-index: 1;
     width: 100%;
     min-width: 0;
   }
@@ -487,9 +484,14 @@ const styles = `
     animation: premiumHeroBob 9s ease-in-out infinite alternate;
   }
 
-  .premium-hero__actions-slot {
-    width: 100%;
-    margin-top: 26px;
+  .premium-hero__panel {
+    position: relative;
+    z-index: 3;
+    margin-top: -1px;
+    padding: clamp(6px, 1vw, 10px) clamp(18px, 3.2vw, 30px) clamp(20px, 3.2vw, 28px);
+    background:
+      radial-gradient(80% 90% at 100% 100%, #7c3aed4d, transparent 70%),
+      linear-gradient(180deg, var(--dark-1), var(--dark-2));
   }
 
   .premium-hero__actions {
@@ -497,9 +499,7 @@ const styles = `
     justify-content: center;
   }
 
-  /* ---------- Amber Glow button ----------
-     Yellow-amber gradient, dark purple bold text, glossy top highlight,
-     darker amber 3D bottom edge and a soft warm glow. */
+  /* ---------- Amber Glow button ---------- */
   .premium-hero .premium-hero__button.premium-hero__button {
     position: relative;
     overflow: hidden;
@@ -508,15 +508,14 @@ const styles = `
     align-items: center;
     justify-content: center;
     gap: 12px;
+    width: 100%;
     max-width: 100%;
     min-height: 58px;
     padding: 16px clamp(20px, 4vw, 34px);
     border: 1px solid #f3b01f;
     border-radius: 16px;
     color: #2e0c4d;
-    background: linear-gradient(
-      180deg, #ffee82 0%, #ffe04e 48%, #ffca30 100%
-    );
+    background: linear-gradient(180deg, #ffee82 0%, #ffe04e 48%, #ffca30 100%);
     box-shadow:
       inset 0 1px 0 #fff8c4,
       inset 0 -2px 4px #f5b2144d,
@@ -538,7 +537,6 @@ const styles = `
       filter .25s var(--hero-ease);
   }
 
-  /* glossy top shine */
   .premium-hero .premium-hero__button.premium-hero__button::before {
     content: "";
     position: absolute;
@@ -557,36 +555,29 @@ const styles = `
       0 8px 16px -8px #f5b323a0;
   }
 
+  /* ---------- Showcase: intro + points ---------- */
   .premium-hero__showcase {
     width: 100%;
-    margin-top: clamp(48px, 6vw, 76px);
+    margin-top: clamp(52px, 7vw, 84px);
   }
 
-  /* Intro heading — refined: smaller size, lighter weight (800 -> 700),
-     Title Case kept, softer tracking and slightly roomier line-height
-     so it supports the content below instead of overpowering it. */
   .premium-hero .premium-hero__intro {
     width: 100%;
-    max-width: 960px;
+    max-width: 920px;
     margin: 0 auto;
-    padding: 0;
-    color: #2b2045;
+    color: var(--ink);
     font-family: "Bricolage Grotesque", sans-serif;
-    font-style: normal;
     font-size: 36px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 45px;
-    letter-spacing: -0.028em;
-    font-optical-sizing: auto;
-    font-synthesis: none;
+    letter-spacing: -0.02em;
     text-align: center;
     text-transform: none;
     text-wrap: balance;
-    overflow-wrap: break-word;
   }
 
   .premium-hero__intro-accent {
-    color: #5b21b6;
+    color: var(--violet-deep);
   }
 
   .premium-hero .premium-hero__points {
@@ -595,8 +586,6 @@ const styles = `
     gap: 20px;
     width: 100%;
     margin-top: clamp(28px, 4vw, 42px);
-    padding: 0;
-    list-style: none;
     text-align: left;
   }
 
@@ -613,12 +602,10 @@ const styles = `
     border: 1px solid var(--card-border);
     border-radius: 28px;
     background:
-      radial-gradient(
-        ellipse at 100% 0%, var(--card-tint), transparent 72%
-      ),
+      radial-gradient(ellipse at 100% 0%, var(--card-tint), transparent 72%),
       linear-gradient(150deg, #ffffffef, #ffffffc9);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
     box-shadow:
       inset 0 1px 0 #fff,
       0 24px 38px -27px #5b21b680,
@@ -694,13 +681,14 @@ const styles = `
 
   .premium-hero .premium-hero__point p {
     margin-top: 24px;
-    color: var(--hero-body);
+    color: var(--muted);
     font-size: clamp(15px, 1.4vw, 17px);
     font-weight: 600;
     line-height: 1.65;
     text-align: left;
   }
 
+  /* ---------- Services marquee ---------- */
   .premium-hero__carousel {
     width: 100%;
     min-width: 0;
@@ -712,12 +700,8 @@ const styles = `
     min-width: 0;
     overflow: hidden;
     padding-block: 18px;
-    -webkit-mask-image: linear-gradient(
-      90deg, transparent, #000 5%, #000 95%, transparent
-    );
-    mask-image: linear-gradient(
-      90deg, transparent, #000 5%, #000 95%, transparent
-    );
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
   }
 
   .premium-hero__track {
@@ -731,7 +715,6 @@ const styles = `
     gap: var(--service-gap);
     width: max-content;
     padding: 0 var(--service-gap) 0 0;
-    list-style: none;
   }
 
   .premium-hero__service {
@@ -742,7 +725,7 @@ const styles = `
     padding: 12px 18px;
     border: 1px solid #e5d7f7;
     border-radius: 999px;
-    color: #5f4d73;
+    color: var(--muted);
     background: #ffffffc9;
     box-shadow: inset 0 1px 0 #fff, 0 10px 20px -16px #5b21b680;
     font-size: 14px;
@@ -752,7 +735,7 @@ const styles = `
   }
 
   .premium-hero__service-icon {
-    color: var(--hero-violet);
+    color: var(--violet);
   }
 
   .premium-hero__service-icon svg {
@@ -773,7 +756,7 @@ const styles = `
   }
 
   @keyframes premiumHeroEnter {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(18px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
@@ -782,25 +765,34 @@ const styles = `
     to { transform: translate3d(-50%, 0, 0); }
   }
 
-  @keyframes premiumHeroGradient {
-    from { background-position: 0% 50%; }
-    to { background-position: 100% 50%; }
-  }
-
   @keyframes premiumHeroPulse {
-    0%, 100% { box-shadow: 0 0 0 0 #ffe0cc80; }
-    50% { box-shadow: 0 0 0 6px #ffe0cc00; }
+    0%, 100% { box-shadow: 0 0 0 0 #7c3aed59; }
+    50% { box-shadow: 0 0 0 6px #7c3aed00; }
   }
 
   @keyframes premiumHeroBob {
     from { transform: translateY(0); }
-    to { transform: translateY(-7px); }
+    to { transform: translateY(-6px); }
+  }
+
+  /* ============ Desktop: text left, image right ============ */
+  @media (min-width: 1024px) {
+    .premium-hero__stage {
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+      gap: clamp(40px, 5vw, 64px);
+    }
+
+    .premium-hero__media {
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: 0;
+    }
   }
 
   /* ============ Tablet ============ */
   @media (max-width: 1023px) {
     .premium-hero .premium-hero__subtitle {
-      max-width: 660px;
+      max-width: 620px;
     }
 
     .premium-hero .premium-hero__intro {
@@ -813,10 +805,6 @@ const styles = `
       max-width: 760px;
       margin-inline: auto;
     }
-
-    .premium-hero__visual-slot {
-      max-width: 760px;
-    }
   }
 
   /* ============ Mobile ============ */
@@ -827,15 +815,12 @@ const styles = `
       padding-top: var(--hero-top-space, 24px);
     }
 
-    /* Eyebrow: always one line, size scales with the viewport.
-       76px = gutters (32) + pill padding (28) + dot (7) + gap (8) + border (2) - safety */
+    /* Eyebrow stays on one line, font scales with the viewport */
     .premium-hero .premium-hero__eyebrow {
       gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
+      padding: 9px 14px;
       font-size: clamp(8px, calc((100vw - 76px) / 30), 13.5px);
       line-height: 1.5;
-      letter-spacing: 0;
       white-space: nowrap;
       text-wrap: nowrap;
     }
@@ -848,23 +833,17 @@ const styles = `
 
     .premium-hero .premium-hero__title {
       margin-top: 18px;
-      font-size: clamp(28px, 7vw, 46px);
-      line-height: 1.2;
-      letter-spacing: -.034em;
+      font-size: clamp(32px, 9vw, 46px);
+      line-height: 1.12;
+      letter-spacing: -.045em;
     }
 
     .premium-hero .premium-hero__subtitle {
       max-width: 100%;
-      margin-top: 12px;
-      line-height: 1.55;
-      letter-spacing: -.005em;
+      margin-top: 14px;
+      line-height: 1.6;
     }
 
-    .premium-hero__focus-slot {
-      margin-top: 16px;
-    }
-
-    /* Promise bar on mobile: slim, text scales with the screen */
     .premium-hero__focus-marquee {
       padding-block: 9px;
     }
@@ -884,34 +863,22 @@ const styles = `
       border-radius: 14px;
     }
 
-    .premium-hero__actions-slot {
-      max-width: 620px;
-      margin-top: 24px;
-    }
-
-    /* Bigger, easier-to-read button on phones.
-       Text scales with the screen: ~16.5px (320px) -> 20px (400px+). */
     .premium-hero .premium-hero__button.premium-hero__button {
-      width: 100%;
-      min-width: 0;
       min-height: 64px;
       padding: 18px 20px;
       border-radius: 18px;
       font-size: clamp(16.5px, 5vw, 20px);
-      font-weight: 800;
       line-height: 1.3;
       letter-spacing: -.012em;
     }
 
     .premium-hero .premium-hero__intro {
-      font-size: 27px;
-      line-height: 35px;
-      letter-spacing: -.024em;
+      font-size: 26px;
+      line-height: 34px;
+      letter-spacing: -0.015em;
     }
 
-    /* 2 x 2 grid on mobile */
     .premium-hero .premium-hero__points {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
     }
 
@@ -964,34 +931,20 @@ const styles = `
     }
 
     .premium-hero .premium-hero__title {
-      font-size: clamp(27px, 7.2vw, 33px);
-    }
-
-    .premium-hero__focus-marquee {
-      padding-block: 8px;
+      font-size: clamp(30px, 8.6vw, 38px);
     }
 
     .premium-hero__focus-item {
       font-size: clamp(12px, 3.6vw, 14px);
     }
 
-    .premium-hero .premium-hero__intro {
-      font-size: 24px;
-      line-height: 31px;
-    }
-
     .premium-hero .premium-hero__points {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
 
     .premium-hero__point {
       padding: 16px 14px 18px;
       border-radius: 20px;
-    }
-
-    .premium-hero__point-top {
-      gap: 8px;
     }
 
     .premium-hero__tile {
@@ -1033,17 +986,12 @@ const styles = `
       font-size: clamp(8px, calc((100vw - 70px) / 30), 12px);
     }
 
-    .premium-hero__focus-marquee {
-      padding-block: 7px;
+    .premium-hero .premium-hero__title {
+      font-size: 28px;
     }
 
     .premium-hero__focus-item {
       font-size: 12px;
-    }
-
-    .premium-hero .premium-hero__intro {
-      font-size: 21px;
-      line-height: 28px;
     }
 
     .premium-hero .premium-hero__points {
@@ -1090,6 +1038,14 @@ const styles = `
 
     .premium-hero__point:hover .premium-hero__tile svg {
       transform: rotate(-6deg) scale(1.08);
+    }
+
+    .premium-hero__card {
+      transition: transform .45s var(--hero-ease);
+    }
+
+    .premium-hero__card:hover {
+      transform: translateY(-4px);
     }
 
     .premium-hero .premium-hero__button.premium-hero__button:hover {
@@ -1181,10 +1137,6 @@ const styles = `
     text-transform: none !important;
   }
 
-  section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro {
-    max-width: 920px !important;
-  }
-
   @media (max-width: 1023px) {
     section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro,
     section#top.premium-hero h2#premium-hero-funnel-heading.premium-hero__intro .premium-hero__intro-accent {
@@ -1234,7 +1186,8 @@ export default function Hero() {
 
       <div className="premium-hero__container">
         <div className="premium-hero__stage">
-          <div className="premium-hero__head">
+          {/* ---------- Left: text ---------- */}
+          <div className="premium-hero__copy">
             <Reveal>
               <div className="premium-hero__pill">
                 <p className="premium-hero__eyebrow">
@@ -1252,12 +1205,9 @@ export default function Hero() {
               >
                 <span className="premium-hero__title-lead">
                   Imagine Generating
-                </span>{' '}
+                </span>
                 <span className="premium-hero__title-accent">
-                  More Leads &amp; Revenue
-                </span>{' '}
-                <span className="premium-hero__title-accent">
-                  Without Increasing Ad Spend.
+                  More Leads &amp; Revenue Without Increasing Ad Spend.
                 </span>
               </h1>
             </Reveal>
@@ -1268,70 +1218,73 @@ export default function Hero() {
                 Invest in a High-Converting Automated Funnel.
               </p>
             </Reveal>
-          </div>
 
-          <Reveal delay={200} className="premium-hero__focus-slot">
-            <div className="premium-hero__promise">
-              <div
-                className="premium-hero__focus-marquee"
-                tabIndex={0}
-                role="region"
-                aria-label="Funnel performance promise. Focus to pause scrolling."
-              >
-                <div className="premium-hero__focus-track">
-                  {[0, 1].map((copy) => (
-                    <ul
-                      key={copy}
-                      className="premium-hero__focus-run"
-                      aria-hidden={copy === 1 ? true : undefined}
-                    >
-                      {focusLines.map((line, index) => (
-                        <li
-                          key={`${copy}-${index}`}
-                          className="premium-hero__focus-item"
-                          aria-hidden={
-                            copy === 0 && index > 0 ? true : undefined
-                          }
-                        >
-                          <span>{line}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ))}
+            <Reveal delay={200} className="premium-hero__focus-slot">
+              <div className="premium-hero__promise">
+                <div
+                  className="premium-hero__focus-marquee"
+                  tabIndex={0}
+                  role="region"
+                  aria-label="Funnel performance promise. Focus to pause scrolling."
+                >
+                  <div className="premium-hero__focus-track">
+                    {[0, 1].map((copy) => (
+                      <ul
+                        key={copy}
+                        className="premium-hero__focus-run"
+                        aria-hidden={copy === 1 ? true : undefined}
+                      >
+                        {focusLines.map((line, index) => (
+                          <li
+                            key={`${copy}-${index}`}
+                            className="premium-hero__focus-item"
+                            aria-hidden={
+                              copy === 0 && index > 0 ? true : undefined
+                            }
+                          >
+                            <span>{line}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          </Reveal>
+            </Reveal>
+          </div>
 
-          <Reveal delay={240} className="premium-hero__visual-slot">
-            <div className="premium-hero__visual">
-              <span
-                className="premium-hero__orb premium-hero__orb--a"
-                aria-hidden="true"
-              />
-              <span
-                className="premium-hero__orb premium-hero__orb--b"
-                aria-hidden="true"
-              />
-
-              <figure className="premium-hero__image-wrap">
-                <img
-                  src={heroImage}
-                  alt="Coaching landing page shown on desktop and mobile"
-                  className="premium-hero__image"
-                  loading="eager"
-                  decoding="async"
-                  fetchPriority="high"
+          {/* ---------- Right: image + dark gradient + button ---------- */}
+          <Reveal delay={240} className="premium-hero__media">
+            <div className="premium-hero__card">
+              <div className="premium-hero__visual">
+                <span
+                  className="premium-hero__orb premium-hero__orb--a"
+                  aria-hidden="true"
                 />
-              </figure>
-            </div>
-          </Reveal>
+                <span
+                  className="premium-hero__orb premium-hero__orb--b"
+                  aria-hidden="true"
+                />
 
-          <Reveal delay={290} className="premium-hero__actions-slot">
-            <div className="premium-hero__actions">
-              <Button className="site-cta--revenue premium-hero__button">
-                Yes! Let's Grow My Revenue
-              </Button>
+                <figure className="premium-hero__image-wrap">
+                  <img
+                    src={heroImage}
+                    alt="Coaching landing page shown on desktop and mobile"
+                    className="premium-hero__image"
+                    loading="eager"
+                    decoding="async"
+                    fetchPriority="high"
+                  />
+                </figure>
+              </div>
+
+              <div className="premium-hero__panel">
+                <div className="premium-hero__actions">
+                  <Button className="site-cta--revenue premium-hero__button">
+                    Yes! Let's Grow My Revenue
+                  </Button>
+                </div>
+              </div>
             </div>
           </Reveal>
         </div>
