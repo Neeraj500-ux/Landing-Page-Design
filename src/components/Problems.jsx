@@ -239,9 +239,8 @@ function Icon({ type, className = '' }) {
 function StatusIcon({ solution = false }) {
   return (
     <span
-      className={`comparison-status ${
-        solution ? 'comparison-status--solution' : ''
-      }`}
+      className={`comparison-status ${solution ? 'comparison-status--solution' : ''
+        }`}
       aria-hidden="true"
     >
       <Icon type={solution ? 'check' : 'close'} />
@@ -263,9 +262,8 @@ function RevenueButton({ intro = false }) {
   return (
     <a
       href="#contact"
-      className={`site-cta--revenue comparison-cta-button ${
-        intro ? 'comparison-intro-button' : ''
-      }`}
+      className={`site-cta--revenue comparison-cta-button ${intro ? 'comparison-intro-button' : ''
+        }`}
     >
       <span> Yes! Let's Grow My Revenue </span>
     </a>
@@ -1593,13 +1591,14 @@ export default function Problems() {
 
               <p>
                 <strong>Let’s Fix That.</strong> At{' '}
-                <strong>Creative Crew</strong>, we build complete funnels that
-                connect your landing page, automation, tracking and analytics.
+                <strong>Creative Crew</strong>, we build complete growth systems with
+                high-converting landing pages, custom tracking, smart automations, and
+                analytics—all designed to convert more leads into clients and generate
+                more revenue for your business.
               </p>
 
               <p>
-                The result: more enquiries, simpler bookings and more value from
-                your existing ad spend.
+                created 2,000+ landing pages and helped 1,000+ professionals grow their revenue
               </p>
 
               <div className="comparison-intro-action">
@@ -1718,9 +1717,8 @@ export default function Problems() {
         {/* Counter starts when this proof section enters the viewport. */}
         <div
           ref={proofRef}
-          className={`comparison-proof ${
-            proofVisible ? 'is-proof-visible' : ''
-          }`}
+          className={`comparison-proof ${proofVisible ? 'is-proof-visible' : ''
+            }`}
         >
           <Reveal {...motionProps} className="comparison-proof-left">
             <div className="comparison-proof-visual">
