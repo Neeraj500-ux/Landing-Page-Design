@@ -600,17 +600,31 @@ const styles = `
     color: var(--ink);
   }
 
+  .premium-hero__title-middle {
+    display: block;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
   .premium-hero__title-accent {
     display: inline;
     color: var(--violet);
-    background: linear-gradient(100deg, #8b5cf6, #7c3aed 30%, var(--indigo) 60%, #8b5cf6);
-    background-size: 220% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
-    animation: premiumHeroSheen 9s ease-in-out infinite alternate;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+  }
+
+  .premium-hero__title-without {
+    display: inline;
+    color: var(--ink);
+  }
+
+  .premium-hero__title-tail {
+    display: block;
+    width: 100%;
+    color: var(--ink);
+    white-space: nowrap;
+    font-size: 0.88em;
+    letter-spacing: -.04em;
   }
 
   .premium-hero .premium-hero__subtitle {
@@ -1188,10 +1202,15 @@ const styles = `
       text-align: center;
     }
 
-    .premium-hero__title-accent {
+    .premium-hero__title-middle {
       display: block;
-      margin-top: .08em;
-      text-wrap: balance;
+      white-space: nowrap;
+    }
+
+    .premium-hero__title-accent {
+      display: inline;
+      margin-top: 0;
+      text-wrap: nowrap;
     }
 
     .premium-hero .premium-hero__subtitle {
@@ -1242,10 +1261,54 @@ const styles = `
     }
 
     .premium-hero .premium-hero__title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 100%;
       margin-top: 16px;
-      font-size: clamp(28px, 7.7vw, 40px);
-      line-height: 1.12;
+      font-size: clamp(27px, 7.2vw, 40px);
+      line-height: 1.1;
       letter-spacing: -.035em;
+      text-align: center;
+      text-wrap: initial;
+      overflow-wrap: normal;
+    }
+
+    .premium-hero__title-lead,
+    .premium-hero__title-middle,
+    .premium-hero__title-tail {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      margin-inline: auto;
+      text-align: center;
+      white-space: nowrap;
+      line-height: 1.1;
+    }
+
+    /* Mobile heading is locked to exactly three centered lines:
+       Generate More / Revenue Without / Spending More */
+    .premium-hero__title-lead {
+      order: 1;
+    }
+
+    .premium-hero__title-middle {
+      order: 2;
+      font-size: 1em;
+      letter-spacing: -.045em;
+    }
+
+    .premium-hero__title-tail {
+      order: 3;
+      font-size: .88em;
+      letter-spacing: -.045em;
+    }
+
+    .premium-hero__title-accent,
+    .premium-hero__title-without {
+      display: inline;
+      white-space: nowrap;
     }
 
     .premium-hero .premium-hero__subtitle {
@@ -1500,7 +1563,15 @@ const styles = `
     }
 
     .premium-hero .premium-hero__title {
-      font-size: 25px;
+      font-size: clamp(23px, 7.2vw, 25px);
+    }
+
+    .premium-hero__title-middle {
+      font-size: 1em;
+    }
+
+    .premium-hero__title-tail {
+      font-size: .88em;
     }
 
     .premium-hero .premium-hero__intro {
@@ -1713,11 +1784,16 @@ export default function Hero() {
                 className="premium-hero__title"
               >
                 <span className="premium-hero__title-lead">
-                  Imagine Generating
+                  Generate More
                 </span>
 
-                <span className="premium-hero__title-accent">
-                  More Leads &amp; Revenue Without Increasing Ad Spend.
+                <span className="premium-hero__title-middle">
+                  <span className="premium-hero__title-accent">Revenue</span>{' '}
+                  <span className="premium-hero__title-without">Without</span>
+                </span>
+
+                <span className="premium-hero__title-tail">
+                  Spending More
                 </span>
               </h1>
             </Reveal>
