@@ -118,11 +118,6 @@ h3 {
   transition: transform .25s ease;
 }
 
-.site-cta--sticky {
-  position: fixed;
-  max-width: calc(100vw - 2rem);
-}
-
 @keyframes premiumCtaShine {
   0%, 55% { transform: translateX(0) skewX(-20deg); }
   100% { transform: translateX(520%) skewX(-20deg); }

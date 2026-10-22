@@ -7,7 +7,6 @@ import Why from "./components/Why";
 import FAQ from "./components/FAQ";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
-import StickyCta from "./components/StickyCta";
 import ImageCarousel from "./components/ImageCarousel";
 import Video from "./components/Video";
 
@@ -26,7 +25,6 @@ export default function App() {
       </main>
 
       <Footer />
-      <StickyCta />
 
       {/* Global contact popup — render only once */}
       <Contact />

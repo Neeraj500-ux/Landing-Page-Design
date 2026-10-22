@@ -221,31 +221,11 @@ function Icon({ type, className = '' }) {
       focusable="false"
     >
       {type === 'check' && <path d="m5 12 4 4L19 6" />}
-      {type === 'close' && <path d="m7 7 10 10M17 7 7 17" />}
       {type === 'arrow' && <path d="M5 12h14M13 6l6 6-6 6" />}
-      {type === 'offer' && (
-        <>
-          <circle cx="12" cy="12" r="8" />
-          <circle cx="12" cy="12" r="3" />
-        </>
-      )}
       {type === 'enquiry' && (
         <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z" />
       )}
-      {type === 'leads' && <path d="M4 17l5-5 4 4 7-8M15 8h5v5" />}
     </svg>
-  )
-}
-
-function StatusIcon({ solution = false }) {
-  return (
-    <span
-      className={`comparison-status ${solution ? 'comparison-status--solution' : ''
-        }`}
-      aria-hidden="true"
-    >
-      <Icon type={solution ? 'check' : 'close'} />
-    </span>
   )
 }
 
@@ -479,17 +459,25 @@ const styles = `
   min-width: 0;
 }
 
+/* Same pill look as .comparison-eyebrow */
 .comparison-intro-eyebrow {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  margin: 0 0 20px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 22px;
+  padding: 10px 18px;
+  border: 1px solid #ddcdf0;
+  border-radius: 999px;
   color: #6b3b8c;
+  background: linear-gradient(180deg, #ffffffe6, #f6effbc0);
+  box-shadow: 0 8px 24px #68428a0d, inset 0 1px 0 #fff;
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 650;
   line-height: 1.6;
-  letter-spacing: .12em;
-  text-transform: uppercase;
+  text-wrap: balance;
 }
 
 .comparison-intro-eyebrow::before,
@@ -546,16 +534,95 @@ const styles = `
     border-color 350ms ease;
 }
 
-.comparison-intro-card p {
+.comparison-intro-lead {
   margin: 0;
+  color: var(--c-ink);
+  font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", sans-serif;
+  font-size: clamp(19px, 1.9vw, 23px);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -.02em;
+  text-wrap: balance;
+}
+
+.comparison-intro-body {
+  position: relative;
+  margin: 18px 0 0;
+  padding-top: 18px;
   color: var(--c-muted);
   font-size: clamp(15px, 1.3vw, 16.5px);
-  line-height: 1.8;
+  line-height: 1.75;
   text-wrap: pretty;
 }
 
-.comparison-intro-card p + p { margin-top: 16px; }
+/* Soft divider between the lead and the body copy */
+.comparison-intro-body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffca30, #ffe04e);
+}
+
 .comparison-intro-card strong { color: var(--c-ink); font-weight: 750; }
+
+/* "Let's Fix That." gets a purple tone with an amber marker underline */
+.comparison-intro-fix {
+  color: var(--c-purple);
+  font-weight: 800;
+  background: linear-gradient(transparent 62%, #ffe04e8c 62%);
+  padding-inline: 2px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Stats */
+.comparison-intro-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comparison-intro-stats li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid #e4d8f3;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #fff, #f6eefb);
+  box-shadow: 0 8px 20px #7542a40d, inset 0 1px 0 #fff;
+}
+
+.comparison-intro-stats strong {
+  font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(24px, 2.4vw, 30px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--c-purple);
+  background: linear-gradient(110deg, #6a359b, #9a5ad4 55%, #6a359b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.comparison-intro-stats span {
+  color: var(--c-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 .comparison-intro-action { margin-top: 28px; padding-bottom: 5px; }
 
 /* ---------- Header ---------- */
@@ -612,8 +679,10 @@ const styles = `
 
 .comparison-pair { display: contents; }
 
+/* Red (problem) cells use these colors by default. */
 .comparison-cell {
-  --cell-accent: var(--c-red);
+  --cell-accent: #b83e51;
+  --cell-text: #9a4757;
   --cell-border: #efd6de;
   --cell-tint: #fff1f5;
   --cell-hover: #e6c3cd;
@@ -625,8 +694,10 @@ const styles = `
   box-shadow: 0 1px 2px #4422600a, 0 12px 30px #44226009, inset 0 1px 0 #fff;
 }
 
+/* Green (solution) cells: same shade family, green instead of red. */
 .comparison-cell--solution {
-  --cell-accent: var(--c-green);
+  --cell-accent: #20734e;
+  --cell-text: #3b6f56;
   --cell-border: #cfe5da;
   --cell-tint: #eef9f2;
   --cell-hover: #b7dbc8;
@@ -640,12 +711,12 @@ const styles = `
 .comparison-group-title {
   display: flex;
   align-items: center;
-  gap: 16px;
   min-width: 0;
 }
 
 .comparison-group-title h3 {
   margin: 0;
+  color: var(--cell-accent);
   font-size: clamp(19px, 1.8vw, 23px);
   font-weight: 750;
   line-height: 1.35;
@@ -663,44 +734,13 @@ const styles = `
 .comparison-item-inner {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
   min-width: 0;
-}
-
-/* Icon wrapper: bobs gently, jumps on card hover. Transform only, so layout never shifts. */
-
-.comparison-status {
-  display: grid;
-  place-items: center;
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
-  border: 1px solid #ebcdd5;
-  border-radius: 13px;
-  color: var(--c-red);
-  background: linear-gradient(145deg, #fff, #fbe6ec);
-  box-shadow: inset 0 1px 0 #fff, 0 5px 12px #b83e5109;
-  will-change: transform;
-  animation: comparison-icon-bob 5.2s ease-in-out infinite;
-}
-
-.comparison-status--solution {
-  border-color: #cbe2d5;
-  color: var(--c-green);
-  background: linear-gradient(145deg, #fff, #e1f3e8);
-}
-
-.comparison-status svg {
-  width: 18px;
-  height: 18px;
-  transition: transform 500ms var(--c-ease);
 }
 
 .comparison-copy {
   flex: 1;
   min-width: 0;
-  padding-top: 2px;
-  padding-right: 40px;
+  padding-right: 44px;
 }
 
 .comparison-number {
@@ -723,9 +763,9 @@ const styles = `
   font-variant-numeric: tabular-nums;
 }
 
-
 .comparison-copy h3 {
   margin: 0;
+  color: var(--cell-accent);
   font-size: clamp(18px, 1.6vw, 21px);
   font-weight: 750;
   line-height: 1.32;
@@ -735,7 +775,7 @@ const styles = `
 
 .comparison-copy p {
   margin: 8px 0 0;
-  color: var(--c-muted);
+  color: var(--cell-text);
   font-size: 14.5px;
   line-height: 1.7;
   text-wrap: pretty;
@@ -789,10 +829,6 @@ const styles = `
   display: flex;
   justify-content: center;
   padding-bottom: 5px;
-}
-
-/* CTA width is section-specific; its visual treatment comes from the shared Hero CTA. */
-.landing-comparison a.comparison-cta-button {
 }
 
 .comparison-cta-note {
@@ -1005,20 +1041,14 @@ const styles = `
 .comparison-proof-note-icon {
   display: grid;
   place-items: center;
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
   border: 1px solid #e0cfee;
   border-radius: 13px;
   color: var(--c-purple);
   background: linear-gradient(145deg, #fff, #f0e4fa);
   will-change: transform;
-}
-
-.comparison-proof-note-icon {
-  flex-basis: 32px;
-  width: 32px;
-  height: 32px;
   animation: comparison-icon-bob 5.2s ease-in-out infinite;
 }
 
@@ -1069,14 +1099,6 @@ const styles = `
 @keyframes comparison-icon-bob {
   0%, 100% { transform: translate3d(0, 0, 0); }
   50% { transform: translate3d(0, -3px, 0); }
-}
-
-@keyframes comparison-icon-jump {
-  0% { transform: translate3d(0, 0, 0); }
-  30% { transform: translate3d(0, -8px, 0); }
-  52% { transform: translate3d(0, 0, 0); }
-  68% { transform: translate3d(0, -3px, 0); }
-  84%, 100% { transform: translate3d(0, 0, 0); }
 }
 
 @keyframes comparison-link-nudge {
@@ -1174,23 +1196,10 @@ const styles = `
     box-shadow: 0 18px 36px #44226014, inset 0 1px 0 #fff;
   }
 
-  .comparison-item:hover .comparison-status {
-    animation: comparison-icon-jump 700ms var(--c-ease-spring) 1;
-  }
-
-  .comparison-item:hover .comparison-status svg {
-    transform: rotate(-7deg);
-  }
-
-  .comparison-cell--solution:hover .comparison-status svg {
-    transform: rotate(7deg);
-  }
-
   .comparison-proof-visual:hover {
     transform: translate3d(0, -4px, 0);
     box-shadow: 0 28px 55px #7542a41c, inset 0 1px 0 #fff;
   }
-
 }
 
 /* Touch feedback instead of hover on phones and tablets */
@@ -1229,9 +1238,6 @@ const styles = `
   .comparison-group-heading,
   .comparison-item { padding: 22px 18px; }
 
-  .comparison-group-title,
-  .comparison-item-inner { gap: 12px; }
-
   .comparison-proof-stage { gap: 28px; }
   .comparison-proof-notes { max-width: 300px; }
 }
@@ -1251,10 +1257,9 @@ const styles = `
   .comparison-intro-left { text-align: center; }
 
   .comparison-intro-eyebrow {
-    justify-content: center;
-    margin-bottom: 14px;
+    margin: 0 auto 20px;
+    padding: 9px 13px;
     font-size: 11px;
-    letter-spacing: .1em;
   }
 
   .comparison-intro h2 {
@@ -1275,7 +1280,19 @@ const styles = `
     border-radius: 24px;
   }
 
-  .comparison-intro-card p { font-size: 15px; line-height: 1.75; }
+  .comparison-intro-lead { font-size: 19px; line-height: 1.38; }
+  .comparison-intro-body {
+    margin-top: 16px;
+    padding-top: 16px;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .comparison-intro-stats { gap: 10px; margin-top: 20px; }
+  .comparison-intro-stats li { padding: 12px 12px; border-radius: 16px; }
+  .comparison-intro-stats strong { font-size: 24px; }
+  .comparison-intro-stats span { font-size: 12px; }
+
   .comparison-intro-action {
     display: flex;
     justify-content: center;
@@ -1324,21 +1341,22 @@ const styles = `
 
   .comparison-group-heading {
     margin-bottom: 0;
-    padding: 18px;
+    padding: 16px;
+    text-align: left;
     border-radius: 22px;
   }
 
   .comparison-group-title h3 { font-size: 20px; }
 
   .comparison-item {
-    padding: 21px 18px;
+    padding: 20px 16px;
     border-radius: 22px;
   }
 
-  .comparison-number { top: 13px; right: 13px; }
-  .comparison-copy { padding-right: 34px; }
-  .comparison-copy h3 { font-size: 18px; }
-  .comparison-copy p { font-size: 14.5px; line-height: 1.65; }
+  .comparison-number { top: 12px; right: 12px; }
+  .comparison-copy { padding-right: 38px; }
+  .comparison-copy h3 { font-size: 17.5px; }
+  .comparison-copy p { font-size: 14.5px; line-height: 1.6; }
 
   .comparison-cta {
     gap: 25px;
@@ -1433,20 +1451,16 @@ const styles = `
   .comparison-header h2 { font-size: 26px; }
 
   .comparison-intro-card { padding: 22px 16px; }
-  .comparison-item { padding: 20px 14px; }
-  .comparison-item-inner { gap: 10px; }
-
-  .comparison-status {
-    flex-basis: 34px;
-    width: 34px;
-    height: 34px;
-    border-radius: 11px;
-  }
+  .comparison-intro-lead { font-size: 18px; }
+  .comparison-intro-body { font-size: 14.5px; }
+  .comparison-intro-stats { grid-template-columns: minmax(0, 1fr); }
+  .comparison-item { padding: 18px 14px; }
 
   .comparison-group-title h3 { font-size: 18px; }
-  .comparison-copy { padding-right: 30px; }
-  .comparison-copy h3 { font-size: 17px; }
-  .comparison-eyebrow::before { display: none; }
+  .comparison-copy { padding-right: 34px; }
+  .comparison-copy h3 { font-size: 16.5px; }
+  .comparison-eyebrow::before,
+  .comparison-intro-eyebrow::before { display: none; }
   .comparison-cta { padding: 32px 16px 36px; }
   .comparison-proof-stat-label { letter-spacing: .08em; }
 }
@@ -1470,7 +1484,6 @@ const styles = `
   .comparison-intro-card:hover,
   .comparison-item:hover,
   .comparison-proof-visual:hover,
-  .comparison-item:hover .comparison-status svg,
   .landing-comparison a.comparison-cta-button:hover,
   .landing-comparison a.comparison-cta-button:active,
   .comparison-item:active {
@@ -1515,22 +1528,29 @@ export default function Problems() {
             className="comparison-intro-right"
           >
             <div className="comparison-intro-card">
-              <p>
+              <p className="comparison-intro-lead">
                 Unclear offers and distracting pages stop interested visitors
                 from taking the next step.
               </p>
 
-              <p>
-                <strong>Let’s Fix That.</strong> At{' '}
-                <strong>Creative Crew</strong>, we build complete growth systems with
-                high-converting landing pages, custom tracking, smart automations, and
-                analytics—all designed to convert more leads into clients and generate
-                more revenue for your business.
+              <p className="comparison-intro-body">
+                <span className="comparison-intro-fix">Let’s Fix That.</span>{' '}
+                At <strong>Creative Crew</strong>, we build complete growth
+                systems with high-converting landing pages, custom tracking,
+                smart automations, and analytics—all designed to convert more
+                leads into clients and generate more revenue for your business.
               </p>
 
-              <p>
-                created 2,000+ landing pages and helped 1,000+ professionals grow their revenue
-              </p>
+              <ul className="comparison-intro-stats">
+                <li>
+                  <strong>2,000+</strong>
+                  <span>Landing pages created</span>
+                </li>
+                <li>
+                  <strong>1,000+</strong>
+                  <span>Professionals grew revenue</span>
+                </li>
+              </ul>
 
               <div className="comparison-intro-action">
                 <RevenueButton intro />
@@ -1562,7 +1582,6 @@ export default function Problems() {
               className="comparison-cell comparison-group-heading comparison-group-heading--problem"
             >
               <div className="comparison-group-title">
-                <StatusIcon />
                 <h3>What Holds Visitors Back</h3>
               </div>
             </Reveal>
@@ -1575,7 +1594,6 @@ export default function Problems() {
               className="comparison-cell comparison-cell--solution comparison-group-heading comparison-group-heading--solution"
             >
               <div className="comparison-group-title">
-                <StatusIcon solution />
                 <h3>How We Fix It</h3>
               </div>
             </Reveal>
@@ -1597,8 +1615,6 @@ export default function Problems() {
                       delay={Math.min(index * 35, 140)}
                     >
                       <div className="comparison-item-inner">
-                        <StatusIcon />
-
                         <div className="comparison-copy">
                           <h3>{problem.title}</h3>
                           <p>{problem.description}</p>
@@ -1617,8 +1633,6 @@ export default function Problems() {
                       delay={Math.min(index * 35 + 60, 200)}
                     >
                       <div className="comparison-item-inner">
-                        <StatusIcon solution />
-
                         <div className="comparison-copy">
                           <h3>{solution.title}</h3>
                           <p>{solution.description}</p>
@@ -1696,12 +1710,6 @@ export default function Problems() {
               enquiry.
             </p>
 
-
-            <ul className="comparison-proof-tagline">
-              <li>Clear Messaging.</li>
-              <li>Connected Funnels.</li>
-              <li>Measurable Performance.</li>
-            </ul>
           </Reveal>
         </div>
       </div>
