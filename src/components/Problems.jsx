@@ -334,6 +334,10 @@ const styles = `
   --c-green: #20734e;
   --c-purple: #7542a4;
 
+  /* Gap between a pill label and the heading under it.
+     One value, used by BOTH sections, on desktop AND mobile. */
+  --c-eyebrow-gap: 14px;
+
   /* Amber Glow button look (same as the Hero.jsx button) */
   --btn-text: #2e0c4d;
   --btn-bg: linear-gradient(180deg, #ffee82 0%, #ffe04e 48%, #ffca30 100%);
@@ -1522,22 +1526,13 @@ const styles = `
   }
 }
 
-/* ---------- Mobile heading spacing: match the reference screenshot ---------- */
+/* ---------- Mobile heading block: header text centered ---------- */
+
 @media (max-width: 767px) {
   .landing-comparison .comparison-header {
     text-align: center;
     margin-inline: auto;
     padding-inline: 0;
-  }
-
-  .landing-comparison .comparison-eyebrow {
-    margin-bottom: 24px;
-  }
-
-  .landing-comparison .comparison-header h2 {
-    margin-top: 0;
-    margin-bottom: 0;
-    line-height: 1.16;
   }
 
   .landing-comparison .comparison-header p {
@@ -1546,6 +1541,55 @@ const styles = `
   }
 }
 
+/* ==========================================================
+   SAME PILL -> HEADING GAP IN BOTH SECTIONS (desktop + mobile)
+
+   Section 1: "More Value From Every Click"  -> "You're Getting Clicks..."
+   Section 2: "Common Landing Page Problems" -> "Getting Clicks, But Not..."
+
+   Both pills now use the same display, padding and margin, and both
+   headings use the same line-height and zero margin, so the gap is
+   identical. Change the gap in ONE place: --c-eyebrow-gap (top of CSS).
+   Keep this block at the very end of the stylesheet.
+   ========================================================== */
+
+.landing-comparison .comparison-intro-eyebrow,
+.landing-comparison .comparison-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  margin-block: 0 var(--c-eyebrow-gap);
+  padding: 10px 18px;
+}
+
+/* Header pill sits in the centered header, so center it as a block. */
+.landing-comparison .comparison-eyebrow {
+  margin-inline: auto;
+}
+
+.landing-comparison .comparison-intro h2,
+.landing-comparison .comparison-header h2 {
+  margin: 0;
+  line-height: 1.16;
+}
+
+/* Keep the intro heading centered on mobile (margin: 0 above would reset it) */
+@media (max-width: 767px) {
+  .landing-comparison .comparison-intro-eyebrow,
+  .landing-comparison .comparison-eyebrow {
+    padding: 9px 13px;
+  }
+
+  .landing-comparison .comparison-intro-eyebrow {
+    margin-inline: auto;
+  }
+
+  .landing-comparison .comparison-intro h2 {
+    margin-inline: auto;
+  }
+}
 `
 
 /* ==================== Complete component ==================== */
