@@ -7,6 +7,8 @@ const points = [
   'Custom tracking and analytics',
 ]
 
+const bars = [34, 48, 42, 63, 57, 78, 92]
+
 const initialForm = {
   fullName: '',
   businessName: '',
@@ -56,20 +58,42 @@ function CloseIcon() {
   )
 }
 
+function TrendIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="m3 17 6-6 4 4 8-8M15 7h6v6"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 
   .ct-popup-root,
   .ct-popup-overlay {
     --ct-violet: #7c3aed;
+    --ct-violet-light: #a98af0;
     --ct-violet-deep: #5b21b6;
     --ct-dark-1: #1b1233;
-    --ct-dark-2: #140d27;
+    --ct-dark-2: #120a24;
     --ct-ink: #14111f;
     --ct-ink-soft: #2a2140;
     --ct-muted: #5b5870;
     --ct-line: #e6dffa;
     --ct-yellow: #ffe04e;
+    --ct-ease: cubic-bezier(.22, 1, .36, 1);
     font-family: Inter, ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
@@ -88,13 +112,14 @@ const css = `
     align-items: center;
     justify-content: center;
     padding: 24px;
-    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-    background: rgba(20, 13, 39, .72);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    background:
+      radial-gradient(60% 50% at 20% 10%, rgba(124, 58, 237, .28), transparent 70%),
+      rgba(20, 13, 39, .74);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     overflow-y: auto;
     overscroll-behavior: contain;
-    animation: ctOverlayIn .22s ease both;
+    animation: ctOverlayIn .25s ease both;
   }
 
   .ct-popup-overlay *,
@@ -106,25 +131,26 @@ const css = `
   .ct-popup-modal {
     position: relative;
     isolation: isolate;
-    width: min(100%, 980px);
+    width: min(100%, 1000px);
     max-height: calc(100dvh - 48px);
     display: grid;
-    grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+    grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
     grid-template-rows: minmax(0, 1fr);
     overflow: hidden;
     background: #fff;
-    border-radius: 26px;
+    border-radius: 28px;
     box-shadow:
-      0 40px 100px -20px rgba(20, 13, 39, .55),
-      0 8px 24px rgba(20, 13, 39, .18);
-    animation: ctModalIn .32s cubic-bezier(.22, 1, .36, 1) both;
+      0 0 0 1px rgba(255, 255, 255, .08),
+      0 44px 110px -20px rgba(20, 13, 39, .6),
+      0 10px 28px rgba(20, 13, 39, .2);
+    animation: ctModalIn .45s var(--ct-ease) both;
   }
 
   .ct-popup-close {
     position: absolute;
     z-index: 5;
-    top: 14px;
-    right: 14px;
+    top: 16px;
+    right: 16px;
     width: 42px;
     height: 42px;
     display: grid;
@@ -136,7 +162,7 @@ const css = `
     border-radius: 50%;
     box-shadow: 0 6px 16px -8px rgba(91, 33, 182, .35);
     cursor: pointer;
-    transition: background .2s, color .2s, transform .2s;
+    transition: background .25s, color .25s, transform .35s var(--ct-ease);
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -148,44 +174,107 @@ const css = `
 
   .ct-popup-close:focus-visible,
   .ct-popup-root .ct-popup-yellow:focus-visible {
-    outline: 3px solid #a98af0;
+    outline: 3px solid var(--ct-violet-light);
     outline-offset: 3px;
   }
 
-  /* Left info panel */
+  /* ---------- Left info panel ---------- */
 
   .ct-popup-side {
     position: relative;
     isolation: isolate;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 28px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0;
     min-width: 0;
-    padding: 44px 34px 30px;
+    padding: 46px 40px 32px;
     color: #fff;
+    text-align: left;
     overflow: hidden;
-    background:
-      radial-gradient(70% 50% at 0% 0%, rgba(255, 224, 78, .18), transparent 70%),
-      radial-gradient(80% 60% at 100% 100%, rgba(139, 92, 246, .5), transparent 70%),
-      linear-gradient(160deg, var(--ct-dark-1), var(--ct-dark-2));
+    background: linear-gradient(160deg, var(--ct-dark-1), var(--ct-dark-2));
   }
 
-  .ct-popup-side::before {
-    content: "";
+  /* Moving background layers */
+
+  .ct-popup-bg {
     position: absolute;
+    inset: 0;
     z-index: -1;
-    right: -150px;
-    bottom: -140px;
-    width: 280px;
-    height: 280px;
-    border: 1px solid rgba(255, 255, 255, .16);
-    border-radius: 50%;
-    box-shadow:
-      0 0 0 30px rgba(255, 255, 255, .035),
-      0 0 0 62px rgba(255, 255, 255, .025);
+    overflow: hidden;
     pointer-events: none;
   }
+
+  .ct-popup-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(48px);
+    will-change: transform;
+  }
+
+  .ct-popup-orb.o1 {
+    top: -90px;
+    left: -80px;
+    width: 280px;
+    height: 280px;
+    background: rgba(255, 224, 78, .22);
+    animation: ctFloatA 14s ease-in-out infinite;
+  }
+
+  .ct-popup-orb.o2 {
+    right: -120px;
+    bottom: -80px;
+    width: 360px;
+    height: 360px;
+    background: rgba(139, 92, 246, .6);
+    animation: ctFloatB 17s ease-in-out infinite;
+  }
+
+  .ct-popup-orb.o3 {
+    top: 42%;
+    left: 30%;
+    width: 200px;
+    height: 200px;
+    background: rgba(168, 85, 247, .28);
+    animation: ctFloatC 20s ease-in-out infinite;
+  }
+
+  .ct-popup-grid {
+    position: absolute;
+    inset: -40px;
+    background-image: radial-gradient(rgba(255, 255, 255, .16) 1px, transparent 1.5px);
+    background-size: 26px 26px;
+    -webkit-mask-image: radial-gradient(70% 60% at 30% 25%, #000, transparent 75%);
+    mask-image: radial-gradient(70% 60% at 30% 25%, #000, transparent 75%);
+    animation: ctGridDrift 18s linear infinite;
+  }
+
+  .ct-popup-rings {
+    position: absolute;
+    right: -150px;
+    bottom: -150px;
+    width: 340px;
+    height: 340px;
+  }
+
+  .ct-popup-rings i {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 50%;
+    animation: ctRing 7s ease-out infinite;
+  }
+
+  .ct-popup-rings i:nth-child(2) {
+    animation-delay: 2.3s;
+  }
+
+  .ct-popup-rings i:nth-child(3) {
+    animation-delay: 4.6s;
+  }
+
+  /* Left content */
 
   .ct-popup-eyebrow {
     display: inline-flex;
@@ -193,17 +282,20 @@ const css = `
     gap: 9px;
     width: fit-content;
     max-width: 100%;
-    padding: 8px 14px;
+    padding: 8px 15px;
     border: 1px solid rgba(255, 255, 255, .2);
     border-radius: 999px;
     color: #fff;
     background: rgba(255, 255, 255, .08);
-    font-size: 12px;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    font-size: 12.5px;
     font-weight: 600;
     line-height: 1.4;
   }
 
   .ct-popup-dot {
+    position: relative;
     flex-shrink: 0;
     width: 8px;
     height: 8px;
@@ -212,34 +304,52 @@ const css = `
     box-shadow: 0 0 12px rgba(255, 224, 78, .8);
   }
 
+  .ct-popup-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--ct-yellow);
+    animation: ctPulse 2s ease-out infinite;
+  }
+
   .ct-popup-side h2 {
-    margin: 22px 0 14px;
-    max-width: 380px;
+    margin: 24px 0 14px;
+    max-width: 390px;
     color: #fff;
     font-family: "Bricolage Grotesque", Inter, sans-serif;
-    font-size: clamp(30px, 3.2vw, 42px);
+    font-size: clamp(32px, 3.4vw, 44px);
     font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -.03em;
+    line-height: 1.08;
+    letter-spacing: -.035em;
+    text-align: left;
     text-wrap: balance;
   }
 
   .ct-popup-side h2 span {
-    color: var(--ct-yellow);
+    color: transparent;
+    background: linear-gradient(90deg, #ffe04e, #ffb938, #ffe04e);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: ctTextShine 5s linear infinite;
   }
 
   .ct-popup-side p {
     margin: 0;
-    max-width: 360px;
-    color: rgba(255, 255, 255, .8);
+    max-width: 370px;
+    color: rgba(255, 255, 255, .78);
     font-size: 15px;
     line-height: 1.7;
+    text-align: left;
   }
 
   .ct-popup-points {
     display: grid;
-    gap: 14px;
-    margin: 26px 0 0;
+    gap: 12px;
+    width: 100%;
+    max-width: 390px;
+    margin: 28px 0 0;
     padding: 0;
     list-style: none;
   }
@@ -247,11 +357,24 @@ const css = `
   .ct-popup-points li {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 11px 14px;
     color: #fff;
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 14px;
     font-size: 14.5px;
     font-weight: 500;
-    line-height: 1.5;
+    line-height: 1.45;
+    text-align: left;
+    transition: background .3s, border-color .3s, transform .3s var(--ct-ease);
+  }
+
+  .ct-popup-points li:hover {
+    background: rgba(255, 255, 255, .09);
+    border-color: rgba(255, 224, 78, .35);
+    transform: translateX(4px);
   }
 
   .ct-popup-check {
@@ -262,32 +385,124 @@ const css = `
     height: 28px;
     color: var(--ct-yellow);
     background: rgba(255, 224, 78, .12);
-    border: 1px solid rgba(255, 224, 78, .35);
+    border: 1px solid rgba(255, 224, 78, .38);
     border-radius: 50%;
   }
 
+  .ct-popup-check path {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    animation: ctDraw .6s ease forwards;
+  }
+
+  .ct-popup-points li:nth-child(1) .ct-popup-check path { animation-delay: .6s; }
+  .ct-popup-points li:nth-child(2) .ct-popup-check path { animation-delay: .8s; }
+  .ct-popup-points li:nth-child(3) .ct-popup-check path { animation-delay: 1s; }
+
+  /* Growth preview card */
+
+  .ct-popup-growth {
+    width: 100%;
+    max-width: 390px;
+    margin-top: 24px;
+    padding: 16px 18px 14px;
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 16px;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    text-align: left;
+  }
+
+  .ct-popup-growth-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    color: rgba(255, 255, 255, .78);
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+
+  .ct-popup-growth-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px;
+    color: var(--ct-yellow);
+    background: rgba(255, 224, 78, .12);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .ct-popup-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 56px;
+  }
+
+  .ct-popup-bars span {
+    flex: 1;
+    height: var(--h);
+    border-radius: 6px 6px 3px 3px;
+    background: linear-gradient(180deg, #ffe04e, rgba(255, 224, 78, .25));
+    transform-origin: bottom;
+    animation:
+      ctBarGrow .9s var(--ct-ease) both,
+      ctBarBreath 4.5s ease-in-out infinite;
+    animation-delay: calc(var(--i) * .08s + .5s), calc(var(--i) * .25s + 1.6s);
+  }
+
+  .ct-popup-bars span:not(:last-child) {
+    background: linear-gradient(180deg, rgba(196, 170, 255, .9), rgba(139, 92, 246, .25));
+  }
+
   .ct-popup-side-note {
+    width: 100%;
+    margin-top: auto;
     padding-top: 18px;
-    border-top: 1px solid rgba(255, 255, 255, .16);
-    color: rgba(255, 255, 255, .68);
+    border-top: 1px solid rgba(255, 255, 255, .14);
+    color: rgba(255, 255, 255, .66);
     font-size: 12.5px;
     font-weight: 500;
     line-height: 1.6;
+    text-align: left;
   }
 
-  /* Form area */
+  .ct-popup-side-note + .ct-popup-side-note {
+    margin-top: 0;
+  }
+
+  .ct-popup-spacer {
+    flex: 1 1 auto;
+    min-height: 24px;
+  }
+
+  /* Staggered entrance for left content */
+
+  .ct-popup-rise {
+    opacity: 0;
+    animation: ctRise .7s var(--ct-ease) forwards;
+    animation-delay: calc(var(--d, 0) * .09s + .15s);
+  }
+
+  /* ---------- Form area ---------- */
 
   .ct-popup-form-area {
     min-width: 0;
-    padding: 38px 36px 30px;
+    padding: 40px 38px 30px;
     overflow-y: auto;
     overscroll-behavior: contain;
     background: #fff;
+    text-align: left;
   }
 
   .ct-popup-form-head {
     padding-right: 48px;
-    margin-bottom: 24px;
+    margin-bottom: 26px;
   }
 
   .ct-popup-form-head small {
@@ -302,7 +517,7 @@ const css = `
     margin: 0 0 8px;
     color: var(--ct-ink);
     font-family: "Bricolage Grotesque", Inter, sans-serif;
-    font-size: clamp(26px, 2.6vw, 32px);
+    font-size: clamp(26px, 2.6vw, 33px);
     font-weight: 800;
     letter-spacing: -.03em;
     line-height: 1.15;
@@ -360,7 +575,7 @@ const css = `
     font-family: inherit;
     font-size: 15px;
     line-height: 1.5;
-    transition: border-color .2s, box-shadow .2s, background .2s;
+    transition: border-color .2s, box-shadow .25s, background .2s, transform .25s var(--ct-ease);
   }
 
   .ct-popup-field input,
@@ -397,7 +612,7 @@ const css = `
     opacity: 1;
   }
 
-  /* Yellow 3D button (same as the hero CTA) */
+  /* ---------- Yellow 3D button ---------- */
 
   .ct-popup-root .ct-popup-yellow,
   .ct-popup-overlay .ct-popup-yellow {
@@ -460,7 +675,7 @@ const css = `
   .ct-popup-overlay .ct-popup-yellow > span {
     font-size: 19px;
     line-height: 1;
-    transition: transform .25s cubic-bezier(.22, 1, .36, 1);
+    transition: transform .25s var(--ct-ease);
   }
 
   .ct-popup-overlay .ct-popup-yellow:active {
@@ -501,9 +716,10 @@ const css = `
     border-radius: 11px;
     font-size: 13.5px;
     line-height: 1.55;
+    animation: ctShake .4s ease;
   }
 
-  /* Success state */
+  /* ---------- Success state ---------- */
 
   .ct-popup-success {
     min-height: 380px;
@@ -522,6 +738,7 @@ const css = `
     border-radius: 18px;
     color: var(--ct-violet-deep);
     background: #efe7ff;
+    animation: ctPop .5s var(--ct-ease) both;
   }
 
   .ct-popup-success-icon svg {
@@ -550,14 +767,21 @@ const css = `
     min-width: 160px;
   }
 
+  /* ---------- Keyframes ---------- */
+
   @keyframes ctOverlayIn {
     from { opacity: 0; }
     to { opacity: 1; }
   }
 
   @keyframes ctModalIn {
-    from { opacity: 0; transform: translateY(16px) scale(.985); }
+    from { opacity: 0; transform: translateY(22px) scale(.97); }
     to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes ctRise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes ctShine {
@@ -565,7 +789,68 @@ const css = `
     100% { transform: translateX(520%) skewX(-20deg); }
   }
 
-  /* Short desktop screens */
+  @keyframes ctFloatA {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(70px, 60px) scale(1.15); }
+  }
+
+  @keyframes ctFloatB {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-80px, -60px) scale(1.1); }
+  }
+
+  @keyframes ctFloatC {
+    0%, 100% { transform: translate(0, 0); }
+    33% { transform: translate(50px, -40px); }
+    66% { transform: translate(-40px, 30px); }
+  }
+
+  @keyframes ctGridDrift {
+    from { background-position: 0 0; }
+    to { background-position: 26px 26px; }
+  }
+
+  @keyframes ctRing {
+    0% { transform: scale(.35); opacity: .9; }
+    100% { transform: scale(1.25); opacity: 0; }
+  }
+
+  @keyframes ctPulse {
+    0% { transform: scale(1); opacity: .7; }
+    100% { transform: scale(3); opacity: 0; }
+  }
+
+  @keyframes ctTextShine {
+    from { background-position: 0% 0; }
+    to { background-position: 200% 0; }
+  }
+
+  @keyframes ctDraw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  @keyframes ctBarGrow {
+    from { transform: scaleY(0); opacity: 0; }
+    to { transform: scaleY(1); opacity: 1; }
+  }
+
+  @keyframes ctBarBreath {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(.84); }
+  }
+
+  @keyframes ctPop {
+    0% { transform: scale(.4); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes ctShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  /* ---------- Short desktop screens ---------- */
 
   @media (min-width: 761px) and (max-height: 820px) {
     .ct-popup-overlay {
@@ -577,22 +862,34 @@ const css = `
     }
 
     .ct-popup-side {
-      gap: 20px;
-      padding: 30px 30px 22px;
+      padding: 32px 32px 22px;
     }
 
     .ct-popup-side h2 {
       margin-top: 16px;
-      font-size: 32px;
+      font-size: 34px;
     }
 
     .ct-popup-points {
-      gap: 10px;
+      gap: 9px;
+      margin-top: 20px;
+    }
+
+    .ct-popup-points li {
+      padding: 9px 12px;
+    }
+
+    .ct-popup-growth {
       margin-top: 18px;
+      padding: 13px 16px 12px;
+    }
+
+    .ct-popup-bars {
+      height: 44px;
     }
 
     .ct-popup-form-area {
-      padding: 28px 32px 24px;
+      padding: 30px 32px 24px;
     }
 
     .ct-popup-form-head {
@@ -606,7 +903,8 @@ const css = `
 
   @media (min-width: 761px) and (max-height: 700px) {
     .ct-popup-side p,
-    .ct-popup-side-note {
+    .ct-popup-side-note,
+    .ct-popup-growth {
       display: none;
     }
 
@@ -632,7 +930,7 @@ const css = `
     }
   }
 
-  /* Tablet and mobile: single column, scrolls as one card */
+  /* ---------- Tablet and mobile: single column, scrolls as one card ---------- */
 
   @media (max-width: 760px) {
     .ct-popup-overlay {
@@ -661,8 +959,7 @@ const css = `
     }
 
     .ct-popup-side {
-      gap: 16px;
-      padding: 24px 20px 22px;
+      padding: 26px 20px 24px;
     }
 
     .ct-popup-eyebrow {
@@ -674,7 +971,7 @@ const css = `
       max-width: 100%;
       margin: 16px 0 10px;
       padding-right: 44px;
-      font-size: clamp(26px, 7vw, 34px);
+      font-size: clamp(27px, 7.4vw, 36px);
     }
 
     .ct-popup-side p {
@@ -684,11 +981,13 @@ const css = `
     }
 
     .ct-popup-points {
-      gap: 9px;
-      margin-top: 16px;
+      max-width: 100%;
+      gap: 8px;
+      margin-top: 18px;
     }
 
     .ct-popup-points li {
+      padding: 9px 12px;
       font-size: 13.5px;
     }
 
@@ -697,6 +996,12 @@ const css = `
       height: 24px;
     }
 
+    .ct-popup-growth {
+      max-width: 100%;
+      margin-top: 16px;
+    }
+
+    .ct-popup-spacer,
     .ct-popup-side-note {
       display: none;
     }
@@ -753,7 +1058,7 @@ const css = `
       grid-column: auto;
     }
 
-    .ct-popup-points li:nth-child(3) {
+    .ct-popup-growth {
       display: none;
     }
   }
@@ -769,7 +1074,7 @@ const css = `
     }
 
     .ct-popup-side {
-      padding: 20px 16px 18px;
+      padding: 22px 16px 18px;
     }
 
     .ct-popup-form-area {
@@ -777,18 +1082,35 @@ const css = `
     }
 
     .ct-popup-side h2 {
-      font-size: 25px;
+      font-size: 26px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .ct-popup-overlay,
     .ct-popup-modal,
+    .ct-popup-orb,
+    .ct-popup-grid,
+    .ct-popup-rings i,
+    .ct-popup-dot::after,
+    .ct-popup-side h2 span,
+    .ct-popup-bars span,
     .ct-popup-overlay .ct-popup-yellow::after {
       animation: none;
     }
 
+    .ct-popup-rise {
+      opacity: 1;
+      animation: none;
+    }
+
+    .ct-popup-check path {
+      stroke-dashoffset: 0;
+      animation: none;
+    }
+
     .ct-popup-close,
+    .ct-popup-points li,
     .ct-popup-overlay .ct-popup-yellow > span {
       transition: none;
     }
@@ -913,32 +1235,79 @@ export default function Contact() {
               </button>
 
               <aside className="ct-popup-side">
-                <div>
-                  <div className="ct-popup-eyebrow">
-                    <span className="ct-popup-dot" />
-                    Let&rsquo;s grow together
+                {/* Moving background */}
+                <div className="ct-popup-bg" aria-hidden="true">
+                  <span className="ct-popup-orb o1" />
+                  <span className="ct-popup-orb o2" />
+                  <span className="ct-popup-orb o3" />
+                  <span className="ct-popup-grid" />
+                  <span className="ct-popup-rings">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                </div>
+
+                <div
+                  className="ct-popup-eyebrow ct-popup-rise"
+                  style={{ '--d': 0 }}
+                >
+                  <span className="ct-popup-dot" />
+                  Let&rsquo;s grow together
+                </div>
+
+                <h2 className="ct-popup-rise" style={{ '--d': 1 }}>
+                  Turn More Clicks Into <span>Customers.</span>
+                </h2>
+
+                <p
+                  id="ct-popup-description"
+                  className="ct-popup-rise"
+                  style={{ '--d': 2 }}
+                >
+                  Tell us about your business. Let&rsquo;s build a smarter
+                  growth system that turns more leads into paying customers.
+                </p>
+
+                <ul className="ct-popup-points">
+                  {points.map((point, index) => (
+                    <li
+                      key={point}
+                      className="ct-popup-rise"
+                      style={{ '--d': 3 + index }}
+                    >
+                      <span className="ct-popup-check">
+                        <CheckIcon />
+                      </span>
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div
+                  className="ct-popup-growth ct-popup-rise"
+                  style={{ '--d': 6 }}
+                  aria-hidden="true"
+                >
+                  <div className="ct-popup-growth-head">
+                    <span>Your growth, step by step</span>
+                    <span className="ct-popup-growth-tag">
+                      <TrendIcon />
+                      Rising
+                    </span>
                   </div>
 
-                  <h2>
-                    Turn More Clicks Into <span>Customers.</span>
-                  </h2>
-
-                  <p id="ct-popup-description">
-                    Tell us about your business. Let&rsquo;s build a smarter
-                    growth system that turns more leads into paying customers.
-                  </p>
-
-                  <ul className="ct-popup-points">
-                    {points.map((point) => (
-                      <li key={point}>
-                        <span className="ct-popup-check">
-                          <CheckIcon />
-                        </span>
-                        <span>{point}</span>
-                      </li>
+                  <div className="ct-popup-bars">
+                    {bars.map((height, index) => (
+                      <span
+                        key={index}
+                        style={{ '--h': `${height}%`, '--i': index }}
+                      />
                     ))}
-                  </ul>
+                  </div>
                 </div>
+
+                <div className="ct-popup-spacer" />
 
                 <div className="ct-popup-side-note">
                   Creative Crew &mdash; growth, built around your business.
