@@ -266,33 +266,34 @@ function ProofVisual() {
   }
 
   return (
-    <div className="comparison-proof-stage" aria-hidden="true">
+    <div className="comparison-proof-stage">
       <div className="comparison-proof-phone">
-        <div className="comparison-proof-phone-notch" />
+        <div className="comparison-proof-phone-notch" aria-hidden="true" />
 
-        <div className="comparison-proof-ad-head">
+        <div className="comparison-proof-ad-head" aria-hidden="true">
           <span className="comparison-proof-avatar" />
           <span className="comparison-proof-bar comparison-proof-bar--head" />
           <span className="comparison-proof-sponsored">Sponsored</span>
         </div>
 
-        <div className="comparison-proof-ad-image">
+        <div className="comparison-proof-ad-image" aria-hidden="true">
           <img src="/imge/Neeraj10.png" alt="" loading="lazy" />
         </div>
 
-        <div className="comparison-proof-ad-lines">
+        <div className="comparison-proof-ad-lines" aria-hidden="true">
           <span className="comparison-proof-bar comparison-proof-bar--strong" />
           <span className="comparison-proof-bar" />
           <span className="comparison-proof-bar comparison-proof-bar--short" />
         </div>
 
-        <div className="comparison-proof-ad-button">
-          Learn more
-          <Icon type="arrow" />
-        </div>
+        {/* Same Button as the other CTAs, so it opens the same form popup */}
+        <Button className="site-cta--revenue comparison-proof-ad-button">
+          <span>Learn more</span>
+
+        </Button>
       </div>
 
-      <div className="comparison-proof-notes">
+      <div className="comparison-proof-notes" aria-hidden="true">
         <div className="comparison-proof-note">
           <span className="comparison-proof-note-icon">
             <Icon type="enquiry" />
@@ -994,11 +995,16 @@ const styles = `
 .comparison-proof-bar--short { width: 64%; }
 
 /* Phone mock "Learn more" button: same amber look, scaled down */
-.comparison-proof-ad-button {
+.landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
   padding: 10px;
   border: 1px solid var(--btn-border);
   border-radius: 9px;
@@ -1008,11 +1014,34 @@ const styles = `
     inset 0 1px 0 #fff8c4,
     0 3px 0 0 #d18f0a,
     0 8px 12px -6px #f5b323a0;
+  font-family: inherit;
   font-size: 10px;
   font-weight: 800;
+  line-height: 1.4;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform 220ms ease, box-shadow 220ms ease;
 }
 
-.comparison-proof-ad-button svg { width: 13px; height: 13px; }
+.landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button svg {
+  width: 13px;
+  height: 13px;
+}
+
+.landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 #fff8c4,
+    0 1px 0 0 #d18f0a,
+    0 4px 8px -6px #f5b323a0;
+}
+
+.landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button:focus-visible {
+  outline: 3px solid #a98af0;
+  outline-offset: 3px;
+}
 
 .comparison-proof-notes {
   flex: 1 1 190px;
@@ -1377,12 +1406,11 @@ const styles = `
   }
 
   .comparison-proof-photo { border-radius: 17px; }
-  .comparison-proof-ad-button {
-    position: relative;
+  .landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button {
     justify-content: center;
   }
 
-  .comparison-proof-ad-button svg {
+  .landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button svg {
     position: absolute;
     right: 10px;
   }
@@ -1493,6 +1521,31 @@ const styles = `
     transform: none !important;
   }
 }
+
+/* ---------- Mobile heading spacing: match the reference screenshot ---------- */
+@media (max-width: 767px) {
+  .landing-comparison .comparison-header {
+    text-align: center;
+    margin-inline: auto;
+    padding-inline: 0;
+  }
+
+  .landing-comparison .comparison-eyebrow {
+    margin-bottom: 24px;
+  }
+
+  .landing-comparison .comparison-header h2 {
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 1.16;
+  }
+
+  .landing-comparison .comparison-header p {
+    margin: 24px auto 0;
+    line-height: 1.8;
+  }
+}
+
 `
 
 /* ==================== Complete component ==================== */
