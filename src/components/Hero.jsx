@@ -551,7 +551,17 @@ const styles = `
     font-size: clamp(12px, 1.2vw, 14px);
     font-weight: 600;
     line-height: 1.6;
-    text-wrap: balance;
+    text-wrap: pretty;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .premium-hero .premium-hero__eyebrow span {
+    display: block;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    text-align: left;
   }
 
   .premium-hero .premium-hero__eyebrow::before {
@@ -1228,7 +1238,7 @@ const styles = `
       font-size: 12px;
       line-height: 1.5;
       white-space: normal;
-      text-align: center;
+      text-align: left;
     }
 
     .premium-hero .premium-hero__title {
@@ -1685,16 +1695,17 @@ export default function Hero() {
           {/* Hero content */}
 
           <div className="premium-hero__copy">
-            <Reveal>
-              <div className="premium-hero__pill">
-                <p className="premium-hero__eyebrow">
-                  <span>
-                    Don&rsquo;t just build landing pages. We build complete
-                    funnels
+
+            <Reveal className="w-full">
+              <div className="premium-hero__pill w-full">
+                <p className="premium-hero__eyebrow !m-0 !w-full flex-1 text-left">
+                  <span className="block w-full flex-1 text-left">
+                    We Don&rsquo;t Just Build Landing Pages; We Build Complete Automated Funnels.
                   </span>
                 </p>
               </div>
             </Reveal>
+
 
             <Reveal delay={90}>
               <h1
