@@ -1267,26 +1267,43 @@ const styles = `
     }
 
     .premium-hero .premium-hero__eyebrow {
+      position: relative;
       display: flex;
       width: 100%;
       max-width: 100%;
+      min-width: 0;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 9px 14px;
-      font-size: 12px;
+      gap: 0;
+      padding: 10px 18px;
+      font-size: clamp(11px, 3.1vw, 13px);
       line-height: 1.5;
       white-space: normal;
       text-align: center;
       border-radius: 24px;
+      box-sizing: border-box;
     }
 
     .premium-hero .premium-hero__eyebrow span {
-      flex: 0 1 auto;
-      width: auto;
+      display: block;
+      flex: 1 1 100%;
+      width: 100%;
       min-width: 0;
+      margin-inline: auto;
+      padding-inline: 12px;
       text-align: center;
       text-wrap: balance;
+      overflow-wrap: break-word;
+    }
+
+    .premium-hero .premium-hero__eyebrow::before {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      translate: 0 -50%;
+      flex: none;
+      width: 8px;
+      height: 8px;
     }
 
     .premium-hero .premium-hero__title {
@@ -1296,9 +1313,9 @@ const styles = `
       width: 100%;
       max-width: 100%;
       margin-top: 16px;
-      font-size: clamp(22px, 6.8vw, 38px);
-      line-height: 1.1;
-      letter-spacing: -.035em;
+      font-size: clamp(25px, 7.2vw, 40px);
+      line-height: 1.08;
+      letter-spacing: -.045em;
       text-align: center;
       text-wrap: initial;
       overflow-wrap: normal;
@@ -1313,7 +1330,7 @@ const styles = `
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0;
+      gap: 2px;
       width: 100%;
       max-width: 100%;
       white-space: nowrap;
@@ -1325,8 +1342,8 @@ const styles = `
       max-width: 100%;
       white-space: nowrap;
       text-align: center;
-      line-height: 1.12;
-      letter-spacing: -.045em;
+      line-height: 1.08;
+      letter-spacing: -.05em;
     }
 
     .premium-hero__title-mobile-revenue {
@@ -1543,7 +1560,7 @@ const styles = `
     }
 
     .premium-hero .premium-hero__title {
-      font-size: clamp(21px, 6.5vw, 32px);
+      font-size: clamp(24px, 7.2vw, 36px);
     }
 
     .premium-hero .premium-hero__subtitle {
@@ -1625,7 +1642,7 @@ const styles = `
     }
 
     .premium-hero .premium-hero__title {
-      font-size: clamp(19px, 6.1vw, 22px);
+      font-size: clamp(22px, 7vw, 25px);
     }
 
     .premium-hero__title-middle {
