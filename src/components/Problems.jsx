@@ -706,6 +706,9 @@ const styles = `
 .comparison-group-heading {
   padding: 20px 26px;
   margin-bottom: 4px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
 }
 
 .comparison-group-title {
