@@ -627,6 +627,10 @@ const styles = `
     letter-spacing: -.04em;
   }
 
+  .premium-hero__title-mobile {
+    display: none;
+  }
+
   .premium-hero .premium-hero__subtitle {
     width: 100%;
     max-width: 540px;
@@ -1251,13 +1255,38 @@ const styles = `
       gap: 22px;
     }
 
+    .premium-hero__copy {
+      align-items: center;
+      text-align: center;
+    }
+
+    .premium-hero__pill {
+      width: 100%;
+      justify-content: center;
+      margin-inline: auto;
+    }
+
     .premium-hero .premium-hero__eyebrow {
+      display: flex;
+      width: 100%;
+      max-width: 100%;
+      align-items: center;
+      justify-content: center;
       gap: 8px;
-      padding: 8px 14px;
+      padding: 9px 14px;
       font-size: 12px;
       line-height: 1.5;
       white-space: normal;
-      text-align: left;
+      text-align: center;
+      border-radius: 24px;
+    }
+
+    .premium-hero .premium-hero__eyebrow span {
+      flex: 0 1 auto;
+      width: auto;
+      min-width: 0;
+      text-align: center;
+      text-wrap: balance;
     }
 
     .premium-hero .premium-hero__title {
@@ -1267,12 +1296,45 @@ const styles = `
       width: 100%;
       max-width: 100%;
       margin-top: 16px;
-      font-size: clamp(27px, 7.2vw, 40px);
+      font-size: clamp(22px, 6.8vw, 38px);
       line-height: 1.1;
       letter-spacing: -.035em;
       text-align: center;
       text-wrap: initial;
       overflow-wrap: normal;
+    }
+
+    .premium-hero__title-desktop {
+      display: none !important;
+    }
+
+    .premium-hero .premium-hero__title-mobile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      width: 100%;
+      max-width: 100%;
+      white-space: nowrap;
+    }
+
+    .premium-hero__title-mobile-line {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      white-space: nowrap;
+      text-align: center;
+      line-height: 1.12;
+      letter-spacing: -.045em;
+    }
+
+    .premium-hero__title-mobile-revenue {
+      color: var(--violet);
+    }
+
+    .premium-hero__title-mobile-black {
+      color: var(--ink);
     }
 
     .premium-hero__title-lead,
@@ -1481,7 +1543,7 @@ const styles = `
     }
 
     .premium-hero .premium-hero__title {
-      font-size: clamp(26px, 7.8vw, 34px);
+      font-size: clamp(21px, 6.5vw, 32px);
     }
 
     .premium-hero .premium-hero__subtitle {
@@ -1563,7 +1625,7 @@ const styles = `
     }
 
     .premium-hero .premium-hero__title {
-      font-size: clamp(23px, 7.2vw, 25px);
+      font-size: clamp(19px, 6.1vw, 22px);
     }
 
     .premium-hero__title-middle {
@@ -1783,17 +1845,29 @@ export default function Hero() {
                 id="premium-hero-title"
                 className="premium-hero__title"
               >
-                <span className="premium-hero__title-lead">
-                  Generate More
+                <span className="premium-hero__title-desktop">
+                  <span className="premium-hero__title-lead">
+                    Generate More
+                  </span>
+
+                  <span className="premium-hero__title-middle">
+                    <span className="premium-hero__title-accent">Revenue</span>{' '}
+                    <span className="premium-hero__title-without">Without</span>
+                  </span>
+
+                  <span className="premium-hero__title-tail">
+                    Spending More
+                  </span>
                 </span>
 
-                <span className="premium-hero__title-middle">
-                  <span className="premium-hero__title-accent">Revenue</span>{' '}
-                  <span className="premium-hero__title-without">Without</span>
-                </span>
-
-                <span className="premium-hero__title-tail">
-                  Spending More
+                <span className="premium-hero__title-mobile" aria-hidden="true">
+                  <span className="premium-hero__title-mobile-line">
+                    <span className="premium-hero__title-mobile-black">Generate More </span>
+                    <span className="premium-hero__title-mobile-revenue">Revenue</span>
+                  </span>
+                  <span className="premium-hero__title-mobile-line premium-hero__title-mobile-black">
+                    Without Spending More
+                  </span>
                 </span>
               </h1>
             </Reveal>
