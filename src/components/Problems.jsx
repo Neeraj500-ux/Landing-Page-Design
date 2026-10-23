@@ -24,51 +24,51 @@ const items = [
   {
     problem: {
       title: 'Unclear Offer',
-      description: 'Visitors can’t tell what you offer within seconds.',
+      description: 'Visitors Can’t Tell What You Offer Within Seconds.',
     },
     solution: {
       title: 'Make Your Offer Clear',
-      description: 'A sharp headline and focused message explain it instantly.',
+      description: 'A Sharp Headline And Focused Message Explain It Instantly.',
     },
   },
   {
     problem: {
       title: 'Generic Design',
-      description: 'Nothing sets you apart from competitors.',
+      description: 'Nothing Sets You Apart From Competitors.',
     },
     solution: {
       title: 'Stand Out With Custom Design',
-      description: 'Layout, colors and type built around your brand.',
+      description: 'Layout, Colors And Type Built Around Your Brand.',
     },
   },
   {
     problem: {
       title: 'Too Many Distractions',
-      description: 'Competing elements pull visitors away.',
+      description: 'Competing Elements Pull Visitors Away.',
     },
     solution: {
       title: 'Focus On One Next Step',
-      description: 'One goal and one clear call to action.',
+      description: 'One Goal And One Clear Call To Action.',
     },
   },
   {
     problem: {
       title: 'Difficult Mobile Experience',
-      description: 'Small screens make reading and tapping hard.',
+      description: 'Small Screens Make Reading And Tapping Hard.',
     },
     solution: {
       title: 'Make Mobile Effortless',
-      description: 'Readable text, easy buttons and simple forms.',
+      description: 'Readable Text, Easy Buttons And Simple Forms.',
     },
   },
   {
     problem: {
       title: 'Low Visitor Confidence',
-      description: 'Visitors aren’t sure they can trust you.',
+      description: 'Visitors Aren’t Sure They Can Trust You.',
     },
     solution: {
       title: 'Build Trust Quickly',
-      description: 'Real testimonials, credentials and helpful FAQs.',
+      description: 'Real Testimonials, Credentials And Helpful FAQs.',
     },
   },
 ]
@@ -382,7 +382,7 @@ function ProofVisual({ playing }) {
 
         {/* Same Button as the other CTAs, so it opens the same form popup */}
         <Button className="site-cta--revenue !relative !m-0 !flex !min-h-0 !w-full !min-w-0 !items-center !justify-center !gap-2 !rounded-[9px] !border !border-[#f3b01f] !bg-[linear-gradient(180deg,#ffee82,#ffe04e_48%,#ffca30)] !p-2.5 !text-[10px] !font-extrabold !leading-[1.4] !text-[#2e0c4d] !shadow-[inset_0_1px_0_#fff8c4,0_3px_0_0_#d18f0a,0_8px_12px_-6px_#f5b323a0] active:!translate-y-0.5">
-          <span>Learn more</span>
+          <span>Learn More</span>
         </Button>
       </div>
 
@@ -399,9 +399,9 @@ function ProofVisual({ playing }) {
           </span>
 
           <div className="min-w-0">
-            <strong className="block text-[10px] leading-[1.45] md:text-xs">New enquiry</strong>
+            <strong className="block text-[10px] leading-[1.45] md:text-xs">New Enquiry</strong>
             <p className="mt-1.5 text-[9.5px] leading-[1.55] text-[#6c607e] md:text-[11px] md:leading-[1.65]">
-              “Hi, could you share pricing and availability?”
+              “Hi, Could You Share Pricing And Availability?”
             </p>
           </div>
         </div>
@@ -416,9 +416,9 @@ function ProofVisual({ playing }) {
           </span>
 
           <div className="min-w-0">
-            <strong className="block text-[10px] leading-[1.45] md:text-xs">Booking confirmed</strong>
+            <strong className="block text-[10px] leading-[1.45] md:text-xs">Booking Confirmed</strong>
             <p className="mt-1.5 text-[9.5px] leading-[1.55] text-[#6c607e] md:text-[11px] md:leading-[1.65]">
-              Your team continues the conversation.
+              Your Team Continues The Conversation.
             </p>
           </div>
         </div>
@@ -535,8 +535,8 @@ export default function Problems() {
               {/* Phone: text fills the full card width (pretty wrap, fluid size).
                   Tablet + desktop: original balanced look. */}
               <p className="w-full font-display text-[clamp(17px,5.3vw,22px)] font-bold leading-[1.4] tracking-[-0.02em] [text-wrap:pretty] md:text-[clamp(19px,1.9vw,23px)] md:leading-[1.4] md:[text-wrap:balance]">
-                Unclear offers and distracting pages stop interested visitors
-                from taking the next step.
+                Unclear Offers And Distracting Pages Stop Interested Visitors
+                From Taking The Next Step.
               </p>
 
               <p className="relative mt-4 pt-4 text-[15px] leading-[1.7] text-[#6c607e] [text-wrap:pretty] md:mt-[18px] md:pt-[18px] md:text-[clamp(15px,1.3vw,16.5px)] md:leading-[1.75]">
@@ -544,16 +544,16 @@ export default function Problems() {
                 <span className="px-0.5 font-extrabold text-[#7542a4] [box-decoration-break:clone] [-webkit-box-decoration-break:clone] bg-[linear-gradient(transparent_62%,#ffe04e8c_62%)]">
                   Let’s Fix That.
                 </span>{' '}
-                At <strong className="font-bold text-[#302045]">Creative Crew</strong>, we build complete growth
-                systems with high-converting landing pages, custom tracking,
-                smart automations, and analytics—all designed to convert more
-                leads into clients and generate more revenue for your business.
+                At <strong className="font-bold text-[#302045]">Creative Crew</strong>, We Build Complete Growth
+                Systems With High-Converting Landing Pages, Custom Tracking,
+                Smart Automations, And Analytics—All Designed To Convert More
+                Leads Into Clients And Generate More Revenue For Your Business.
               </p>
 
               <ul className="mt-5 grid list-none grid-cols-1 gap-2.5 p-0 min-[360px]:grid-cols-2 md:mt-[22px] md:gap-3">
                 {[
-                  ['2,000+', 'Landing pages created'],
-                  ['1,000+', 'Professionals grew revenue'],
+                  ['2,000+', 'Landing Pages Created'],
+                  ['1,000+', 'Professionals Grew Revenue'],
                 ].map(([figure, label]) => (
                   <li
                     key={label}
@@ -598,8 +598,8 @@ export default function Problems() {
           </h2>
 
           <p className="mx-auto mt-6 max-w-[560px] text-[15px] leading-[1.8] text-[#6c607e] [text-wrap:pretty] md:mt-5 md:text-[clamp(15px,1.3vw,17px)]">
-            Visitors decide in seconds. If your message is unclear or the next
-            step is hard, they leave.
+            Visitors Decide In Seconds. If Your Message Is Unclear Or The Next
+            Step Is Hard, They Leave.
           </p>
         </Reveal>
 
@@ -703,7 +703,7 @@ export default function Problems() {
               <span
                 className="inline-grid whitespace-nowrap font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[clamp(58px,16vw,72px)] font-extrabold leading-[1.12] tracking-[-0.05em] tabular-nums md:text-[clamp(52px,5.5vw,76px)]"
                 role="img"
-                aria-label="More than 2,000"
+                aria-label="More Than 2,000"
               >
                 {/* Invisible final value fixes the width so the counter never jitters. */}
                 <span
@@ -733,9 +733,9 @@ export default function Problems() {
             </h2>
 
             <p className="mt-[18px] text-base leading-[1.8] text-[#6c607e] [text-wrap:pretty] md:text-[15.5px]">
-              At <strong className="text-[#302045]">Creative Crew</strong>, we
-              combine landing pages, automation and tracking to create a
-              clearer path from interest to enquiry.
+              At <strong className="text-[#302045]">Creative Crew</strong>, We
+              Combine Landing Pages, Automation And Tracking To Create A
+              Clearer Path From Interest To Enquiry.
             </p>
           </Reveal>
         </div>

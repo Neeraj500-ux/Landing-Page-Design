@@ -4,6 +4,15 @@ import { Button, Container, Reveal, SectionHead } from './ui'
 const baseUrl = import.meta.env.BASE_URL || '/'
 const imageBase = `${baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`}images/`
 
+/* Capitalizes the first letter of every word (Title Case) without touching
+   the rest of the word, so "Let's" stays "Let's" and "B2B" stays "B2B".
+   Used for the badge + title coming from ../data, so you don't have to
+   edit the data file. */
+const toTitleCase = (value = '') =>
+  String(value).replace(/(^|[\s\-(“"])(\p{Ll})/gu, (_, lead, char) =>
+    `${lead}${char.toUpperCase()}`,
+  )
+
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -384,14 +393,14 @@ export default function Audience() {
     <section
       id="who"
       className="expert-audience"
-      aria-label="Who our landing pages are built for"
+      aria-label="Who Our Landing Pages Are Built For"
     >
       <style>{styles}</style>
 
       <Container className="expert-audience__container">
         <div className="expert-audience__header">
           <SectionHead
-            title="Built for Experts Who Want More Meaningful Conversations."
+            title="Built For Experts Who Want More Meaningful Conversations."
             text="Whether you sell personal guidance, professional advice or practical training, your landing page should explain your offer in a way your audience understands."
           />
         </div>
@@ -431,14 +440,14 @@ export default function Audience() {
                 className="expert-audience__content"
               >
                 <span className="expert-audience__badge">
-                  {audience.t}
+                  {toTitleCase(audience.t)}
                 </span>
 
                 <h3
                   id={`expert-audience-title-${index}`}
                   className="expert-audience__title"
                 >
-                  {audience.h}
+                  {toTitleCase(audience.h)}
                 </h3>
 
                 <p className="expert-audience__description">
@@ -446,7 +455,7 @@ export default function Audience() {
                 </p>
 
                 <p className="expert-audience__goals">
-                  <strong>Page goals: </strong>
+                  <strong>Page Goals: </strong>
                   {audience.g}
                 </p>
               </Reveal>
