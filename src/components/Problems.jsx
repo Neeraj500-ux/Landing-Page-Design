@@ -23,52 +23,52 @@ const proofImageAlt =
 const items = [
   {
     problem: {
-      title: 'Unclear Offer',
-      description: 'Visitors Can’t Tell What You Offer Within Seconds.',
+      title: 'Generic Landing Page Design',
+      description: 'Using Common Templates That Fail To Make Your Brand Stand Out.',
     },
     solution: {
-      title: 'Make Your Offer Clear',
-      description: 'A Sharp Headline And Focused Message Explain It Instantly.',
+      title: 'Custom, Conversion-Focused Design',
+      description: 'A Landing Page Designed Around Your Brand, Offer, And Target Audience.',
     },
   },
   {
     problem: {
-      title: 'Generic Design',
-      description: 'Nothing Sets You Apart From Competitors.',
+      title: 'No Proper Tracking Setup',
+      description: 'Missing Pixel Events And Conversion Tracking To Measure Campaign Performance.',
     },
     solution: {
-      title: 'Stand Out With Custom Design',
-      description: 'Layout, Colors And Type Built Around Your Brand.',
+      title: 'Custom Pixel & Conversion Tracking',
+      description: 'Track Important Actions And Understand Where Your Leads Are Coming From.',
     },
   },
   {
     problem: {
-      title: 'Too Many Distractions',
-      description: 'Competing Elements Pull Visitors Away.',
+      title: 'No Automated Follow-Ups',
+      description: 'Leads Come In, But There’s No System To Follow Up With Them Automatically.',
     },
     solution: {
-      title: 'Focus On One Next Step',
-      description: 'One Goal And One Clear Call To Action.',
+      title: 'Automated Lead Follow-Ups',
+      description: 'Connect Your Funnel With CRM And Email Automation To Manage And Nurture Leads.',
     },
   },
   {
     problem: {
-      title: 'Difficult Mobile Experience',
-      description: 'Small Screens Make Reading And Tapping Hard.',
+      title: 'Unclear Messaging & Offer',
+      description: 'Visitors Don’t Understand Your Offer, Its Value, Or Why They Should Choose You.',
     },
     solution: {
-      title: 'Make Mobile Effortless',
-      description: 'Readable Text, Easy Buttons And Simple Forms.',
+      title: 'Clear Messaging That Converts',
+      description: 'Present Your Offer, Benefits, And CTA In A Way Your Audience Understands Instantly.',
     },
   },
   {
     problem: {
-      title: 'Low Visitor Confidence',
-      description: 'Visitors Aren’t Sure They Can Trust You.',
+      title: 'No Structured Funnel System',
+      description: 'No Proper Steps To Track Leads, Measure Conversions, And Optimize Ad Performance.',
     },
     solution: {
-      title: 'Build Trust Quickly',
-      description: 'Real Testimonials, Credentials And Helpful FAQs.',
+      title: 'Complete Funnel Tracking System',
+      description: 'Track Leads, Monitor Performance, Identify Drop-Offs, And Make Data-Driven Improvements.',
     },
   },
 ]
@@ -314,9 +314,8 @@ function Connector() {
 function RevenueButton({ intro = false }) {
   return (
     <Button
-      className={`site-cta--revenue comparison-cta-button ${
-        intro ? 'comparison-intro-button' : ''
-      } max-md:w-full max-md:max-w-[420px]`}
+      className={`site-cta--revenue comparison-cta-button ${intro ? 'comparison-intro-button' : ''
+        } max-md:w-full max-md:max-w-[420px]`}
     >
       Yes! Let's Grow My Revenue
     </Button>
@@ -597,10 +596,7 @@ export default function Problems() {
             <span className={GRADIENT_TEXT}>Not Enough Enquiries?</span>
           </h2>
 
-          <p className="mx-auto mt-6 max-w-[560px] text-[15px] leading-[1.8] text-[#6c607e] [text-wrap:pretty] md:mt-5 md:text-[clamp(15px,1.3vw,17px)]">
-            Visitors Decide In Seconds. If Your Message Is Unclear Or The Next
-            Step Is Hard, They Leave.
-          </p>
+
         </Reveal>
 
         <div className="mt-8 md:mt-[clamp(36px,5vw,60px)]">

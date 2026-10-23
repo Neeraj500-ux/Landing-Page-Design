@@ -3,16 +3,18 @@ import { ScanEye } from 'lucide-react'
 import { Button } from './ui'
 
 /* ==========================================================
-   Hero.jsx  (100% Tailwind utility classes)
-   - Same content, same colors, same video controls.
-   - The dot icon in the top pill is removed.
-   - Fluid text sizes that scale on every screen.
-   - Heading scales with its own column width (cqw), so it
-     always stays in 3 lines on tablet + desktop.
-   - All visible text is Title Case (every word starts with
-     a capital letter, nothing is forced to all uppercase).
-   - Only keyframes + the font import live in the small
-     <style> block at the bottom of this file.
+   Hero.jsx  (100% Tailwind utility classes)  - MOBILE-READY
+   - Same content, same colors, same layout.
+   - Heading is sized from its own column width (cqw) with a
+     safer ratio, so the 3 lines never overflow on 320px phones.
+   - Safe-area padding for notched phones (iPhone / Android).
+   - 44px touch targets for the video controls + CTA.
+   - Hover effects only run on devices that really hover, so
+     nothing "sticks" after a tap on touch screens.
+   - Marquees no longer freeze after tapping them on touch.
+   - Fullscreen has a Vimeo-API fallback (iOS Safari can't
+     fullscreen an iframe with the normal browser API).
+   - Lighter blur on small screens for smoother scrolling.
    - Arbitrary values only, so it works on Tailwind v3 and v4.
    ========================================================== */
 
@@ -59,6 +61,11 @@ const VIOLET_FLOW =
 const MASK =
   '[mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)] [-webkit-mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)] motion-reduce:[mask-image:none] motion-reduce:[-webkit-mask-image:none]'
 
+// Marquee pause: only on devices with a real hover / keyboard focus,
+// so a simple tap on a phone never freezes the scrolling row.
+const MARQUEE_PAUSE =
+  '[@media(hover:hover)]:group-hover:[animation-play-state:paused] [@media(hover:hover)]:group-focus-within:[animation-play-state:paused]'
+
 // Space between promise-marquee items (the run padding must equal the gap)
 const FOCUS_GAP =
   'gap-4 min-[480px]:gap-5 md:gap-[clamp(22px,3vw,44px)]'
@@ -70,12 +77,12 @@ const SERVICE_RUN_GAP =
 
 // Yellow CTA (the "!" wins over your Button component's own styles)
 const HERO_BTN =
-  'site-cta--revenue !relative !isolate !inline-flex !min-h-[50px] !w-full !min-w-0 !max-w-full !items-center !justify-center !gap-2 !overflow-hidden !whitespace-normal !rounded-[13px] !border !border-[#f3b01f] ' +
+  'site-cta--revenue !relative !isolate !inline-flex !min-h-[52px] !w-full !min-w-0 !max-w-full !items-center !justify-center !gap-2 !overflow-hidden !whitespace-normal !rounded-[13px] !border !border-[#f3b01f] ' +
   '!bg-[linear-gradient(180deg,#ffee82,#ffe04e_48%,#ffca30)] !px-3.5 !py-3 !text-center !text-[15px] !font-extrabold !leading-[1.35] !text-[#2e0c4d] !no-underline ' +
   '!shadow-[inset_0_1px_0_#fff8c4,inset_0_-2px_4px_#f5b2144d,0_4px_0_#d18f0a,0_14px_24px_-10px_#f5b323a0] ' +
   'min-[480px]:!text-base md:!min-h-[54px] md:!rounded-[14px] md:!px-[clamp(14px,4vw,30px)] md:!text-[clamp(15px,1.4vw,17px)] ' +
-  'transition-[transform,box-shadow,filter] duration-200 [-webkit-tap-highlight-color:transparent] ' +
-  'hover:!-translate-y-[3px] hover:!brightness-105 hover:!shadow-[inset_0_1px_0_#fff8c4,0_7px_0_#d18f0a,0_22px_36px_-12px_#f5b323c0] ' +
+  'transition-[transform,box-shadow,filter] duration-200 [-webkit-tap-highlight-color:transparent] touch-manipulation ' +
+  '[@media(hover:hover)]:hover:!-translate-y-[3px] [@media(hover:hover)]:hover:!brightness-105 [@media(hover:hover)]:hover:!shadow-[inset_0_1px_0_#fff8c4,0_7px_0_#d18f0a,0_22px_36px_-12px_#f5b323c0] ' +
   'active:!translate-y-[2px] ' +
   'focus-visible:!outline focus-visible:!outline-[3px] focus-visible:!outline-offset-[3px] focus-visible:!outline-[#a98af0] ' +
   'before:pointer-events-none before:absolute before:inset-x-0 before:bottom-1/2 before:top-0 before:-z-10 before:bg-[linear-gradient(180deg,#ffffff40,transparent)] ' +
@@ -228,7 +235,7 @@ function ControlIcon({ name }) {
 
   return (
     <svg
-      className="block h-[18px] w-[18px] shrink-0 sm:h-5 sm:w-5"
+      className="block h-5 w-5 shrink-0"
       width="20"
       height="20"
       viewBox="0 0 24 24"
@@ -266,7 +273,7 @@ function Reveal({ as: Tag = 'div', children, delay = 0, className = '' }) {
           observer.disconnect()
         }
       },
-      { threshold: 0.08, rootMargin: '0px 0px -4% 0px' }
+      { threshold: 0.05, rootMargin: '0px 0px -2% 0px' }
     )
 
     observer.observe(el)
@@ -319,11 +326,12 @@ function useTilt() {
 const VIMEO_SRC =
   'https://player.vimeo.com/video/1234072596?autoplay=1&muted=1&loop=1&autopause=0&controls=0&playsinline=1&dnt=1&title=0&byline=0&portrait=0'
 
+// 44px touch target on phones, 40px on larger screens
 const VIDEO_BTN =
-  'pointer-events-auto inline-grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/25 bg-[rgba(20,17,31,.6)] p-0 text-white ' +
+  'pointer-events-auto inline-grid h-11 w-11 cursor-pointer place-items-center rounded-full border border-white/25 bg-[rgba(20,17,31,.6)] p-0 text-white ' +
   '[-webkit-backdrop-filter:blur(12px)] [backdrop-filter:blur(12px)] [-webkit-tap-highlight-color:transparent] touch-manipulation ' +
-  'transition-[transform,background-color] duration-200 hover:scale-105 hover:bg-[#7c3aed] active:scale-95 ' +
-  'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0] sm:h-10 sm:w-10'
+  'transition-[transform,background-color] duration-200 [@media(hover:hover)]:hover:scale-105 [@media(hover:hover)]:hover:bg-[#7c3aed] active:scale-95 active:bg-[#7c3aed] ' +
+  'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0] md:h-10 md:w-10'
 
 function HeroVideo() {
   const wrapRef = useRef(null)
@@ -383,12 +391,19 @@ function HeroVideo() {
     const target = frame || wrap
 
     try {
-      if (document.fullscreenElement) {
-        document.exitFullscreen?.()
-      } else if (target?.requestFullscreen) {
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        if (document.exitFullscreen) document.exitFullscreen()
+        else document.webkitExitFullscreen?.()
+        return
+      }
+
+      if (target?.requestFullscreen) {
         target.requestFullscreen()
       } else if (target?.webkitRequestFullscreen) {
         target.webkitRequestFullscreen()
+      } else {
+        // iOS Safari: ask the Vimeo player to handle fullscreen itself
+        post('requestFullscreen')
       }
     } catch {
       /* Fullscreen is not available on this device */
@@ -422,11 +437,11 @@ function HeroVideo() {
         type="button"
         onClick={togglePlay}
         aria-label={playing ? 'Pause Video' : 'Play Video'}
-        className="absolute inset-0 z-[2] h-full w-full cursor-pointer border-0 bg-transparent p-0 [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0]"
+        className="absolute inset-0 z-[2] h-full w-full cursor-pointer touch-manipulation border-0 bg-transparent p-0 [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0]"
       />
 
-      <div className="pointer-events-none absolute inset-x-2 bottom-2 z-[3] flex items-center justify-between gap-2 md:inset-x-2.5 md:bottom-2.5">
-        <div className="flex items-center gap-2">
+      <div className="pointer-events-none absolute inset-x-1.5 bottom-1.5 z-[3] flex items-center justify-between gap-2 min-[480px]:inset-x-2 min-[480px]:bottom-2 md:inset-x-2.5 md:bottom-2.5">
+        <div className="flex items-center gap-1.5 min-[480px]:gap-2">
           <button
             type="button"
             className={VIDEO_BTN}
@@ -469,7 +484,7 @@ function PointCard({ point, index }) {
   return (
     <Reveal as="li" delay={index * 100} className="h-full">
       <div
-        className={`group relative h-full min-w-0 overflow-hidden rounded-2xl border px-3 pb-[18px] pt-3.5 shadow-[inset_0_1px_0_#fff,0_24px_38px_-27px_rgba(91,33,182,.5),0_5px_12px_-7px_rgba(91,33,182,.17)] [-webkit-backdrop-filter:blur(20px)] [backdrop-filter:blur(20px)] transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(.22,1,.36,1)] hover:-translate-y-[5px] hover:shadow-[inset_0_1px_0_#fff,0_32px_46px_-26px_rgba(91,33,182,.56),0_5px_12px_-7px_rgba(91,33,182,.17)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 min-[480px]:rounded-[18px] min-[480px]:px-3.5 min-[480px]:pb-5 min-[480px]:pt-4 md:px-5 md:pb-6 md:pt-5 lg:rounded-[26px] lg:px-6 lg:pb-[30px] lg:pt-[26px] ${tone.card}`}
+        className={`group relative h-full min-w-0 overflow-hidden rounded-2xl border px-3 pb-[18px] pt-3.5 shadow-[inset_0_1px_0_#fff,0_24px_38px_-27px_rgba(91,33,182,.5),0_5px_12px_-7px_rgba(91,33,182,.17)] [-webkit-backdrop-filter:blur(20px)] [backdrop-filter:blur(20px)] transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(.22,1,.36,1)] [@media(hover:hover)]:hover:-translate-y-[5px] [@media(hover:hover)]:hover:shadow-[inset_0_1px_0_#fff,0_32px_46px_-26px_rgba(91,33,182,.56),0_5px_12px_-7px_rgba(91,33,182,.17)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 min-[480px]:rounded-[18px] min-[480px]:px-3.5 min-[480px]:pb-5 min-[480px]:pt-4 md:px-5 md:pb-6 md:pt-5 lg:rounded-[26px] lg:px-6 lg:pb-[30px] lg:pt-[26px] ${tone.card}`}
       >
         <div className="flex w-full min-w-0 items-center justify-between gap-1.5 md:items-start md:gap-3">
           {/* Idle bob on the wrapper, hover effects on the tile */}
@@ -479,14 +494,14 @@ function PointCard({ point, index }) {
             aria-hidden="true"
           >
             <span
-              className={`pointer-events-none absolute inset-0 rounded-xl border opacity-0 group-hover:animate-[heroRing_1.5s_ease-out_infinite] motion-reduce:hidden md:rounded-2xl ${tone.ring}`}
+              className={`pointer-events-none absolute inset-0 rounded-xl border opacity-0 [@media(hover:hover)]:group-hover:animate-[heroRing_1.5s_ease-out_infinite] motion-reduce:hidden md:rounded-2xl ${tone.ring}`}
             />
             <span
               className={`relative grid h-9 w-9 flex-none place-items-center rounded-xl border min-[480px]:h-10 min-[480px]:w-10 md:h-[54px] md:w-[54px] md:rounded-2xl ${tone.tile}`}
             >
               <Icon
                 name={point.icon}
-                className="h-[19px] w-[19px] origin-center transition-transform duration-[450ms] ease-[cubic-bezier(.22,1,.36,1)] group-hover:-rotate-6 group-hover:scale-110 min-[480px]:h-5 min-[480px]:w-5 md:h-[25px] md:w-[25px]"
+                className="h-[19px] w-[19px] origin-center transition-transform duration-[450ms] ease-[cubic-bezier(.22,1,.36,1)] [@media(hover:hover)]:group-hover:-rotate-6 [@media(hover:hover)]:group-hover:scale-110 min-[480px]:h-5 min-[480px]:w-5 md:h-[25px] md:w-[25px]"
               />
             </span>
           </span>
@@ -503,10 +518,10 @@ function PointCard({ point, index }) {
           {point.text}
         </p>
 
-        {/* Accent bar grows on hover */}
+        {/* Accent bar (grows on hover; on touch screens it stays half open) */}
         <span
           aria-hidden="true"
-          className={`pointer-events-none absolute inset-x-3.5 bottom-0 h-[3px] origin-left scale-x-[.14] rounded-t-[3px] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:scale-x-100 motion-reduce:transition-none md:inset-x-5 lg:inset-x-6 ${tone.bar}`}
+          className={`pointer-events-none absolute inset-x-3.5 bottom-0 h-[3px] origin-left scale-x-[.3] rounded-t-[3px] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] md:scale-x-[.14] [@media(hover:hover)]:group-hover:scale-x-100 motion-reduce:transition-none md:inset-x-5 lg:inset-x-6 ${tone.bar}`}
         />
       </div>
     </Reveal>
@@ -521,7 +536,7 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="relative isolate w-full min-w-0 max-w-full overflow-x-clip bg-[radial-gradient(55%_42%_at_100%_0%,#efe6ff,transparent_70%),radial-gradient(40%_34%_at_0%_8%,#f6f0ff,transparent_72%),radial-gradient(60%_36%_at_85%_65%,#f3ecff,transparent_72%),#fff] pb-7 pt-[var(--hero-top-space,20px)] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#14111f] antialiased md:pb-[clamp(28px,4vw,48px)] md:pt-[var(--hero-top-space,clamp(28px,5vw,72px))]"
+      className="relative isolate w-full min-w-0 max-w-full overflow-x-clip bg-[radial-gradient(55%_42%_at_100%_0%,#efe6ff,transparent_70%),radial-gradient(40%_34%_at_0%_8%,#f6f0ff,transparent_72%),radial-gradient(60%_36%_at_85%_65%,#f3ecff,transparent_72%),#fff] pb-[max(28px,env(safe-area-inset-bottom))] pt-[var(--hero-top-space,20px)] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#14111f] antialiased [-webkit-text-size-adjust:100%] [text-size-adjust:100%] md:pb-[clamp(28px,4vw,48px)] md:pt-[var(--hero-top-space,clamp(28px,5vw,72px))]"
       aria-labelledby="premium-hero-title"
     >
       <style>{keyframes}</style>
@@ -533,22 +548,23 @@ export default function Hero() {
       />
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute right-[-8%] top-[4%] -z-10 aspect-square w-[min(46vw,520px)] animate-[heroDrift_16s_ease-in-out_infinite_alternate] rounded-full bg-[#7c3aed24] blur-[70px] motion-reduce:animate-none"
+        className="pointer-events-none absolute right-[-8%] top-[4%] -z-10 aspect-square w-[min(46vw,520px)] animate-[heroDrift_16s_ease-in-out_infinite_alternate] rounded-full bg-[#7c3aed24] blur-[48px] motion-reduce:animate-none md:blur-[70px]"
       />
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute left-[-10%] top-[52%] -z-10 aspect-square w-[min(40vw,440px)] animate-[heroDrift_16s_ease-in-out_-6s_infinite_alternate] rounded-full bg-[#ffeadb99] blur-[70px] motion-reduce:animate-none"
+        className="pointer-events-none absolute left-[-10%] top-[52%] -z-10 aspect-square w-[min(40vw,440px)] animate-[heroDrift_16s_ease-in-out_-6s_infinite_alternate] rounded-full bg-[#ffeadb99] blur-[48px] motion-reduce:animate-none md:blur-[70px]"
       />
 
-      <div className="mx-auto w-full min-w-0 max-w-[1180px] px-3 min-[360px]:px-3.5 min-[480px]:px-4 md:px-[clamp(16px,4vw,36px)]">
-        {/* ================= HERO STAGE ================= */}
+      <div className="mx-auto w-full min-w-0 max-w-[1180px]">        {/* ================= HERO STAGE ================= */}
         <div className="grid grid-cols-1 items-center gap-5 min-[480px]:gap-[22px] md:gap-[clamp(24px,5vw,48px)] lg:grid-cols-[minmax(0,.94fr)_minmax(0,1.06fr)] lg:gap-[clamp(36px,4vw,60px)]">
           {/* ---------- Copy ---------- */}
           <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
             {/* Pill (no dot icon) */}
             <Reveal className="w-full">
-              <p className="relative m-0 w-full overflow-hidden rounded-[26px] border border-[#e0d2ff] bg-[linear-gradient(180deg,#f6f1ff,#efe7ff)] px-4 py-3 text-center text-[clamp(14px,4vw,17px)] font-semibold leading-[1.55] text-[#2a2140] shadow-[inset_0_1px_0_#fff,0_10px_24px_-16px_rgba(124,58,237,.5)] [text-wrap:balance] after:pointer-events-none after:absolute after:inset-y-0 after:-left-[40%] after:w-[36%] after:animate-[heroShine_6s_ease-in-out_1.2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffffb3,transparent)] motion-reduce:after:hidden md:px-5 md:py-3.5 md:text-[clamp(16px,1.65vw,21px)] lg:text-left">
-                We Don’t Just Build Landing Pages; We Build Complete Automated Funnels.
+              <p className="relative m-0 w-full overflow-hidden rounded-[22px] border border-[#e0d2ff] bg-[linear-gradient(180deg,#f6f1ff,#efe7ff)] px-3.5 py-2.5 text-center text-[clamp(13.5px,3.9vw,17px)] font-semibold leading-[1.5] text-[#2a2140] shadow-[inset_0_1px_0_#fff,0_10px_24px_-16px_rgba(124,58,237,.5)] [overflow-wrap:break-word] [text-wrap:balance] after:pointer-events-none after:absolute after:inset-y-0 after:-left-[40%] after:w-[36%] after:animate-[heroShine_6s_ease-in-out_1.2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffffb3,transparent)] motion-reduce:after:hidden min-[480px]:rounded-[26px] min-[480px]:px-4 min-[480px]:py-3 min-[480px]:leading-[1.55] md:px-5 md:py-3.5 md:text-[clamp(16px,1.65vw,21px)] lg:text-left">
+                We Don’t Just Build Landing Pages.
+                <br />
+                We Build Complete Automated Funnels.
               </p>
             </Reveal>
 
@@ -556,12 +572,12 @@ export default function Hero() {
             <Reveal delay={90} className="w-full [container-type:inline-size]">
               <h1
                 id="premium-hero-title"
-                className="font-display m-0 mt-4 w-full text-center text-[clamp(20px,8.3cqw,41px)] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#14111f] capitalize md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(33px,9cqw,64px)] md:tracking-[-0.035em] lg:text-left"
+                className="font-display m-0 mt-4 w-full text-center text-[clamp(17px,7.1cqw,41px)] font-extrabold leading-[1.1] tracking-[-0.04em] text-[#14111f] capitalize md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(30px,7.7cqw,64px)] md:leading-[1.08] md:tracking-[-0.035em] lg:text-left"
               >
                 {/* Desktop + tablet: three lines */}
                 <span className="block max-md:hidden">
                   <span className="block whitespace-nowrap">
-                    Generate More Leads &amp;
+                    Generate More <span className={VIOLET_FLOW}>Leads &amp;</span>
                   </span>
 
                   <span className="block whitespace-nowrap">
@@ -569,7 +585,7 @@ export default function Hero() {
                   </span>
 
                   <span className="block w-full whitespace-nowrap tracking-[-0.04em]">
-                    Spending More Ad Spend
+                    Spending More <span className={VIOLET_FLOW}>Ad Spend</span>
                   </span>
                 </span>
 
@@ -578,14 +594,16 @@ export default function Hero() {
                   className="flex flex-col items-center gap-0.5 whitespace-nowrap md:hidden"
                   aria-hidden="true"
                 >
-                  <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
-                    Generate More Leads
+                  <span className="block w-full whitespace-nowrap text-center leading-[1.1] tracking-[-0.045em]">
+                    Generate More <span className={VIOLET_FLOW}>Leads</span>
                   </span>
-                  <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
-                    &amp; <span className={VIOLET_FLOW}>Revenue</span> Without
+
+                  <span className="block w-full whitespace-nowrap text-center leading-[1.1] tracking-[-0.045em]">
+                    <span className={VIOLET_FLOW}>&amp; Revenue</span> Without
                   </span>
-                  <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
-                    Spending More Ad Spend
+
+                  <span className="block w-full whitespace-nowrap text-center leading-[1.1] tracking-[-0.045em]">
+                    Spending More <span className={VIOLET_FLOW}>Ad Spend</span>
                   </span>
                 </span>
               </h1>
@@ -593,22 +611,22 @@ export default function Hero() {
 
             {/* Subtitle */}
             <Reveal delay={180} className="w-full">
-              <p className="m-0 mx-auto mt-3 w-full max-w-[480px] text-[clamp(14.5px,.8vw+12px,18.5px)] font-medium leading-[1.65] text-[#5b5870] [text-wrap:pretty] md:mt-[clamp(14px,2vw,20px)] md:max-w-[620px] lg:mx-0 lg:max-w-[540px]">
-                Stop Wasting Ad Spend On Low Conversion Pages. Invest In A
-                High-Converting Automated Funnel.
+              <p className="m-0 mx-auto mt-3.5 w-full max-w-[330px] text-[clamp(14.5px,4.1vw,17px)] font-bold leading-[1.5] text-[#2b2938] [overflow-wrap:break-word] [text-wrap:balance] min-[480px]:max-w-[480px] min-[480px]:text-[clamp(16px,.8vw+13.5px,20px)] min-[480px]:leading-[1.6] md:mt-[clamp(14px,2vw,20px)] md:max-w-[620px] md:leading-[1.65] md:[text-wrap:pretty] lg:mx-0 lg:max-w-[540px]">
+                Stop Spending On Low-Converting Pages. Build A High-Converting Automated
+                Funnel That Helps You Reduce CPL And Increase ROI. From The Day 1
               </p>
             </Reveal>
 
             {/* Promise marquee */}
-            <Reveal delay={260} className="mt-[18px] w-full md:mt-[clamp(20px,3vw,32px)]">
-              <div className="min-w-0 overflow-hidden rounded-[14px] border border-[#e0d2ff] bg-[linear-gradient(110deg,#ffffffd9,#f7f2ffd9_65%,#fff4ecd9)] shadow-[inset_0_1px_0_#fff,0_18px_36px_-26px_rgba(91,33,182,.55)] [-webkit-backdrop-filter:blur(18px)] [backdrop-filter:blur(18px)] transition-shadow duration-300 hover:shadow-[inset_0_1px_0_#fff,0_22px_40px_-24px_rgba(91,33,182,.7)] md:rounded-[18px]">
+            <Reveal delay={260} className="mt-5 w-full md:mt-[clamp(20px,3vw,32px)]">
+              <div className="min-w-0 overflow-hidden rounded-[14px] border border-[#e0d2ff] bg-[linear-gradient(110deg,#ffffffd9,#f7f2ffd9_65%,#fff4ecd9)] shadow-[inset_0_1px_0_#fff,0_18px_36px_-26px_rgba(91,33,182,.55)] [-webkit-backdrop-filter:blur(18px)] [backdrop-filter:blur(18px)] transition-shadow duration-300 [@media(hover:hover)]:hover:shadow-[inset_0_1px_0_#fff,0_22px_40px_-24px_rgba(91,33,182,.7)] md:rounded-[18px]">
                 <div
                   className={`group w-full min-w-0 overflow-hidden py-3 outline-none md:py-3.5 ${MASK}`}
                   tabIndex={0}
                   role="region"
                   aria-label="Funnel Performance Promise. Focus To Pause Scrolling."
                 >
-                  <div className="flex w-max animate-[heroMarquee_38s_linear_infinite] items-center will-change-transform group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_52s_linear_infinite]">
+                  <div className={`flex w-max animate-[heroMarquee_30s_linear_infinite] items-center will-change-transform ${MARQUEE_PAUSE} motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_52s_linear_infinite]`}>
                     {[0, 1].map((copy) => (
                       <ul
                         key={copy}
@@ -648,7 +666,7 @@ export default function Hero() {
             {/* Violet glow behind the card */}
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute -bottom-[4%] -z-10 inset-x-[-6%] top-[10%] animate-[heroGlow_6s_ease-in-out_infinite_alternate] rounded-full bg-[radial-gradient(closest-side,#7c3aed4d,transparent_75%)] blur-[34px] motion-reduce:animate-none"
+              className="pointer-events-none absolute -bottom-[4%] -z-10 inset-x-[-4%] top-[10%] animate-[heroGlow_6s_ease-in-out_infinite_alternate] rounded-full bg-[radial-gradient(closest-side,#7c3aed4d,transparent_75%)] blur-[26px] motion-reduce:animate-none md:inset-x-[-6%] md:blur-[34px]"
             />
 
             <div
@@ -661,7 +679,7 @@ export default function Hero() {
                 <HeroVideo />
               </div>
 
-              <div className="relative z-[3] -mt-px bg-[radial-gradient(80%_90%_at_100%_100%,#7c3aed4d,transparent_70%),linear-gradient(180deg,#1b1233,#140d27)] px-2.5 pb-3 pt-2.5 min-[360px]:px-2.5 md:px-[clamp(12px,2.4vw,18px)] md:pb-[clamp(14px,2.2vw,18px)] md:pt-[clamp(12px,2vw,16px)]">
+              <div className="relative z-[3] -mt-px bg-[radial-gradient(80%_90%_at_100%_100%,#7c3aed4d,transparent_70%),linear-gradient(180deg,#1b1233,#140d27)] px-2.5 pb-3 pt-2.5 min-[480px]:px-3 md:px-[clamp(12px,2.4vw,18px)] md:pb-[clamp(14px,2.2vw,18px)] md:pt-[clamp(12px,2vw,16px)]">
                 <div className="flex w-full justify-center">
                   <Button className={HERO_BTN}>Yes! Let's Grow My Revenue</Button>
                 </div>
@@ -671,11 +689,11 @@ export default function Hero() {
         </div>
 
         {/* ================= FUNNEL FEATURES ================= */}
-        <Reveal className="mt-11 w-full md:mt-[clamp(44px,8vw,96px)]">
+        <Reveal className="mt-10 w-full md:mt-[clamp(44px,8vw,96px)]">
           <section aria-labelledby="premium-hero-funnel-heading">
             <h2
               id="premium-hero-funnel-heading"
-              className="font-display m-0 mx-auto w-full max-w-[920px] text-center text-[clamp(22px,4.6vw+6px,36px)] font-semibold normal-case leading-[1.3] tracking-[-0.02em] text-[#14111f] [text-wrap:balance]"
+              className="font-display m-0 mx-auto w-full max-w-[920px] text-center text-[clamp(20px,4.6vw+5px,36px)] font-semibold normal-case leading-[1.3] tracking-[-0.02em] text-[#14111f] [overflow-wrap:break-word] [text-wrap:balance]"
             >
               At{' '}
               <span className="font-bold text-[#5b21b6]">Creative Crew,</span>{' '}
@@ -683,7 +701,7 @@ export default function Hero() {
               Seamlessly.
             </h2>
 
-            <ul className="m-0 mx-auto mt-6 grid w-full list-none grid-cols-1 gap-2.5 p-0 text-left min-[360px]:grid-cols-2 min-[480px]:gap-3 md:mt-[30px] md:max-w-[760px] md:gap-5 lg:mt-[clamp(26px,4.4vw,48px)] lg:max-w-none lg:grid-cols-4">
+            <ul className="m-0 mx-auto mt-5 grid w-full list-none grid-cols-1 gap-2.5 p-0 text-left min-[340px]:grid-cols-2 min-[480px]:mt-6 min-[480px]:gap-3 md:mt-[30px] md:max-w-[760px] md:gap-5 lg:mt-[clamp(26px,4.4vw,48px)] lg:max-w-none lg:grid-cols-4">
               {points.map((point, index) => (
                 <PointCard key={point.text} point={point} index={index} />
               ))}
@@ -693,14 +711,14 @@ export default function Hero() {
       </div>
 
       {/* ================= SERVICES MARQUEE (full width) ================= */}
-      <Reveal className="mt-[22px] w-full md:mt-[clamp(24px,4vw,48px)]">
+      <Reveal className="mt-5 w-full md:mt-[clamp(24px,4vw,48px)]">
         <div
           className={`group w-full min-w-0 overflow-hidden py-3 outline-none md:py-[18px] ${MASK}`}
           tabIndex={0}
           role="region"
           aria-label="Landing Page Services. Focus To Pause Scrolling."
         >
-          <div className="flex w-max animate-[heroMarquee_40s_linear_infinite] items-center will-change-transform group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_46s_linear_infinite]">
+          <div className={`flex w-max animate-[heroMarquee_32s_linear_infinite] items-center will-change-transform ${MARQUEE_PAUSE} motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_46s_linear_infinite]`}>
             {[0, 1].map((copy) => (
               <ul
                 key={copy}
@@ -711,12 +729,12 @@ export default function Hero() {
                 {services.map((service) => (
                   <li
                     key={service.text}
-                    className="inline-flex flex-none items-center gap-2 whitespace-nowrap rounded-full border border-[#e5d7f7] bg-white/85 px-3.5 py-[9px] text-[13px] font-[650] leading-normal text-[#5b5870] shadow-[inset_0_1px_0_#fff,0_10px_20px_-16px_rgba(91,33,182,.5)] transition-[transform,border-color] duration-300 hover:-translate-y-[3px] hover:border-[#cdb6f6] motion-reduce:whitespace-normal motion-reduce:transition-none md:gap-2.5 md:px-[18px] md:py-3 md:text-sm"
+                    className="inline-flex flex-none items-center gap-2 whitespace-nowrap rounded-full border border-[#e5d7f7] bg-white/85 px-3 py-2 text-[12.5px] font-[650] leading-normal text-[#5b5870] shadow-[inset_0_1px_0_#fff,0_10px_20px_-16px_rgba(91,33,182,.5)] transition-[transform,border-color] duration-300 [@media(hover:hover)]:hover:-translate-y-[3px] [@media(hover:hover)]:hover:border-[#cdb6f6] motion-reduce:whitespace-normal motion-reduce:transition-none min-[480px]:px-3.5 min-[480px]:py-[9px] min-[480px]:text-[13px] md:gap-2.5 md:px-[18px] md:py-3 md:text-sm"
                   >
                     <span className="text-[#7c3aed]">
                       <Icon
                         name={service.icon}
-                        className="h-[18px] w-[18px] md:h-[19px] md:w-[19px]"
+                        className="h-4 w-4 min-[480px]:h-[18px] min-[480px]:w-[18px] md:h-[19px] md:w-[19px]"
                       />
                     </span>
 
