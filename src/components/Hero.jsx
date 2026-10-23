@@ -3,20 +3,18 @@ import { ScanEye } from 'lucide-react'
 import { Button } from './ui'
 
 /* ==========================================================
-   Hero.jsx  (100% Tailwind utility classes)  - MOBILE-READY
-   - Same content, same colors, same layout.
-   - Heading is sized from its own column width (cqw) with a
-     safer ratio, so the 3 lines never overflow on 320px phones.
-   - Safe-area padding for notched phones (iPhone / Android).
-   - 44px touch targets for the video controls + CTA.
-   - Hover effects only run on devices that really hover, so
-     nothing "sticks" after a tap on touch screens.
-   - Marquees no longer freeze after tapping them on touch.
-   - Fullscreen has a Vimeo-API fallback (iOS Safari can't
-     fullscreen an iframe with the normal browser API).
-   - Lighter blur on small screens for smoother scrolling.
-   - Arbitrary values only, so it works on Tailwind v3 and v4.
+   Hero.jsx (100% Tailwind utility classes) - FULLY RESPONSIVE
+   Breakpoints used:
+     phone  : < 480px   (single column, tight spacing)
+     phone+ : 480-767px (a bit more air)
+     tablet : 768-1023px (centered single column, max-w 720)
+     laptop : 1024-1279px (2 columns, side padding 40px)
+     desktop: 1280px+   (2 columns, 1180px max width)
    ========================================================== */
+
+// Change this if your Vimeo video is not 16:9 (e.g. '4 / 5' or '1 / 1').
+// This is what removes the empty grey area above/below the video.
+const VIDEO_RATIO = '16 / 9'
 
 const focusLines = Array(4).fill(
   'Guaranteed Better Funnel Performance. More Value From Every Ad Spend.'
@@ -24,21 +22,9 @@ const focusLines = Array(4).fill(
 
 const points = [
   { text: 'Communicate Your Offer Clearly.', icon: 'target', tone: 'peach' },
-  {
-    text: 'Custom Pixel Tracking To Optimize Your Ads.',
-    icon: 'scan-eye',
-    tone: 'purple',
-  },
-  {
-    text: 'Make Enquiries And Bookings Simple.',
-    icon: 'calendar',
-    tone: 'gold',
-  },
-  {
-    text: 'Build Credibility With Relevant Proof.',
-    icon: 'shield',
-    tone: 'purple',
-  },
+  { text: 'Custom Pixel Tracking To Optimize Your Ads.', icon: 'scan-eye', tone: 'purple' },
+  { text: 'Make Enquiries And Bookings Simple.', icon: 'calendar', tone: 'gold' },
+  { text: 'Build Credibility With Relevant Proof.', icon: 'shield', tone: 'purple' },
 ]
 
 const services = [
@@ -54,28 +40,23 @@ const services = [
 
 /* ==================== Shared class strings ==================== */
 
-// Violet gradient that slowly shifts (used on accent words)
 const VIOLET_FLOW =
   'bg-[linear-gradient(110deg,#6d28d9,#9b5cf0,#6d28d9)] bg-[length:200%_100%] bg-clip-text text-transparent animate-[heroSheen_5s_ease-in-out_infinite_alternate] motion-reduce:animate-none'
 
 const MASK =
   '[mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)] [-webkit-mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)] motion-reduce:[mask-image:none] motion-reduce:[-webkit-mask-image:none]'
 
-// Marquee pause: only on devices with a real hover / keyboard focus,
-// so a simple tap on a phone never freezes the scrolling row.
+// Pause marquee only on real hover devices / keyboard focus (never on tap)
 const MARQUEE_PAUSE =
   '[@media(hover:hover)]:group-hover:[animation-play-state:paused] [@media(hover:hover)]:group-focus-within:[animation-play-state:paused]'
 
-// Space between promise-marquee items (the run padding must equal the gap)
-const FOCUS_GAP =
-  'gap-4 min-[480px]:gap-5 md:gap-[clamp(22px,3vw,44px)]'
+const FOCUS_GAP = 'gap-4 min-[480px]:gap-5 md:gap-[clamp(22px,3vw,44px)]'
 const FOCUS_RUN_GAP =
   'gap-4 pr-4 min-[480px]:gap-5 min-[480px]:pr-5 md:gap-[clamp(22px,3vw,44px)] md:pr-[clamp(22px,3vw,44px)]'
 
 const SERVICE_RUN_GAP =
-  'gap-2 pr-2 min-[480px]:gap-2.5 min-[480px]:pr-2.5 md:gap-3.5 md:pr-3.5'
+  'gap-2 pr-2 min-[480px]:gap-2.5 min-[480px]:pr-2.5 md:gap-3.5 md:pr-3.5 lg:gap-4 lg:pr-4'
 
-// Yellow CTA (the "!" wins over your Button component's own styles)
 const HERO_BTN =
   'site-cta--revenue !relative !isolate !inline-flex !min-h-[52px] !w-full !min-w-0 !max-w-full !items-center !justify-center !gap-2 !overflow-hidden !whitespace-normal !rounded-[13px] !border !border-[#f3b01f] ' +
   '!bg-[linear-gradient(180deg,#ffee82,#ffe04e_48%,#ffca30)] !px-3.5 !py-3 !text-center !text-[15px] !font-extrabold !leading-[1.35] !text-[#2e0c4d] !no-underline ' +
@@ -88,7 +69,6 @@ const HERO_BTN =
   'before:pointer-events-none before:absolute before:inset-x-0 before:bottom-1/2 before:top-0 before:-z-10 before:bg-[linear-gradient(180deg,#ffffff40,transparent)] ' +
   'after:pointer-events-none after:absolute after:inset-y-0 after:-left-[45%] after:-z-10 after:w-[32%] after:animate-[heroShine_5.5s_ease-in-out_2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffff99,transparent)] motion-reduce:after:hidden'
 
-// Colors for the four feature cards
 const TONES = {
   purple: {
     card: 'border-[#e3d3ff] bg-[radial-gradient(ellipse_at_100%_0%,#f3eaff,transparent_72%),linear-gradient(150deg,#ffffffef,#ffffffc9)]',
@@ -184,9 +164,7 @@ function Icon({ name, className = '' }) {
         <path d="M10 5h4m-3 14h2" />
       </>
     ),
-    sparkle: (
-      <path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z" />
-    ),
+    sparkle: <path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z" />,
   }
 
   return (
@@ -208,7 +186,6 @@ function Icon({ name, className = '' }) {
   )
 }
 
-/* Small icons used by the video controls */
 function ControlIcon({ name }) {
   const shapes = {
     play: <path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor" />,
@@ -284,8 +261,9 @@ function Reveal({ as: Tag = 'div', children, delay = 0, className = '' }) {
     <Tag
       ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
-      className={`min-w-0 max-w-full transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${seen ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-        } ${className}`}
+      className={`min-w-0 max-w-full transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${
+        seen ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+      } ${className}`}
     >
       {children}
     </Tag>
@@ -299,7 +277,6 @@ function useTilt() {
 
   const onPointerMove = (event) => {
     const el = ref.current
-
     if (!el || event.pointerType !== 'mouse') return
 
     const rect = el.getBoundingClientRect()
@@ -326,12 +303,12 @@ function useTilt() {
 const VIMEO_SRC =
   'https://player.vimeo.com/video/1234072596?autoplay=1&muted=1&loop=1&autopause=0&controls=0&playsinline=1&dnt=1&title=0&byline=0&portrait=0'
 
-// 44px touch target on phones, 40px on larger screens
+// 44px touch target on phones/tablets, 40px on laptops
 const VIDEO_BTN =
   'pointer-events-auto inline-grid h-11 w-11 cursor-pointer place-items-center rounded-full border border-white/25 bg-[rgba(20,17,31,.6)] p-0 text-white ' +
   '[-webkit-backdrop-filter:blur(12px)] [backdrop-filter:blur(12px)] [-webkit-tap-highlight-color:transparent] touch-manipulation ' +
   'transition-[transform,background-color] duration-200 [@media(hover:hover)]:hover:scale-105 [@media(hover:hover)]:hover:bg-[#7c3aed] active:scale-95 active:bg-[#7c3aed] ' +
-  'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0] md:h-10 md:w-10'
+  'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0] lg:h-10 lg:w-10'
 
 function HeroVideo() {
   const wrapRef = useRef(null)
@@ -348,7 +325,6 @@ function HeroVideo() {
     )
   }, [])
 
-  /* Keep the button state in sync with the player */
   useEffect(() => {
     const onMessage = (event) => {
       if (!String(event.origin).includes('vimeo.com')) return
@@ -386,9 +362,7 @@ function HeroVideo() {
   }
 
   const goFullscreen = () => {
-    const frame = frameRef.current
-    const wrap = wrapRef.current
-    const target = frame || wrap
+    const target = frameRef.current || wrapRef.current
 
     try {
       if (document.fullscreenElement || document.webkitFullscreenElement) {
@@ -397,14 +371,9 @@ function HeroVideo() {
         return
       }
 
-      if (target?.requestFullscreen) {
-        target.requestFullscreen()
-      } else if (target?.webkitRequestFullscreen) {
-        target.webkitRequestFullscreen()
-      } else {
-        // iOS Safari: ask the Vimeo player to handle fullscreen itself
-        post('requestFullscreen')
-      }
+      if (target?.requestFullscreen) target.requestFullscreen()
+      else if (target?.webkitRequestFullscreen) target.webkitRequestFullscreen()
+      else post('requestFullscreen') // iOS Safari fallback
     } catch {
       /* Fullscreen is not available on this device */
     }
@@ -413,11 +382,12 @@ function HeroVideo() {
   return (
     <figure
       ref={wrapRef}
-      className="relative m-0 aspect-[16/9] w-full min-w-0 overflow-hidden bg-[#1b1233]"
+      style={{ aspectRatio: VIDEO_RATIO }}
+      className="relative m-0 w-full min-w-0 overflow-hidden bg-[#1b1233]"
     >
       <iframe
         ref={frameRef}
-        className="block h-full w-full max-w-full border-0 bg-[#1b1233]"
+        className="absolute inset-0 block h-full w-full max-w-full border-0 bg-[#1b1233]"
         src={VIMEO_SRC}
         title="Creative Crew Landing Page Preview"
         allow="autoplay; fullscreen; picture-in-picture"
@@ -426,7 +396,6 @@ function HeroVideo() {
         onLoad={onLoad}
       />
 
-      {/* Soft fade at the bottom so the controls stay readable */}
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[38%] bg-[linear-gradient(180deg,transparent,#14111f8c)]"
@@ -440,7 +409,7 @@ function HeroVideo() {
         className="absolute inset-0 z-[2] h-full w-full cursor-pointer touch-manipulation border-0 bg-transparent p-0 [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0]"
       />
 
-      <div className="pointer-events-none absolute inset-x-1.5 bottom-1.5 z-[3] flex items-center justify-between gap-2 min-[480px]:inset-x-2 min-[480px]:bottom-2 md:inset-x-2.5 md:bottom-2.5">
+      <div className="pointer-events-none absolute inset-x-1.5 bottom-1.5 z-[3] flex items-center justify-between gap-2 min-[480px]:inset-x-2 min-[480px]:bottom-2 md:inset-x-3 md:bottom-3">
         <div className="flex items-center gap-1.5 min-[480px]:gap-2">
           <button
             type="button"
@@ -484,10 +453,9 @@ function PointCard({ point, index }) {
   return (
     <Reveal as="li" delay={index * 100} className="h-full">
       <div
-        className={`group relative h-full min-w-0 overflow-hidden rounded-2xl border px-3 pb-[18px] pt-3.5 shadow-[inset_0_1px_0_#fff,0_24px_38px_-27px_rgba(91,33,182,.5),0_5px_12px_-7px_rgba(91,33,182,.17)] [-webkit-backdrop-filter:blur(20px)] [backdrop-filter:blur(20px)] transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(.22,1,.36,1)] [@media(hover:hover)]:hover:-translate-y-[5px] [@media(hover:hover)]:hover:shadow-[inset_0_1px_0_#fff,0_32px_46px_-26px_rgba(91,33,182,.56),0_5px_12px_-7px_rgba(91,33,182,.17)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 min-[480px]:rounded-[18px] min-[480px]:px-3.5 min-[480px]:pb-5 min-[480px]:pt-4 md:px-5 md:pb-6 md:pt-5 lg:rounded-[26px] lg:px-6 lg:pb-[30px] lg:pt-[26px] ${tone.card}`}
+        className={`group relative h-full min-w-0 overflow-hidden rounded-2xl border px-3 pb-[18px] pt-3.5 shadow-[inset_0_1px_0_#fff,0_24px_38px_-27px_rgba(91,33,182,.5),0_5px_12px_-7px_rgba(91,33,182,.17)] [-webkit-backdrop-filter:blur(20px)] [backdrop-filter:blur(20px)] transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(.22,1,.36,1)] [@media(hover:hover)]:hover:-translate-y-[5px] [@media(hover:hover)]:hover:shadow-[inset_0_1px_0_#fff,0_32px_46px_-26px_rgba(91,33,182,.56),0_5px_12px_-7px_rgba(91,33,182,.17)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 min-[480px]:rounded-[18px] min-[480px]:px-3.5 min-[480px]:pb-5 min-[480px]:pt-4 md:px-5 md:pb-6 md:pt-5 lg:rounded-[22px] lg:px-4 lg:pb-7 lg:pt-5 xl:rounded-[26px] xl:px-6 xl:pb-[30px] xl:pt-[26px] ${tone.card}`}
       >
         <div className="flex w-full min-w-0 items-center justify-between gap-1.5 md:items-start md:gap-3">
-          {/* Idle bob on the wrapper, hover effects on the tile */}
           <span
             className="relative inline-flex animate-[heroBob_4.5s_ease-in-out_infinite] motion-reduce:animate-none"
             style={{ animationDelay: `${index * 0.4}s` }}
@@ -497,7 +465,7 @@ function PointCard({ point, index }) {
               className={`pointer-events-none absolute inset-0 rounded-xl border opacity-0 [@media(hover:hover)]:group-hover:animate-[heroRing_1.5s_ease-out_infinite] motion-reduce:hidden md:rounded-2xl ${tone.ring}`}
             />
             <span
-              className={`relative grid h-9 w-9 flex-none place-items-center rounded-xl border min-[480px]:h-10 min-[480px]:w-10 md:h-[54px] md:w-[54px] md:rounded-2xl ${tone.tile}`}
+              className={`relative grid h-9 w-9 flex-none place-items-center rounded-xl border min-[480px]:h-10 min-[480px]:w-10 md:h-[54px] md:w-[54px] md:rounded-2xl lg:h-12 lg:w-12 xl:h-[54px] xl:w-[54px] ${tone.tile}`}
             >
               <Icon
                 name={point.icon}
@@ -507,21 +475,20 @@ function PointCard({ point, index }) {
           </span>
 
           <span
-            className={`grid h-7 w-7 flex-none place-items-center rounded-[9px] border bg-white/85 text-xs font-extrabold leading-none tabular-nums text-[#5b3291] shadow-[inset_0_1px_0_#fff,0_4px_10px_rgba(91,33,182,.03)] md:h-[38px] md:w-[38px] md:rounded-xl md:text-[15px] ${tone.number}`}
+            className={`grid h-7 w-7 flex-none place-items-center rounded-[9px] border bg-white/85 text-xs font-extrabold leading-none tabular-nums text-[#5b3291] shadow-[inset_0_1px_0_#fff,0_4px_10px_rgba(91,33,182,.03)] md:h-[38px] md:w-[38px] md:rounded-xl md:text-[15px] lg:h-9 lg:w-9 xl:h-[38px] xl:w-[38px] ${tone.number}`}
             aria-hidden="true"
           >
             {String(index + 1).padStart(2, '0')}
           </span>
         </div>
 
-        <p className="m-0 mt-3.5 text-[13px] font-semibold leading-[1.55] text-[#5b5870] [overflow-wrap:break-word] min-[480px]:text-sm md:mt-6 md:text-[clamp(15px,1.4vw,17px)] md:leading-[1.65]">
+        <p className="m-0 mt-3.5 text-[13px] font-semibold leading-[1.55] text-[#5b5870] [overflow-wrap:break-word] min-[480px]:text-sm md:mt-6 md:text-[clamp(15px,1.4vw,17px)] md:leading-[1.65] lg:mt-5 lg:text-[15px] xl:mt-6 xl:text-[17px]">
           {point.text}
         </p>
 
-        {/* Accent bar (grows on hover; on touch screens it stays half open) */}
         <span
           aria-hidden="true"
-          className={`pointer-events-none absolute inset-x-3.5 bottom-0 h-[3px] origin-left scale-x-[.3] rounded-t-[3px] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] md:scale-x-[.14] [@media(hover:hover)]:group-hover:scale-x-100 motion-reduce:transition-none md:inset-x-5 lg:inset-x-6 ${tone.bar}`}
+          className={`pointer-events-none absolute inset-x-3.5 bottom-0 h-[3px] origin-left scale-x-[.3] rounded-t-[3px] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] md:scale-x-[.14] [@media(hover:hover)]:group-hover:scale-x-100 motion-reduce:transition-none md:inset-x-5 lg:inset-x-4 xl:inset-x-6 ${tone.bar}`}
         />
       </div>
     </Reveal>
@@ -555,53 +522,47 @@ export default function Hero() {
         className="pointer-events-none absolute left-[-10%] top-[52%] -z-10 aspect-square w-[min(40vw,440px)] animate-[heroDrift_16s_ease-in-out_-6s_infinite_alternate] rounded-full bg-[#ffeadb99] blur-[48px] motion-reduce:animate-none md:blur-[70px]"
       />
 
-      <div className="mx-auto w-full min-w-0 max-w-[1180px]">        {/* ================= HERO STAGE ================= */}
-        <div className="grid grid-cols-1 items-center gap-5 min-[480px]:gap-[22px] md:gap-[clamp(24px,5vw,48px)] lg:grid-cols-[minmax(0,.94fr)_minmax(0,1.06fr)] lg:gap-[clamp(36px,4vw,60px)]">
+      {/* Side padding: phone 16 / 480+ 20 / tablet 32 / laptop 40 / desktop 0 (max-w centers it) */}
+      <div className="mx-auto w-full min-w-0 max-w-[1180px] px-4 min-[480px]:px-5 md:px-8 lg:px-10 min-[1260px]:px-0">
+        {/* ================= HERO STAGE ================= */}
+        <div className="mx-auto grid max-w-[720px] grid-cols-1 items-center gap-5 min-[480px]:gap-[22px] md:gap-[clamp(24px,5vw,40px)] lg:max-w-none lg:grid-cols-[minmax(0,.94fr)_minmax(0,1.06fr)] lg:gap-[clamp(28px,3.5vw,60px)]">
           {/* ---------- Copy ---------- */}
           <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
-            {/* Pill (no dot icon) */}
             <Reveal className="w-full">
-              <p className="relative m-0 w-full overflow-hidden rounded-[22px] border border-[#e0d2ff] bg-[linear-gradient(180deg,#f6f1ff,#efe7ff)] px-3.5 py-2.5 text-center text-[clamp(13.5px,3.9vw,17px)] font-semibold leading-[1.5] text-[#2a2140] shadow-[inset_0_1px_0_#fff,0_10px_24px_-16px_rgba(124,58,237,.5)] [overflow-wrap:break-word] [text-wrap:balance] after:pointer-events-none after:absolute after:inset-y-0 after:-left-[40%] after:w-[36%] after:animate-[heroShine_6s_ease-in-out_1.2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffffb3,transparent)] motion-reduce:after:hidden min-[480px]:rounded-[26px] min-[480px]:px-4 min-[480px]:py-3 min-[480px]:leading-[1.55] md:px-5 md:py-3.5 md:text-[clamp(16px,1.65vw,21px)] lg:text-left">
+              <p className="relative m-0 w-full overflow-hidden rounded-[22px] border border-[#e0d2ff] bg-[linear-gradient(180deg,#f6f1ff,#efe7ff)] px-3.5 py-2.5 text-center text-[clamp(13.5px,3.9vw,17px)] font-semibold leading-[1.5] text-[#2a2140] shadow-[inset_0_1px_0_#fff,0_10px_24px_-16px_rgba(124,58,237,.5)] [overflow-wrap:break-word] [text-wrap:balance] after:pointer-events-none after:absolute after:inset-y-0 after:-left-[40%] after:w-[36%] after:animate-[heroShine_6s_ease-in-out_1.2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffffb3,transparent)] motion-reduce:after:hidden min-[480px]:rounded-[26px] min-[480px]:px-4 min-[480px]:py-3 min-[480px]:leading-[1.55] md:px-5 md:py-3.5 md:text-[clamp(16px,1.65vw,21px)] lg:text-left lg:text-[clamp(15px,1.45vw,19px)]">
                 We Don’t Just Build Landing Pages.
                 <br />
                 We Build Complete Automated Funnels.
               </p>
             </Reveal>
 
-            {/* Title (container = column width, so the heading scales with it) */}
+            {/* Title: container = column width, so the heading scales with it */}
             <Reveal delay={90} className="w-full [container-type:inline-size]">
               <h1
                 id="premium-hero-title"
-                className="font-display m-0 mt-4 w-full text-center text-[clamp(17px,7.1cqw,41px)] font-extrabold leading-[1.1] tracking-[-0.04em] text-[#14111f] capitalize md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(30px,7.7cqw,64px)] md:leading-[1.08] md:tracking-[-0.035em] lg:text-left"
+                className="font-display m-0 mt-4 w-full text-center text-[clamp(17px,7.1cqw,41px)] font-extrabold capitalize leading-[1.1] tracking-[-0.04em] text-[#14111f] md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(30px,7.7cqw,64px)] md:leading-[1.08] md:tracking-[-0.035em] lg:text-left"
               >
-                {/* Desktop + tablet: three lines */}
+                {/* Tablet + laptop + desktop */}
                 <span className="block max-md:hidden">
                   <span className="block whitespace-nowrap">
                     Generate More <span className={VIOLET_FLOW}>Leads &amp;</span>
                   </span>
-
                   <span className="block whitespace-nowrap">
                     <span className={VIOLET_FLOW}>Revenue</span> Without
                   </span>
-
                   <span className="block w-full whitespace-nowrap tracking-[-0.04em]">
                     Spending More <span className={VIOLET_FLOW}>Ad Spend</span>
                   </span>
                 </span>
 
-                {/* Phones: three lines that always fit */}
-                <span
-                  className="flex flex-col items-center gap-0.5 whitespace-nowrap md:hidden"
-                  aria-hidden="true"
-                >
+                {/* Phones */}
+                <span className="flex flex-col items-center gap-0.5 whitespace-nowrap md:hidden">
                   <span className="block w-full whitespace-nowrap text-center leading-[1.1] tracking-[-0.045em]">
                     Generate More <span className={VIOLET_FLOW}>Leads</span>
                   </span>
-
                   <span className="block w-full whitespace-nowrap text-center leading-[1.1] tracking-[-0.045em]">
                     <span className={VIOLET_FLOW}>&amp; Revenue</span> Without
                   </span>
-
                   <span className="block w-full whitespace-nowrap text-center leading-[1.1] tracking-[-0.045em]">
                     Spending More <span className={VIOLET_FLOW}>Ad Spend</span>
                   </span>
@@ -611,7 +572,7 @@ export default function Hero() {
 
             {/* Subtitle */}
             <Reveal delay={180} className="w-full">
-              <p className="m-0 mx-auto mt-3.5 w-full max-w-[330px] text-[clamp(14.5px,4.1vw,17px)] font-bold leading-[1.5] text-[#2b2938] [overflow-wrap:break-word] [text-wrap:balance] min-[480px]:max-w-[480px] min-[480px]:text-[clamp(16px,.8vw+13.5px,20px)] min-[480px]:leading-[1.6] md:mt-[clamp(14px,2vw,20px)] md:max-w-[620px] md:leading-[1.65] md:[text-wrap:pretty] lg:mx-0 lg:max-w-[540px]">
+              <p className="m-0 mx-auto mt-3.5 w-full px-1 text-center text-[clamp(14.5px,4.1vw,17px)] font-bold leading-[1.45] text-[#2b2938] [overflow-wrap:break-word] [text-wrap:pretty] min-[480px]:max-w-[520px] min-[480px]:px-2 min-[480px]:text-[clamp(16px,.8vw+13.5px,20px)] min-[480px]:leading-[1.55] md:mt-[clamp(14px,2vw,20px)] md:max-w-[620px] md:leading-[1.6] lg:mx-0 lg:max-w-[540px] lg:px-0 lg:text-left lg:text-[clamp(16px,1.2vw,19px)]">
                 Stop Spending On Low-Converting Pages. Build A High-Converting Automated
                 Funnel That Helps You Reduce CPL And Increase ROI. From The Day 1
               </p>
@@ -626,22 +587,24 @@ export default function Hero() {
                   role="region"
                   aria-label="Funnel Performance Promise. Focus To Pause Scrolling."
                 >
-                  <div className={`flex w-max animate-[heroMarquee_30s_linear_infinite] items-center will-change-transform ${MARQUEE_PAUSE} motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_52s_linear_infinite]`}>
+                  <div
+                    className={`flex w-max animate-[heroMarquee_30s_linear_infinite] items-center will-change-transform ${MARQUEE_PAUSE} motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_52s_linear_infinite]`}
+                  >
                     {[0, 1].map((copy) => (
                       <ul
                         key={copy}
-                        className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center ${FOCUS_RUN_GAP} ${copy === 1 ? 'motion-reduce:hidden' : ''
-                          }`}
+                        className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center ${FOCUS_RUN_GAP} ${
+                          copy === 1 ? 'motion-reduce:hidden' : ''
+                        }`}
                         aria-hidden={copy === 1 ? true : undefined}
                       >
                         {focusLines.map((line, index) => (
                           <li
                             key={`${copy}-${index}`}
-                            className={`inline-flex flex-none items-center whitespace-nowrap text-[clamp(13px,3.7vw,15px)] font-bold leading-[1.45] text-[#2a2140] motion-reduce:whitespace-normal motion-reduce:text-center md:text-[clamp(14px,.6vw+10px,17px)] ${FOCUS_GAP} ${index > 0 ? 'motion-reduce:hidden' : ''
-                              }`}
-                            aria-hidden={
-                              copy === 0 && index > 0 ? true : undefined
-                            }
+                            className={`inline-flex flex-none items-center whitespace-nowrap text-[clamp(13px,3.7vw,15px)] font-bold leading-[1.45] text-[#2a2140] motion-reduce:whitespace-normal motion-reduce:text-center md:text-[clamp(14px,.6vw+10px,17px)] ${FOCUS_GAP} ${
+                              index > 0 ? 'motion-reduce:hidden' : ''
+                            }`}
+                            aria-hidden={copy === 0 && index > 0 ? true : undefined}
                           >
                             <span>{line}</span>
                             <span
@@ -661,9 +624,8 @@ export default function Hero() {
           {/* ---------- Video + CTA ---------- */}
           <Reveal
             delay={200}
-            className="relative mx-auto w-full max-w-full md:max-w-[560px] lg:ml-auto lg:mr-0 lg:max-w-[600px]"
+            className="relative mx-auto w-full max-w-full md:max-w-[640px] lg:ml-auto lg:mr-0 lg:max-w-[600px]"
           >
-            {/* Violet glow behind the card */}
             <span
               aria-hidden="true"
               className="pointer-events-none absolute -bottom-[4%] -z-10 inset-x-[-4%] top-[10%] animate-[heroGlow_6s_ease-in-out_infinite_alternate] rounded-full bg-[radial-gradient(closest-side,#7c3aed4d,transparent_75%)] blur-[26px] motion-reduce:animate-none md:inset-x-[-6%] md:blur-[34px]"
@@ -673,7 +635,7 @@ export default function Hero() {
               ref={tilt.ref}
               onPointerMove={tilt.onPointerMove}
               onPointerLeave={tilt.onPointerLeave}
-              className="relative w-full min-w-0 overflow-hidden rounded-[18px] bg-[#1b1233] shadow-[0_20px_40px_-24px_rgba(91,33,182,.65)] transition-[transform,box-shadow] duration-[350ms] ease-out md:rounded-[clamp(18px,3vw,28px)] md:shadow-[0_2px_4px_#14111f14,0_30px_60px_-28px_#5b21b6a6,0_50px_90px_-50px_#14111fb3] md:will-change-transform md:[transform:perspective(1100px)_rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))_translateY(var(--lift,0px))] md:hover:[--lift:-5px] md:hover:shadow-[0_2px_4px_#14111f14,0_40px_70px_-28px_#5b21b6c4,0_50px_90px_-50px_#14111fb3] md:motion-reduce:[transform:none]"
+              className="relative w-full min-w-0 overflow-hidden rounded-[18px] bg-[#1b1233] shadow-[0_20px_40px_-24px_rgba(91,33,182,.65)] transition-[transform,box-shadow] duration-[350ms] ease-out md:rounded-[clamp(18px,3vw,28px)] md:shadow-[0_2px_4px_#14111f14,0_30px_60px_-28px_#5b21b6a6,0_50px_90px_-50px_#14111fb3] lg:will-change-transform lg:[transform:perspective(1100px)_rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))_translateY(var(--lift,0px))] lg:hover:[--lift:-5px] lg:hover:shadow-[0_2px_4px_#14111f14,0_40px_70px_-28px_#5b21b6c4,0_50px_90px_-50px_#14111fb3] lg:motion-reduce:[transform:none]"
             >
               <div className="relative isolate w-full min-w-0 bg-[#1b1233]">
                 <HeroVideo />
@@ -695,13 +657,11 @@ export default function Hero() {
               id="premium-hero-funnel-heading"
               className="font-display m-0 mx-auto w-full max-w-[920px] text-center text-[clamp(20px,4.6vw+5px,36px)] font-semibold normal-case leading-[1.3] tracking-[-0.02em] text-[#14111f] [overflow-wrap:break-word] [text-wrap:balance]"
             >
-              At{' '}
-              <span className="font-bold text-[#5b21b6]">Creative Crew,</span>{' '}
-              We Simplify Growth With A Complete Funnel System That Works
-              Seamlessly.
+              At <span className="font-bold text-[#5b21b6]">Creative Crew,</span> We
+              Simplify Growth With A Complete Funnel System That Works Seamlessly.
             </h2>
 
-            <ul className="m-0 mx-auto mt-5 grid w-full list-none grid-cols-1 gap-2.5 p-0 text-left min-[340px]:grid-cols-2 min-[480px]:mt-6 min-[480px]:gap-3 md:mt-[30px] md:max-w-[760px] md:gap-5 lg:mt-[clamp(26px,4.4vw,48px)] lg:max-w-none lg:grid-cols-4">
+            <ul className="m-0 mx-auto mt-5 grid w-full list-none grid-cols-1 gap-2.5 p-0 text-left min-[340px]:grid-cols-2 min-[480px]:mt-6 min-[480px]:gap-3 md:mt-[30px] md:max-w-[760px] md:gap-5 lg:mt-[clamp(26px,4.4vw,48px)] lg:max-w-none lg:grid-cols-4 lg:gap-4 xl:gap-5">
               {points.map((point, index) => (
                 <PointCard key={point.text} point={point} index={index} />
               ))}
@@ -718,12 +678,15 @@ export default function Hero() {
           role="region"
           aria-label="Landing Page Services. Focus To Pause Scrolling."
         >
-          <div className={`flex w-max animate-[heroMarquee_32s_linear_infinite] items-center will-change-transform ${MARQUEE_PAUSE} motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_46s_linear_infinite]`}>
+          <div
+            className={`flex w-max animate-[heroMarquee_32s_linear_infinite] items-center will-change-transform ${MARQUEE_PAUSE} motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_46s_linear_infinite]`}
+          >
             {[0, 1].map((copy) => (
               <ul
                 key={copy}
-                className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-3 motion-reduce:p-0 ${SERVICE_RUN_GAP} ${copy === 1 ? 'motion-reduce:hidden' : ''
-                  }`}
+                className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-3 motion-reduce:p-0 ${SERVICE_RUN_GAP} ${
+                  copy === 1 ? 'motion-reduce:hidden' : ''
+                }`}
                 aria-hidden={copy === 1 ? true : undefined}
               >
                 {services.map((service) => (
@@ -737,7 +700,6 @@ export default function Hero() {
                         className="h-4 w-4 min-[480px]:h-[18px] min-[480px]:w-[18px] md:h-[19px] md:w-[19px]"
                       />
                     </span>
-
                     <span>{service.text}</span>
                   </li>
                 ))}
