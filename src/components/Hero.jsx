@@ -7,6 +7,8 @@ import { Button } from './ui'
    - Same content, same colors, same video controls.
    - The dot icon in the top pill is removed.
    - Fluid text sizes that scale on every screen.
+   - Heading scales with its own column width (cqw), so it
+     always stays in 3 lines on tablet + desktop.
    - Only keyframes + the font import live in the small
      <style> block at the bottom of this file.
    - Arbitrary values only, so it works on Tailwind v3 and v4.
@@ -550,35 +552,40 @@ export default function Hero() {
               </p>
             </Reveal>
 
-            {/* Title */}
-            <Reveal delay={90} className="w-full">
+            {/* Title (container = column width, so the heading scales with it) */}
+            <Reveal delay={90} className="w-full [container-type:inline-size]">
               <h1
                 id="premium-hero-title"
-                className="font-display m-0 mt-4 w-full text-center text-[clamp(22px,7vw,38px)] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#14111f] md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(38px,6vw,56px)] md:tracking-[-0.035em] lg:text-left lg:text-[clamp(38px,4.3vw,54px)]"
+                className="font-display m-0 mt-4 w-full text-center text-[clamp(24px,7.4vw,41px)] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#14111f] md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(33px,9cqw,64px)] md:tracking-[-0.035em] lg:text-left"
               >
                 {/* Desktop + tablet: three lines */}
                 <span className="block max-md:hidden">
-                  <span className="block">Generate More</span>
+                  <span className="block whitespace-nowrap">
+                    Generate More Leads &amp;
+                  </span>
 
                   <span className="block whitespace-nowrap">
                     <span className={VIOLET_FLOW}>Revenue</span> Without
                   </span>
 
-                  <span className="block w-full whitespace-nowrap text-[.88em] tracking-[-0.04em]">
-                    Spending More
+                  <span className="block w-full whitespace-nowrap text-[.8em] tracking-[-0.04em]">
+                    Spending More Ad Spend
                   </span>
                 </span>
 
-                {/* Phones: two lines that always fit */}
+                {/* Phones: three lines that always fit */}
                 <span
                   className="flex flex-col items-center gap-0.5 whitespace-nowrap md:hidden"
                   aria-hidden="true"
                 >
                   <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
-                    Generate More <span className={VIOLET_FLOW}>Revenue</span>
+                    Generate More Leads &amp;
                   </span>
                   <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
-                    Without Spending More
+                    <span className={VIOLET_FLOW}>Revenue</span> Without
+                  </span>
+                  <span className="block w-full whitespace-nowrap text-center text-[.84em] leading-[1.08] tracking-[-0.05em]">
+                    Spending More Ad Spend
                   </span>
                 </span>
               </h1>
