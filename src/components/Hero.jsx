@@ -275,9 +275,8 @@ function Reveal({ as: Tag = 'div', children, delay = 0, className = '' }) {
     <Tag
       ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
-      className={`min-w-0 max-w-full transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${
-        seen ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-      } ${className}`}
+      className={`min-w-0 max-w-full transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${seen ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+        } ${className}`}
     >
       {children}
     </Tag>
@@ -547,8 +546,7 @@ export default function Hero() {
             {/* Pill (no dot icon) */}
             <Reveal className="w-full">
               <p className="relative m-0 w-full overflow-hidden rounded-[26px] border border-[#e0d2ff] bg-[linear-gradient(180deg,#f6f1ff,#efe7ff)] px-4 py-3 text-center text-[clamp(14px,4vw,17px)] font-semibold leading-[1.55] text-[#2a2140] shadow-[inset_0_1px_0_#fff,0_10px_24px_-16px_rgba(124,58,237,.5)] [text-wrap:balance] after:pointer-events-none after:absolute after:inset-y-0 after:-left-[40%] after:w-[36%] after:animate-[heroShine_6s_ease-in-out_1.2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffffb3,transparent)] motion-reduce:after:hidden md:px-5 md:py-3.5 md:text-[clamp(16px,1.65vw,21px)] lg:text-left">
-                We Don&rsquo;t Just Build Landing Pages; We Build Complete
-                Automated Funnels.
+                We Don’t Just Build Landing Pages; We Build Complete Automated Funnels.
               </p>
             </Reveal>
 
@@ -568,7 +566,7 @@ export default function Hero() {
                     <span className={VIOLET_FLOW}>Revenue</span> Without
                   </span>
 
-                  <span className="block w-full whitespace-nowrap text-[.8em] tracking-[-0.04em]">
+                  <span className="block w-full whitespace-nowrap tracking-[-0.04em]">
                     Spending More Ad Spend
                   </span>
                 </span>
@@ -584,7 +582,7 @@ export default function Hero() {
                   <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
                     <span className={VIOLET_FLOW}>Revenue</span> Without
                   </span>
-                  <span className="block w-full whitespace-nowrap text-center text-[.84em] leading-[1.08] tracking-[-0.05em]">
+                  <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
                     Spending More Ad Spend
                   </span>
                 </span>
@@ -612,17 +610,15 @@ export default function Hero() {
                     {[0, 1].map((copy) => (
                       <ul
                         key={copy}
-                        className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center ${FOCUS_RUN_GAP} ${
-                          copy === 1 ? 'motion-reduce:hidden' : ''
-                        }`}
+                        className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center ${FOCUS_RUN_GAP} ${copy === 1 ? 'motion-reduce:hidden' : ''
+                          }`}
                         aria-hidden={copy === 1 ? true : undefined}
                       >
                         {focusLines.map((line, index) => (
                           <li
                             key={`${copy}-${index}`}
-                            className={`inline-flex flex-none items-center whitespace-nowrap text-[clamp(13px,3.7vw,15px)] font-bold leading-[1.45] text-[#2a2140] motion-reduce:whitespace-normal motion-reduce:text-center md:text-[clamp(14px,.6vw+10px,17px)] ${FOCUS_GAP} ${
-                              index > 0 ? 'motion-reduce:hidden' : ''
-                            }`}
+                            className={`inline-flex flex-none items-center whitespace-nowrap text-[clamp(13px,3.7vw,15px)] font-bold leading-[1.45] text-[#2a2140] motion-reduce:whitespace-normal motion-reduce:text-center md:text-[clamp(14px,.6vw+10px,17px)] ${FOCUS_GAP} ${index > 0 ? 'motion-reduce:hidden' : ''
+                              }`}
                             aria-hidden={
                               copy === 0 && index > 0 ? true : undefined
                             }
@@ -706,9 +702,8 @@ export default function Hero() {
             {[0, 1].map((copy) => (
               <ul
                 key={copy}
-                className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-3 motion-reduce:p-0 ${SERVICE_RUN_GAP} ${
-                  copy === 1 ? 'motion-reduce:hidden' : ''
-                }`}
+                className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-3 motion-reduce:p-0 ${SERVICE_RUN_GAP} ${copy === 1 ? 'motion-reduce:hidden' : ''
+                  }`}
                 aria-hidden={copy === 1 ? true : undefined}
               >
                 {services.map((service) => (
