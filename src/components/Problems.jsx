@@ -7,6 +7,8 @@ import { Button } from './ui'
      live in the tiny <style> block at the bottom of this file.
    - Gradients use arbitrary values, so they work on
      Tailwind v3 AND v4.
+   - Mobile: the "Unclear offers..." heading now fills the whole
+     card width (no more empty space on the right side).
    ========================================================== */
 
 /* ==================== Content ==================== */
@@ -528,8 +530,11 @@ export default function Problems() {
             delay={80}
             className="mx-auto w-full max-w-[720px] lg:mx-0 lg:max-w-none"
           >
-            <div className="relative rounded-3xl border border-[#e4d8f3] bg-[linear-gradient(150deg,#ffffffee,#f8f2fdd0)] px-5 py-6 shadow-[0_18px_48px_#5b21b611,inset_0_1px_0_#fff] backdrop-blur-[22px] transition duration-[450ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none md:rounded-[28px] md:p-[clamp(26px,3vw,40px)] md:hover:-translate-y-1 md:hover:border-[#ccb0e2] md:hover:shadow-[0_24px_52px_#5b21b619,inset_0_1px_0_#fff]">
-              <p className="font-display text-[19px] font-bold leading-[1.38] tracking-[-0.02em] [text-wrap:balance] md:text-[clamp(19px,1.9vw,23px)] md:leading-[1.4]">
+            {/* Card: slightly tighter side padding on phones so the heading gets more room */}
+            <div className="relative rounded-3xl border border-[#e4d8f3] bg-[linear-gradient(150deg,#ffffffee,#f8f2fdd0)] px-4 py-5 shadow-[0_18px_48px_#5b21b611,inset_0_1px_0_#fff] backdrop-blur-[22px] transition duration-[450ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none min-[400px]:px-5 min-[400px]:py-6 md:rounded-[28px] md:p-[clamp(26px,3vw,40px)] md:hover:-translate-y-1 md:hover:border-[#ccb0e2] md:hover:shadow-[0_24px_52px_#5b21b619,inset_0_1px_0_#fff]">
+              {/* Phone: text fills the full card width (pretty wrap, fluid size).
+                  Tablet + desktop: original balanced look. */}
+              <p className="w-full font-display text-[clamp(17px,5.3vw,22px)] font-bold leading-[1.4] tracking-[-0.02em] [text-wrap:pretty] md:text-[clamp(19px,1.9vw,23px)] md:leading-[1.4] md:[text-wrap:balance]">
                 Unclear offers and distracting pages stop interested visitors
                 from taking the next step.
               </p>

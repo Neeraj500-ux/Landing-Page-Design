@@ -9,13 +9,15 @@ import { Button } from './ui'
    - Fluid text sizes that scale on every screen.
    - Heading scales with its own column width (cqw), so it
      always stays in 3 lines on tablet + desktop.
+   - All visible text is Title Case (every word starts with
+     a capital letter, nothing is forced to all uppercase).
    - Only keyframes + the font import live in the small
      <style> block at the bottom of this file.
    - Arbitrary values only, so it works on Tailwind v3 and v4.
    ========================================================== */
 
 const focusLines = Array(4).fill(
-  'Guaranteed Better Funnel Performance. More Value from Every Ad Spend.'
+  'Guaranteed Better Funnel Performance. More Value From Every Ad Spend.'
 )
 
 const points = [
@@ -38,14 +40,14 @@ const points = [
 ]
 
 const services = [
-  { text: 'Offer and audience discovery', icon: 'target' },
-  { text: 'Persuasive content', icon: 'edit' },
-  { text: 'Custom visual design', icon: 'layers' },
-  { text: 'Responsive development', icon: 'devices' },
-  { text: 'Booking integration', icon: 'calendar' },
-  { text: 'Tracking and launch setup', icon: 'chart' },
-  { text: 'Clear calls to action', icon: 'cursor' },
-  { text: 'Mobile-first layouts', icon: 'phone' },
+  { text: 'Offer And Audience Discovery', icon: 'target' },
+  { text: 'Persuasive Content', icon: 'edit' },
+  { text: 'Custom Visual Design', icon: 'layers' },
+  { text: 'Responsive Development', icon: 'devices' },
+  { text: 'Booking Integration', icon: 'calendar' },
+  { text: 'Tracking And Launch Setup', icon: 'chart' },
+  { text: 'Clear Calls To Action', icon: 'cursor' },
+  { text: 'Mobile-First Layouts', icon: 'phone' },
 ]
 
 /* ==================== Shared class strings ==================== */
@@ -402,7 +404,7 @@ function HeroVideo() {
         ref={frameRef}
         className="block h-full w-full max-w-full border-0 bg-[#1b1233]"
         src={VIMEO_SRC}
-        title="Creative Crew landing page preview"
+        title="Creative Crew Landing Page Preview"
         allow="autoplay; fullscreen; picture-in-picture"
         allowFullScreen
         loading="eager"
@@ -419,7 +421,7 @@ function HeroVideo() {
       <button
         type="button"
         onClick={togglePlay}
-        aria-label={playing ? 'Pause video' : 'Play video'}
+        aria-label={playing ? 'Pause Video' : 'Play Video'}
         className="absolute inset-0 z-[2] h-full w-full cursor-pointer border-0 bg-transparent p-0 [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0]"
       />
 
@@ -429,7 +431,7 @@ function HeroVideo() {
             type="button"
             className={VIDEO_BTN}
             onClick={togglePlay}
-            aria-label={playing ? 'Pause video' : 'Play video'}
+            aria-label={playing ? 'Pause Video' : 'Play Video'}
             aria-pressed={!playing}
           >
             <ControlIcon name={playing ? 'pause' : 'play'} />
@@ -439,7 +441,7 @@ function HeroVideo() {
             type="button"
             className={VIDEO_BTN}
             onClick={toggleMute}
-            aria-label={muted ? 'Unmute video' : 'Mute video'}
+            aria-label={muted ? 'Unmute Video' : 'Mute Video'}
             aria-pressed={!muted}
           >
             <ControlIcon name={muted ? 'muted' : 'volume'} />
@@ -450,7 +452,7 @@ function HeroVideo() {
           type="button"
           className={VIDEO_BTN}
           onClick={goFullscreen}
-          aria-label="Toggle fullscreen"
+          aria-label="Toggle Fullscreen"
         >
           <ControlIcon name="expand" />
         </button>
@@ -554,7 +556,7 @@ export default function Hero() {
             <Reveal delay={90} className="w-full [container-type:inline-size]">
               <h1
                 id="premium-hero-title"
-                className="font-display m-0 mt-4 w-full text-center text-[clamp(24px,7.4vw,41px)] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#14111f] md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(33px,9cqw,64px)] md:tracking-[-0.035em] lg:text-left"
+                className="font-display m-0 mt-4 w-full text-center text-[clamp(20px,8.3cqw,41px)] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#14111f] capitalize md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(33px,9cqw,64px)] md:tracking-[-0.035em] lg:text-left"
               >
                 {/* Desktop + tablet: three lines */}
                 <span className="block max-md:hidden">
@@ -577,10 +579,10 @@ export default function Hero() {
                   aria-hidden="true"
                 >
                   <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
-                    Generate More Leads &amp;
+                    Generate More Leads
                   </span>
                   <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
-                    <span className={VIOLET_FLOW}>Revenue</span> Without
+                    &amp; <span className={VIOLET_FLOW}>Revenue</span> Without
                   </span>
                   <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
                     Spending More Ad Spend
@@ -592,7 +594,7 @@ export default function Hero() {
             {/* Subtitle */}
             <Reveal delay={180} className="w-full">
               <p className="m-0 mx-auto mt-3 w-full max-w-[480px] text-[clamp(14.5px,.8vw+12px,18.5px)] font-medium leading-[1.65] text-[#5b5870] [text-wrap:pretty] md:mt-[clamp(14px,2vw,20px)] md:max-w-[620px] lg:mx-0 lg:max-w-[540px]">
-                Stop Wasting Ad Spend on Low Conversion Pages. Invest in a
+                Stop Wasting Ad Spend On Low Conversion Pages. Invest In A
                 High-Converting Automated Funnel.
               </p>
             </Reveal>
@@ -604,7 +606,7 @@ export default function Hero() {
                   className={`group w-full min-w-0 overflow-hidden py-3 outline-none md:py-3.5 ${MASK}`}
                   tabIndex={0}
                   role="region"
-                  aria-label="Funnel performance promise. Focus to pause scrolling."
+                  aria-label="Funnel Performance Promise. Focus To Pause Scrolling."
                 >
                   <div className="flex w-max animate-[heroMarquee_38s_linear_infinite] items-center will-change-transform group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_52s_linear_infinite]">
                     {[0, 1].map((copy) => (
@@ -696,7 +698,7 @@ export default function Hero() {
           className={`group w-full min-w-0 overflow-hidden py-3 outline-none md:py-[18px] ${MASK}`}
           tabIndex={0}
           role="region"
-          aria-label="Landing page services. Focus to pause scrolling."
+          aria-label="Landing Page Services. Focus To Pause Scrolling."
         >
           <div className="flex w-max animate-[heroMarquee_40s_linear_infinite] items-center will-change-transform group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_46s_linear_infinite]">
             {[0, 1].map((copy) => (
