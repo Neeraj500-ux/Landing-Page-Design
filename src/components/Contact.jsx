@@ -1,5 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+
+/* ==========================================================
+   Contact.jsx  (100% Tailwind utility classes)
+   - Same content, same behavior, same yellow CTA button.
+   - Richer purple / violet look + more popup animation.
+   - Only the font import and keyframes live in the small
+     <style> block at the bottom (Tailwind can't declare them).
+   - Arbitrary values only, so it works on Tailwind v3 and v4.
+   ========================================================== */
 
 const points = [
   'High-converting landing pages',
@@ -8,6 +17,17 @@ const points = [
 ]
 
 const bars = [34, 48, 42, 63, 57, 78, 92]
+
+// [left %, top %, delay s, size px]
+const stars = [
+  [12, 14, 0, 3],
+  [78, 10, 1.2, 4],
+  [90, 38, 2.1, 3],
+  [20, 52, 0.7, 4],
+  [64, 62, 1.7, 3],
+  [8, 82, 2.6, 3],
+  [48, 28, 3.1, 3],
+]
 
 const initialForm = {
   fullName: '',
@@ -19,9 +39,47 @@ const initialForm = {
   goal: '',
 }
 
-function CheckIcon() {
+/* ==================== Shared class strings ==================== */
+
+// Staggered entrance (use with style={rise(n)})
+const RISE =
+  'opacity-0 animate-[ctRise_.7s_cubic-bezier(.22,1,.36,1)_forwards] motion-reduce:animate-none motion-reduce:opacity-100'
+
+const rise = (step, base = 150, gap = 90) => ({
+  animationDelay: `${base + step * gap}ms`,
+})
+
+// Moving violet -> purple -> yellow gradient
+const FLOW =
+  'bg-[length:200%_100%] animate-[ctFlow_6s_ease-in-out_infinite_alternate] motion-reduce:animate-none'
+
+const LABEL = 'text-[13px] font-bold leading-[1.3] text-[#2a2140]'
+
+const FIELD =
+  'block m-0 h-[50px] w-full min-w-0 rounded-xl border border-[#e2dcf2] bg-[#fbfaff] px-3.5 py-3 font-[inherit] text-base leading-normal text-[#14111f] outline-none ' +
+  'transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-[#a7a2b8] ' +
+  'hover:border-[#cdbff3] focus:border-[#7c3aed] focus:bg-white focus:shadow-[0_0_0_4px_rgba(124,58,237,.14)] ' +
+  'min-[761px]:h-12 min-[761px]:text-[15px]'
+
+const YELLOW_BTN =
+  'group relative isolate inline-flex min-h-[54px] w-full min-w-0 cursor-pointer items-center justify-center gap-2.5 overflow-hidden whitespace-normal rounded-[14px] border border-[#f3b01f] ' +
+  'bg-[linear-gradient(180deg,#ffee82,#ffe04e_48%,#ffca30)] px-[clamp(16px,4vw,30px)] py-3.5 text-center font-[inherit] text-[clamp(15px,1.4vw,17px)] font-extrabold leading-[1.35] text-[#2e0c4d] ' +
+  'shadow-[inset_0_1px_0_#fff8c4,inset_0_-2px_4px_#f5b2144d,0_5px_0_#d18f0a,0_16px_28px_-10px_#f5b323a0] ' +
+  'transition-[transform,box-shadow,filter] duration-200 touch-manipulation [-webkit-tap-highlight-color:transparent] ' +
+  'hover:enabled:-translate-y-[3px] hover:enabled:brightness-105 hover:enabled:shadow-[inset_0_1px_0_#fff8c4,0_8px_0_#d18f0a,0_24px_38px_-12px_#f5b323c0] ' +
+  'active:translate-y-[3px] active:shadow-[inset_0_1px_0_#fff8c4,0_2px_0_#d18f0a,0_8px_16px_-8px_#f5b323a0] ' +
+  'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0] ' +
+  'disabled:cursor-not-allowed disabled:opacity-65 ' +
+  'before:pointer-events-none before:absolute before:inset-x-0 before:bottom-1/2 before:top-0 before:-z-10 before:bg-[linear-gradient(180deg,#ffffff40,transparent)] ' +
+  'after:pointer-events-none after:absolute after:inset-y-0 after:-left-[45%] after:-z-10 after:w-[32%] after:animate-[ctShine_5.5s_ease-in-out_2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffff99,transparent)] motion-reduce:after:hidden ' +
+  'min-[761px]:min-h-14 min-[761px]:rounded-2xl'
+
+/* ==================== Icons ==================== */
+
+function CheckIcon({ delay = 0, className = 'h-4 w-4', draw = true }) {
   return (
     <svg
+      className={className}
       width="16"
       height="16"
       viewBox="0 0 24 24"
@@ -34,6 +92,12 @@ function CheckIcon() {
         strokeWidth="2.4"
         strokeLinecap="round"
         strokeLinejoin="round"
+        className={
+          draw
+            ? '[stroke-dasharray:24] [stroke-dashoffset:24] animate-[ctDraw_.6s_ease_forwards] motion-reduce:animate-none motion-reduce:[stroke-dashoffset:0]'
+            : ''
+        }
+        style={draw ? { animationDelay: `${delay}ms` } : undefined}
       />
     </svg>
   )
@@ -41,13 +105,7 @@ function CheckIcon() {
 
 function CloseIcon() {
   return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="m6 6 12 12M18 6 6 18"
         stroke="currentColor"
@@ -60,13 +118,7 @@ function CloseIcon() {
 
 function TrendIcon() {
   return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="m3 17 6-6 4 4 8-8M15 7h6v6"
         stroke="currentColor"
@@ -78,1075 +130,71 @@ function TrendIcon() {
   )
 }
 
-const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
-
-  .ct-popup-root,
-  .ct-popup-overlay {
-    --ct-violet: #7c3aed;
-    --ct-violet-light: #a98af0;
-    --ct-violet-deep: #5b21b6;
-    --ct-dark-1: #1b1233;
-    --ct-dark-2: #120a24;
-    --ct-ink: #14111f;
-    --ct-ink-soft: #2a2140;
-    --ct-muted: #5b5870;
-    --ct-line: #e6dffa;
-    --ct-yellow: #ffe04e;
-    --ct-ease: cubic-bezier(.22, 1, .36, 1);
-    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .ct-popup-root *,
-  .ct-popup-root *::before,
-  .ct-popup-root *::after {
-    box-sizing: border-box;
-  }
-
-  .ct-popup-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background:
-      radial-gradient(60% 50% at 20% 10%, rgba(124, 58, 237, .28), transparent 70%),
-      rgba(20, 13, 39, .74);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    animation: ctOverlayIn .25s ease both;
-  }
-
-  .ct-popup-overlay *,
-  .ct-popup-overlay *::before,
-  .ct-popup-overlay *::after {
-    box-sizing: border-box;
-  }
-
-  .ct-popup-modal {
-    position: relative;
-    isolation: isolate;
-    width: min(100%, 1000px);
-    max-height: calc(100dvh - 48px);
-    display: grid;
-    grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
-    grid-template-rows: minmax(0, 1fr);
-    overflow: hidden;
-    background: #fff;
-    border-radius: 28px;
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, .08),
-      0 44px 110px -20px rgba(20, 13, 39, .6),
-      0 10px 28px rgba(20, 13, 39, .2);
-    animation: ctModalIn .45s var(--ct-ease) both;
-  }
-
-  .ct-popup-close {
-    position: absolute;
-    z-index: 5;
-    top: 16px;
-    right: 16px;
-    width: 42px;
-    height: 42px;
-    display: grid;
-    place-items: center;
-    padding: 0;
-    color: var(--ct-ink-soft);
-    background: #fff;
-    border: 1px solid var(--ct-line);
-    border-radius: 50%;
-    box-shadow: 0 6px 16px -8px rgba(91, 33, 182, .35);
-    cursor: pointer;
-    transition: background .25s, color .25s, transform .35s var(--ct-ease);
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .ct-popup-close:hover {
-    color: #fff;
-    background: var(--ct-violet);
-    transform: rotate(90deg);
-  }
-
-  .ct-popup-close:focus-visible,
-  .ct-popup-root .ct-popup-yellow:focus-visible {
-    outline: 3px solid var(--ct-violet-light);
-    outline-offset: 3px;
-  }
-
-  /* ---------- Left info panel ---------- */
-
-  .ct-popup-side {
-    position: relative;
-    isolation: isolate;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 0;
-    min-width: 0;
-    padding: 46px 40px 32px;
-    color: #fff;
-    text-align: left;
-    overflow: hidden;
-    background: linear-gradient(160deg, var(--ct-dark-1), var(--ct-dark-2));
-  }
-
-  /* Moving background layers */
-
-  .ct-popup-bg {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .ct-popup-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(48px);
-    will-change: transform;
-  }
-
-  .ct-popup-orb.o1 {
-    top: -90px;
-    left: -80px;
-    width: 280px;
-    height: 280px;
-    background: rgba(255, 224, 78, .22);
-    animation: ctFloatA 14s ease-in-out infinite;
-  }
-
-  .ct-popup-orb.o2 {
-    right: -120px;
-    bottom: -80px;
-    width: 360px;
-    height: 360px;
-    background: rgba(139, 92, 246, .6);
-    animation: ctFloatB 17s ease-in-out infinite;
-  }
-
-  .ct-popup-orb.o3 {
-    top: 42%;
-    left: 30%;
-    width: 200px;
-    height: 200px;
-    background: rgba(168, 85, 247, .28);
-    animation: ctFloatC 20s ease-in-out infinite;
-  }
-
-  .ct-popup-grid {
-    position: absolute;
-    inset: -40px;
-    background-image: radial-gradient(rgba(255, 255, 255, .16) 1px, transparent 1.5px);
-    background-size: 26px 26px;
-    -webkit-mask-image: radial-gradient(70% 60% at 30% 25%, #000, transparent 75%);
-    mask-image: radial-gradient(70% 60% at 30% 25%, #000, transparent 75%);
-    animation: ctGridDrift 18s linear infinite;
-  }
-
-  .ct-popup-rings {
-    position: absolute;
-    right: -150px;
-    bottom: -150px;
-    width: 340px;
-    height: 340px;
-  }
-
-  .ct-popup-rings i {
-    position: absolute;
-    inset: 0;
-    border: 1px solid rgba(255, 255, 255, .18);
-    border-radius: 50%;
-    animation: ctRing 7s ease-out infinite;
-  }
-
-  .ct-popup-rings i:nth-child(2) {
-    animation-delay: 2.3s;
-  }
-
-  .ct-popup-rings i:nth-child(3) {
-    animation-delay: 4.6s;
-  }
-
-  /* Left content */
-
-  .ct-popup-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    width: fit-content;
-    max-width: 100%;
-    padding: 8px 15px;
-    border: 1px solid rgba(255, 255, 255, .2);
-    border-radius: 999px;
-    color: #fff;
-    background: rgba(255, 255, 255, .08);
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
-    font-size: 12.5px;
-    font-weight: 600;
-    line-height: 1.4;
-  }
-
-  .ct-popup-dot {
-    position: relative;
-    flex-shrink: 0;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--ct-yellow);
-    box-shadow: 0 0 12px rgba(255, 224, 78, .8);
-  }
-
-  .ct-popup-dot::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: var(--ct-yellow);
-    animation: ctPulse 2s ease-out infinite;
-  }
-
-  .ct-popup-side h2 {
-    margin: 24px 0 14px;
-    max-width: 390px;
-    color: #fff;
-    font-family: "Bricolage Grotesque", Inter, sans-serif;
-    font-size: clamp(32px, 3.4vw, 44px);
-    font-weight: 800;
-    line-height: 1.08;
-    letter-spacing: -.035em;
-    text-align: left;
-    text-wrap: balance;
-  }
-
-  .ct-popup-side h2 span {
-    color: transparent;
-    background: linear-gradient(90deg, #ffe04e, #ffb938, #ffe04e);
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    animation: ctTextShine 5s linear infinite;
-  }
-
-  .ct-popup-side p {
-    margin: 0;
-    max-width: 370px;
-    color: rgba(255, 255, 255, .78);
-    font-size: 15px;
-    line-height: 1.7;
-    text-align: left;
-  }
-
-  .ct-popup-points {
-    display: grid;
-    gap: 12px;
-    width: 100%;
-    max-width: 390px;
-    margin: 28px 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .ct-popup-points li {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 14px;
-    padding: 11px 14px;
-    color: #fff;
-    background: rgba(255, 255, 255, .05);
-    border: 1px solid rgba(255, 255, 255, .1);
-    border-radius: 14px;
-    font-size: 14.5px;
-    font-weight: 500;
-    line-height: 1.45;
-    text-align: left;
-    transition: background .3s, border-color .3s, transform .3s var(--ct-ease);
-  }
-
-  .ct-popup-points li:hover {
-    background: rgba(255, 255, 255, .09);
-    border-color: rgba(255, 224, 78, .35);
-    transform: translateX(4px);
-  }
-
-  .ct-popup-check {
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    color: var(--ct-yellow);
-    background: rgba(255, 224, 78, .12);
-    border: 1px solid rgba(255, 224, 78, .38);
-    border-radius: 50%;
-  }
-
-  .ct-popup-check path {
-    stroke-dasharray: 24;
-    stroke-dashoffset: 24;
-    animation: ctDraw .6s ease forwards;
-  }
-
-  .ct-popup-points li:nth-child(1) .ct-popup-check path { animation-delay: .6s; }
-  .ct-popup-points li:nth-child(2) .ct-popup-check path { animation-delay: .8s; }
-  .ct-popup-points li:nth-child(3) .ct-popup-check path { animation-delay: 1s; }
-
-  /* Growth preview card */
-
-  .ct-popup-growth {
-    width: 100%;
-    max-width: 390px;
-    margin-top: 24px;
-    padding: 16px 18px 14px;
-    background: rgba(255, 255, 255, .06);
-    border: 1px solid rgba(255, 255, 255, .12);
-    border-radius: 16px;
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    text-align: left;
-  }
-
-  .ct-popup-growth-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 14px;
-    color: rgba(255, 255, 255, .78);
-    font-size: 12.5px;
-    font-weight: 600;
-  }
-
-  .ct-popup-growth-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 9px;
-    color: var(--ct-yellow);
-    background: rgba(255, 224, 78, .12);
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
-  }
-
-  .ct-popup-bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    height: 56px;
-  }
-
-  .ct-popup-bars span {
-    flex: 1;
-    height: var(--h);
-    border-radius: 6px 6px 3px 3px;
-    background: linear-gradient(180deg, #ffe04e, rgba(255, 224, 78, .25));
-    transform-origin: bottom;
-    animation:
-      ctBarGrow .9s var(--ct-ease) both,
-      ctBarBreath 4.5s ease-in-out infinite;
-    animation-delay: calc(var(--i) * .08s + .5s), calc(var(--i) * .25s + 1.6s);
-  }
-
-  .ct-popup-bars span:not(:last-child) {
-    background: linear-gradient(180deg, rgba(196, 170, 255, .9), rgba(139, 92, 246, .25));
-  }
-
-  .ct-popup-side-note {
-    width: 100%;
-    margin-top: auto;
-    padding-top: 18px;
-    border-top: 1px solid rgba(255, 255, 255, .14);
-    color: rgba(255, 255, 255, .66);
-    font-size: 12.5px;
-    font-weight: 500;
-    line-height: 1.6;
-    text-align: left;
-  }
-
-  .ct-popup-side-note + .ct-popup-side-note {
-    margin-top: 0;
-  }
-
-  .ct-popup-spacer {
-    flex: 1 1 auto;
-    min-height: 24px;
-  }
-
-  /* Staggered entrance for left content */
-
-  .ct-popup-rise {
-    opacity: 0;
-    animation: ctRise .7s var(--ct-ease) forwards;
-    animation-delay: calc(var(--d, 0) * .09s + .15s);
-  }
-
-  /* ---------- Form area ---------- */
-
-  .ct-popup-form-area {
-    min-width: 0;
-    padding: 40px 38px 30px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    background: #fff;
-    text-align: left;
-  }
-
-  .ct-popup-form-head {
-    padding-right: 48px;
-    margin-bottom: 26px;
-  }
-
-  .ct-popup-form-head small {
-    display: inline-block;
-    margin-bottom: 8px;
-    color: var(--ct-violet);
-    font-size: 13px;
-    font-weight: 700;
-  }
-
-  .ct-popup-form-head h3 {
-    margin: 0 0 8px;
-    color: var(--ct-ink);
-    font-family: "Bricolage Grotesque", Inter, sans-serif;
-    font-size: clamp(26px, 2.6vw, 33px);
-    font-weight: 800;
-    letter-spacing: -.03em;
-    line-height: 1.15;
-  }
-
-  .ct-popup-form-head p {
-    margin: 0;
-    color: var(--ct-muted);
-    font-size: 14.5px;
-    line-height: 1.65;
-  }
-
-  .ct-popup-form {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px 14px;
-  }
-
-  .ct-popup-field {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    gap: 7px;
-  }
-
-  .ct-popup-field.full {
-    grid-column: 1 / -1;
-  }
-
-  .ct-popup-field label {
-    color: var(--ct-ink-soft);
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1.3;
-  }
-
-  .ct-popup-field label span {
-    color: #8b8798;
-    font-weight: 500;
-  }
-
-  .ct-popup-field input,
-  .ct-popup-field select,
-  .ct-popup-field textarea {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    margin: 0;
-    padding: 12px 14px;
-    border: 1px solid #e2dcf2;
-    border-radius: 12px;
-    outline: none;
-    color: var(--ct-ink);
-    background: #fbfaff;
-    font-family: inherit;
-    font-size: 15px;
-    line-height: 1.5;
-    transition: border-color .2s, box-shadow .25s, background .2s, transform .25s var(--ct-ease);
-  }
-
-  .ct-popup-field input,
-  .ct-popup-field select {
-    height: 48px;
-  }
-
-  .ct-popup-field select {
-    cursor: pointer;
-  }
-
-  .ct-popup-field textarea {
-    min-height: 96px;
-    resize: vertical;
-  }
-
-  .ct-popup-field input:hover,
-  .ct-popup-field select:hover,
-  .ct-popup-field textarea:hover {
-    border-color: #cdbff3;
-  }
-
-  .ct-popup-field input:focus,
-  .ct-popup-field select:focus,
-  .ct-popup-field textarea:focus {
-    border-color: var(--ct-violet);
-    background: #fff;
-    box-shadow: 0 0 0 4px rgba(124, 58, 237, .13);
-  }
-
-  .ct-popup-field input::placeholder,
-  .ct-popup-field textarea::placeholder {
-    color: #a7a2b8;
-    opacity: 1;
-  }
-
-  /* ---------- Yellow 3D button ---------- */
-
-  .ct-popup-root .ct-popup-yellow,
-  .ct-popup-overlay .ct-popup-yellow {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    min-width: 0;
-    min-height: 56px;
-    margin: 0;
-    padding: 14px clamp(16px, 4vw, 30px);
-    border: 1px solid #f3b01f;
-    border-radius: 16px;
-    color: #2e0c4d;
-    background: linear-gradient(180deg, #ffee82, #ffe04e 48%, #ffca30);
-    box-shadow:
-      inset 0 1px 0 #fff8c4,
-      inset 0 -2px 4px #f5b2144d,
-      0 5px 0 #d18f0a,
-      0 16px 28px -10px #f5b323a0;
-    font-family: inherit;
-    font-size: clamp(15px, 1.4vw, 17px);
-    font-weight: 800;
-    line-height: 1.35;
-    text-align: center;
-    text-decoration: none;
-    white-space: normal;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  .ct-popup-overlay .ct-popup-yellow::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 50%;
-    z-index: -1;
-    pointer-events: none;
-    background: linear-gradient(180deg, #ffffff40, transparent);
-  }
-
-  .ct-popup-overlay .ct-popup-yellow::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -45%;
-    width: 32%;
-    z-index: -1;
-    pointer-events: none;
-    background: linear-gradient(100deg, transparent, #ffffff99, transparent);
-    transform: skewX(-20deg);
-    animation: ctShine 5.5s ease-in-out 2s infinite;
-  }
-
-  .ct-popup-overlay .ct-popup-yellow > span {
-    font-size: 19px;
-    line-height: 1;
-    transition: transform .25s var(--ct-ease);
-  }
-
-  .ct-popup-overlay .ct-popup-yellow:active {
-    transform: translateY(3px);
-    box-shadow:
-      inset 0 1px 0 #fff8c4,
-      0 2px 0 #d18f0a,
-      0 8px 16px -8px #f5b323a0;
-  }
-
-  .ct-popup-overlay .ct-popup-yellow:disabled {
-    opacity: .65;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  .ct-popup-submit {
-    grid-column: 1 / -1;
-    margin-top: 6px;
-  }
-
-  .ct-popup-privacy {
-    grid-column: 1 / -1;
-    margin: 0;
-    color: #8a869a;
-    font-size: 12.5px;
-    line-height: 1.6;
-    text-align: center;
-  }
-
-  .ct-popup-error {
-    grid-column: 1 / -1;
-    margin: 0;
-    padding: 11px 14px;
-    color: #9d2737;
-    background: #fff1f2;
-    border: 1px solid #ffd7dc;
-    border-radius: 11px;
-    font-size: 13.5px;
-    line-height: 1.55;
-    animation: ctShake .4s ease;
-  }
-
-  /* ---------- Success state ---------- */
-
-  .ct-popup-success {
-    min-height: 380px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-  }
-
-  .ct-popup-success-icon {
-    width: 60px;
-    height: 60px;
-    display: grid;
-    place-items: center;
-    margin-bottom: 22px;
-    border-radius: 18px;
-    color: var(--ct-violet-deep);
-    background: #efe7ff;
-    animation: ctPop .5s var(--ct-ease) both;
-  }
-
-  .ct-popup-success-icon svg {
-    width: 26px;
-    height: 26px;
-  }
-
-  .ct-popup-success h3 {
-    margin: 0 0 10px;
-    color: var(--ct-ink);
-    font-family: "Bricolage Grotesque", Inter, sans-serif;
-    font-size: 32px;
-    font-weight: 800;
-    letter-spacing: -.03em;
-  }
-
-  .ct-popup-success p {
-    margin: 0 0 26px;
-    color: var(--ct-muted);
-    font-size: 15px;
-    line-height: 1.7;
-  }
-
-  .ct-popup-done {
-    width: auto;
-    min-width: 160px;
-  }
-
-  /* ---------- Keyframes ---------- */
-
-  @keyframes ctOverlayIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes ctModalIn {
-    from { opacity: 0; transform: translateY(22px) scale(.97); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  @keyframes ctRise {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes ctShine {
-    0%, 55% { transform: translateX(0) skewX(-20deg); }
-    100% { transform: translateX(520%) skewX(-20deg); }
-  }
-
-  @keyframes ctFloatA {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(70px, 60px) scale(1.15); }
-  }
-
-  @keyframes ctFloatB {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(-80px, -60px) scale(1.1); }
-  }
-
-  @keyframes ctFloatC {
-    0%, 100% { transform: translate(0, 0); }
-    33% { transform: translate(50px, -40px); }
-    66% { transform: translate(-40px, 30px); }
-  }
-
-  @keyframes ctGridDrift {
-    from { background-position: 0 0; }
-    to { background-position: 26px 26px; }
-  }
-
-  @keyframes ctRing {
-    0% { transform: scale(.35); opacity: .9; }
-    100% { transform: scale(1.25); opacity: 0; }
-  }
-
-  @keyframes ctPulse {
-    0% { transform: scale(1); opacity: .7; }
-    100% { transform: scale(3); opacity: 0; }
-  }
-
-  @keyframes ctTextShine {
-    from { background-position: 0% 0; }
-    to { background-position: 200% 0; }
-  }
-
-  @keyframes ctDraw {
-    to { stroke-dashoffset: 0; }
-  }
-
-  @keyframes ctBarGrow {
-    from { transform: scaleY(0); opacity: 0; }
-    to { transform: scaleY(1); opacity: 1; }
-  }
-
-  @keyframes ctBarBreath {
-    0%, 100% { transform: scaleY(1); }
-    50% { transform: scaleY(.84); }
-  }
-
-  @keyframes ctPop {
-    0% { transform: scale(.4); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  @keyframes ctShake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-  }
-
-  /* ---------- Short desktop screens ---------- */
-
-  @media (min-width: 761px) and (max-height: 820px) {
-    .ct-popup-overlay {
-      padding: 16px;
-    }
-
-    .ct-popup-modal {
-      max-height: calc(100dvh - 32px);
-    }
-
-    .ct-popup-side {
-      padding: 32px 32px 22px;
-    }
-
-    .ct-popup-side h2 {
-      margin-top: 16px;
-      font-size: 34px;
-    }
-
-    .ct-popup-points {
-      gap: 9px;
-      margin-top: 20px;
-    }
-
-    .ct-popup-points li {
-      padding: 9px 12px;
-    }
-
-    .ct-popup-growth {
-      margin-top: 18px;
-      padding: 13px 16px 12px;
-    }
-
-    .ct-popup-bars {
-      height: 44px;
-    }
-
-    .ct-popup-form-area {
-      padding: 30px 32px 24px;
-    }
-
-    .ct-popup-form-head {
-      margin-bottom: 16px;
-    }
-
-    .ct-popup-form {
-      gap: 12px;
-    }
-  }
-
-  @media (min-width: 761px) and (max-height: 700px) {
-    .ct-popup-side p,
-    .ct-popup-side-note,
-    .ct-popup-growth {
-      display: none;
-    }
-
-    .ct-popup-form-head p {
-      display: none;
-    }
-
-    .ct-popup-form-head {
-      margin-bottom: 12px;
-    }
-
-    .ct-popup-field input,
-    .ct-popup-field select {
-      height: 44px;
-    }
-
-    .ct-popup-field textarea {
-      min-height: 72px;
-    }
-
-    .ct-popup-overlay .ct-popup-yellow {
-      min-height: 50px;
-    }
-  }
-
-  /* ---------- Tablet and mobile: single column, scrolls as one card ---------- */
-
-  @media (max-width: 760px) {
-    .ct-popup-overlay {
-      align-items: flex-start;
-      padding: 12px;
-    }
-
-    .ct-popup-modal {
-      width: 100%;
-      max-height: calc(100dvh - 24px);
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-rows: auto;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      border-radius: 22px;
-    }
-
-    .ct-popup-close {
-      position: sticky;
-      float: right;
-      top: 10px;
-      right: auto;
-      margin: 10px 10px -52px 0;
-      width: 40px;
-      height: 40px;
-    }
-
-    .ct-popup-side {
-      padding: 26px 20px 24px;
-    }
-
-    .ct-popup-eyebrow {
-      font-size: 11.5px;
-      padding: 7px 12px;
-    }
-
-    .ct-popup-side h2 {
-      max-width: 100%;
-      margin: 16px 0 10px;
-      padding-right: 44px;
-      font-size: clamp(27px, 7.4vw, 36px);
-    }
-
-    .ct-popup-side p {
-      max-width: 100%;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .ct-popup-points {
-      max-width: 100%;
-      gap: 8px;
-      margin-top: 18px;
-    }
-
-    .ct-popup-points li {
-      padding: 9px 12px;
-      font-size: 13.5px;
-    }
-
-    .ct-popup-check {
-      width: 24px;
-      height: 24px;
-    }
-
-    .ct-popup-growth {
-      max-width: 100%;
-      margin-top: 16px;
-    }
-
-    .ct-popup-spacer,
-    .ct-popup-side-note {
-      display: none;
-    }
-
-    .ct-popup-form-area {
-      padding: 24px 20px 22px;
-      overflow: visible;
-    }
-
-    .ct-popup-form-head {
-      margin-bottom: 18px;
-      padding-right: 0;
-    }
-
-    .ct-popup-form-head h3 {
-      font-size: 25px;
-    }
-
-    .ct-popup-form-head p {
-      font-size: 14px;
-    }
-
-    .ct-popup-form {
-      gap: 14px 12px;
-    }
-
-    /* 16px stops iOS from zooming into fields */
-    .ct-popup-field input,
-    .ct-popup-field select,
-    .ct-popup-field textarea {
-      font-size: 16px;
-    }
-
-    .ct-popup-field input,
-    .ct-popup-field select {
-      height: 50px;
-    }
-
-    .ct-popup-overlay .ct-popup-yellow {
-      min-height: 54px;
-      border-radius: 14px;
-    }
-  }
-
-  @media (max-width: 560px) {
-    .ct-popup-form {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .ct-popup-field.full,
-    .ct-popup-submit,
-    .ct-popup-privacy,
-    .ct-popup-error {
-      grid-column: auto;
-    }
-
-    .ct-popup-growth {
-      display: none;
-    }
-  }
-
-  @media (max-width: 380px) {
-    .ct-popup-overlay {
-      padding: 8px;
-    }
-
-    .ct-popup-modal {
-      max-height: calc(100dvh - 16px);
-      border-radius: 18px;
-    }
-
-    .ct-popup-side {
-      padding: 22px 16px 18px;
-    }
-
-    .ct-popup-form-area {
-      padding: 20px 16px 18px;
-    }
-
-    .ct-popup-side h2 {
-      font-size: 26px;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .ct-popup-overlay,
-    .ct-popup-modal,
-    .ct-popup-orb,
-    .ct-popup-grid,
-    .ct-popup-rings i,
-    .ct-popup-dot::after,
-    .ct-popup-side h2 span,
-    .ct-popup-bars span,
-    .ct-popup-overlay .ct-popup-yellow::after {
-      animation: none;
-    }
-
-    .ct-popup-rise {
-      opacity: 1;
-      animation: none;
-    }
-
-    .ct-popup-check path {
-      stroke-dashoffset: 0;
-      animation: none;
-    }
-
-    .ct-popup-close,
-    .ct-popup-points li,
-    .ct-popup-overlay .ct-popup-yellow > span {
-      transition: none;
-    }
-  }
-
-  /* Hover effects only on mouse devices */
-
-  @media (hover: hover) and (pointer: fine) {
-    .ct-popup-overlay .ct-popup-yellow {
-      transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
-    }
-
-    .ct-popup-overlay .ct-popup-yellow:hover:not(:disabled) {
-      transform: translateY(-3px);
-      filter: brightness(1.04) saturate(1.05);
-      box-shadow:
-        inset 0 1px 0 #fff8c4,
-        0 8px 0 #d18f0a,
-        0 24px 38px -12px #f5b323c0;
-    }
-
-    .ct-popup-overlay .ct-popup-yellow:hover > span {
-      transform: translateX(3px);
-    }
-  }
-`
+/* ==================== Left panel background ==================== */
+
+function SideBackground() {
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+      aria-hidden="true"
+    >
+      {/* Violet / purple orbs */}
+      <span className="absolute -left-20 -top-[90px] h-[280px] w-[280px] animate-[ctFloatA_14s_ease-in-out_infinite] rounded-full bg-[rgba(167,139,250,.42)] blur-[48px] will-change-transform motion-reduce:animate-none" />
+      <span className="absolute -bottom-20 -right-[120px] h-[360px] w-[360px] animate-[ctFloatB_17s_ease-in-out_infinite] rounded-full bg-[rgba(124,58,237,.7)] blur-[48px] will-change-transform motion-reduce:animate-none" />
+      <span className="absolute left-[30%] top-[42%] h-[200px] w-[200px] animate-[ctFloatC_20s_ease-in-out_infinite] rounded-full bg-[rgba(217,70,239,.24)] blur-[48px] will-change-transform motion-reduce:animate-none" />
+      <span className="absolute right-[18%] top-[6%] h-[120px] w-[120px] animate-[ctFloatA_16s_ease-in-out_infinite] rounded-full bg-[rgba(255,224,78,.14)] blur-[40px] will-change-transform motion-reduce:animate-none" />
+
+      {/* Drifting dot grid */}
+      <span className="absolute -inset-10 animate-[ctGridDrift_18s_linear_infinite] [background-image:radial-gradient(rgba(255,255,255,.16)_1px,transparent_1.5px)] [background-size:26px_26px] [mask-image:radial-gradient(70%_60%_at_30%_25%,#000,transparent_75%)] [-webkit-mask-image:radial-gradient(70%_60%_at_30%_25%,#000,transparent_75%)] motion-reduce:animate-none" />
+
+      {/* Twinkling stars */}
+      <span className="motion-reduce:hidden">
+        {stars.map(([left, top, delay, size], i) => (
+          <i
+            key={i}
+            className="absolute animate-[ctTwinkle_3.6s_ease-in-out_infinite] rounded-full bg-white opacity-0 shadow-[0_0_10px_2px_rgba(255,255,255,.7)]"
+            style={{
+              left: `${left}%`,
+              top: `${top}%`,
+              width: size,
+              height: size,
+              animationDelay: `${delay}s`,
+            }}
+          />
+        ))}
+      </span>
+
+      {/* Expanding rings */}
+      <span className="absolute -bottom-[150px] -right-[150px] h-[340px] w-[340px]">
+        {[0, 2.3, 4.6].map((delay) => (
+          <i
+            key={delay}
+            className="absolute inset-0 animate-[ctRing_7s_ease-out_infinite] rounded-full border border-white/20 motion-reduce:animate-none"
+            style={{ animationDelay: `${delay}s` }}
+          />
+        ))}
+      </span>
+    </div>
+  )
+}
+
+/* ==================== Main component ==================== */
 
 export default function Contact() {
   const [isOpen, setIsOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
   const [sent, setSent] = useState(false)
   const [form, setForm] = useState(initialForm)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
+  const closeTimer = useRef(null)
+  const closeRef = useRef(() => {})
+
   useEffect(() => {
     const openPopup = () => {
+      clearTimeout(closeTimer.current)
+      setClosing(false)
       setSent(false)
       setSubmitError('')
       setIsOpen(true)
@@ -1156,6 +204,7 @@ export default function Contact() {
 
     return () => {
       window.removeEventListener('open-contact-popup', openPopup)
+      clearTimeout(closeTimer.current)
     }
   }, [])
 
@@ -1167,7 +216,7 @@ export default function Contact() {
     document.body.style.overflow = 'hidden'
 
     const handleEscape = (event) => {
-      if (event.key === 'Escape') setIsOpen(false)
+      if (event.key === 'Escape') closeRef.current()
     }
 
     document.addEventListener('keydown', handleEscape)
@@ -1199,297 +248,418 @@ export default function Contact() {
     )
   }
 
+  // Plays a short exit animation, then unmounts
   const closePopup = () => {
-    if (isSubmitting) return
-    setIsOpen(false)
+    if (isSubmitting || closing) return
+    setClosing(true)
+    closeTimer.current = setTimeout(() => {
+      setIsOpen(false)
+      setClosing(false)
+    }, 220)
   }
 
+  closeRef.current = closePopup
+
   return (
-    <div className="ct-popup-root">
-      <style>{css}</style>
+    <div className="font-[Inter,ui-sans-serif,system-ui,sans-serif] antialiased">
+      <style>{keyframes}</style>
 
       {isOpen &&
         createPortal(
           <div
-            className="ct-popup-overlay"
+            className={`fixed inset-0 z-[99999] flex items-start justify-center overflow-y-auto overscroll-contain bg-[radial-gradient(60%_50%_at_20%_10%,rgba(124,58,237,.38),transparent_70%),radial-gradient(50%_45%_at_85%_90%,rgba(168,85,247,.28),transparent_70%),rgba(20,13,39,.78)] p-3 font-[Inter,ui-sans-serif,system-ui,sans-serif] antialiased [-webkit-backdrop-filter:blur(12px)] [backdrop-filter:blur(12px)] max-[380px]:p-2 min-[761px]:items-center min-[761px]:p-6 [&_*]:box-border ${
+              closing
+                ? 'animate-[ctOverlayOut_.22s_ease_both]'
+                : 'animate-[ctOverlayIn_.25s_ease_both]'
+            } motion-reduce:animate-none`}
             onMouseDown={(event) => {
-              if (event.target === event.currentTarget) {
-                closePopup()
-              }
+              if (event.target === event.currentTarget) closePopup()
             }}
           >
+            {/* Wrapper = rotating violet light around the card edge */}
             <div
-              className="ct-popup-modal"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="ct-popup-title"
-              aria-describedby="ct-popup-description"
+              className={`relative isolate w-full max-w-[1000px] overflow-hidden rounded-[23px] p-px shadow-[0_0_0_1px_rgba(255,255,255,.08),0_44px_110px_-20px_rgba(91,33,182,.7),0_10px_28px_rgba(20,13,39,.25)] max-[380px]:rounded-[19px] min-[761px]:rounded-[29px] ${
+                closing
+                  ? 'animate-[ctModalOut_.22s_ease-in_both]'
+                  : 'animate-[ctModalIn_.55s_cubic-bezier(.22,1,.36,1)_both]'
+              } motion-reduce:animate-none`}
             >
-              <button
-                className="ct-popup-close"
-                type="button"
-                onClick={closePopup}
-                aria-label="Close contact form"
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 top-1/2 -z-10 aspect-square w-[250%] animate-[ctSpin_8s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,#a855f7_60deg,#7c3aed_120deg,#ffe04e_160deg,transparent_220deg)] motion-reduce:hidden"
+              />
+
+              <div
+                className="relative max-h-[calc(100dvh_-_24px)] overflow-y-auto overscroll-contain rounded-[22px] bg-white max-[380px]:max-h-[calc(100dvh_-_16px)] max-[380px]:rounded-[18px] min-[761px]:grid min-[761px]:max-h-[calc(100dvh_-_48px)] min-[761px]:grid-cols-[minmax(0,.88fr)_minmax(0,1.12fr)] min-[761px]:grid-rows-[minmax(0,1fr)] min-[761px]:overflow-hidden min-[761px]:rounded-[28px]"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="ct-popup-title"
+                aria-describedby="ct-popup-description"
               >
-                <CloseIcon />
-              </button>
-
-              <aside className="ct-popup-side">
-                {/* Moving background */}
-                <div className="ct-popup-bg" aria-hidden="true">
-                  <span className="ct-popup-orb o1" />
-                  <span className="ct-popup-orb o2" />
-                  <span className="ct-popup-orb o3" />
-                  <span className="ct-popup-grid" />
-                  <span className="ct-popup-rings">
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                </div>
-
-                <div
-                  className="ct-popup-eyebrow ct-popup-rise"
-                  style={{ '--d': 0 }}
+                {/* Close button (sticky on phones, fixed in the corner on desktop) */}
+                <button
+                  type="button"
+                  onClick={closePopup}
+                  aria-label="Close contact form"
+                  className="sticky top-2.5 z-20 float-right -mb-[52px] mr-2.5 mt-2.5 grid h-10 w-10 cursor-pointer place-items-center rounded-full border border-[#e6dffa] bg-white p-0 text-[#2a2140] shadow-[0_6px_16px_-8px_rgba(91,33,182,.35)] transition-[background-color,color,transform] duration-[350ms] ease-[cubic-bezier(.22,1,.36,1)] [-webkit-tap-highlight-color:transparent] hover:rotate-90 hover:bg-[#7c3aed] hover:text-white focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0] motion-reduce:transition-none min-[761px]:absolute min-[761px]:right-4 min-[761px]:top-4 min-[761px]:float-none min-[761px]:m-0 min-[761px]:h-[42px] min-[761px]:w-[42px]"
                 >
-                  <span className="ct-popup-dot" />
-                  Let&rsquo;s grow together
-                </div>
+                  <CloseIcon />
+                </button>
 
-                <h2 className="ct-popup-rise" style={{ '--d': 1 }}>
-                  Turn More Clicks Into <span>Customers.</span>
-                </h2>
+                {/* ================= LEFT: INFO PANEL ================= */}
+                <aside className="relative isolate flex min-w-0 flex-col items-start justify-start overflow-hidden bg-[linear-gradient(160deg,#3a1590,#24106a_55%,#150a35)] px-5 pb-6 pt-[26px] text-left text-white max-[380px]:px-4 max-[380px]:pb-[18px] max-[380px]:pt-[22px] min-[761px]:px-10 min-[761px]:pb-8 min-[761px]:pt-[46px] [@media(min-width:761px)_and_(max-height:820px)]:px-8 [@media(min-width:761px)_and_(max-height:820px)]:pb-[22px] [@media(min-width:761px)_and_(max-height:820px)]:pt-8">
+                  <SideBackground />
 
-                <p
-                  id="ct-popup-description"
-                  className="ct-popup-rise"
-                  style={{ '--d': 2 }}
-                >
-                  Tell us about your business. Let&rsquo;s build a smarter
-                  growth system that turns more leads into paying customers.
-                </p>
-
-                <ul className="ct-popup-points">
-                  {points.map((point, index) => (
-                    <li
-                      key={point}
-                      className="ct-popup-rise"
-                      style={{ '--d': 3 + index }}
-                    >
-                      <span className="ct-popup-check">
-                        <CheckIcon />
-                      </span>
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div
-                  className="ct-popup-growth ct-popup-rise"
-                  style={{ '--d': 6 }}
-                  aria-hidden="true"
-                >
-                  <div className="ct-popup-growth-head">
-                    <span>Your growth, step by step</span>
-                    <span className="ct-popup-growth-tag">
-                      <TrendIcon />
-                      Rising
+                  <div
+                    className={`inline-flex w-fit max-w-full items-center gap-[9px] rounded-full border border-white/20 bg-white/10 px-3 py-[7px] text-[11.5px] font-semibold leading-[1.4] text-white [-webkit-backdrop-filter:blur(6px)] [backdrop-filter:blur(6px)] min-[761px]:px-[15px] min-[761px]:py-2 min-[761px]:text-[12.5px] ${RISE}`}
+                    style={rise(0)}
+                  >
+                    <span className="relative h-2 w-2 shrink-0 rounded-full bg-[#ffe04e] shadow-[0_0_12px_rgba(255,224,78,.8)]">
+                      <span className="absolute inset-0 animate-[ctPulse_2s_ease-out_infinite] rounded-full bg-[#ffe04e] motion-reduce:animate-none" />
                     </span>
+                    Let&rsquo;s grow together
                   </div>
 
-                  <div className="ct-popup-bars">
-                    {bars.map((height, index) => (
-                      <span
-                        key={index}
-                        style={{ '--h': `${height}%`, '--i': index }}
-                      />
+                  <h2
+                    className={`ct-display mb-2.5 mt-4 max-w-full pr-11 text-[clamp(27px,7.4vw,36px)] font-extrabold leading-[1.08] tracking-[-0.035em] text-white [text-wrap:balance] max-[380px]:text-[26px] min-[761px]:mb-3.5 min-[761px]:mt-6 min-[761px]:max-w-[390px] min-[761px]:pr-0 min-[761px]:text-[clamp(32px,3.4vw,44px)] [@media(min-width:761px)_and_(max-height:820px)]:mt-4 [@media(min-width:761px)_and_(max-height:820px)]:text-[34px] ${RISE}`}
+                    style={rise(1)}
+                  >
+                    Turn More Clicks Into{' '}
+                    <span
+                      className={`bg-[linear-gradient(90deg,#ffe04e,#ffb938,#ffe04e)] bg-clip-text text-transparent ${FLOW}`}
+                    >
+                      Customers.
+                    </span>
+                  </h2>
+
+                  <p
+                    id="ct-popup-description"
+                    className={`m-0 max-w-full text-sm leading-[1.6] text-white/80 min-[761px]:max-w-[370px] min-[761px]:text-[15px] min-[761px]:leading-[1.7] [@media(min-width:761px)_and_(max-height:700px)]:hidden ${RISE}`}
+                    style={rise(2)}
+                  >
+                    Tell us about your business. Let&rsquo;s build a smarter
+                    growth system that turns more leads into paying customers.
+                  </p>
+
+                  <ul className="m-0 mt-[18px] grid w-full max-w-full list-none gap-2 p-0 min-[761px]:mt-7 min-[761px]:max-w-[390px] min-[761px]:gap-3 [@media(min-width:761px)_and_(max-height:820px)]:mt-5 [@media(min-width:761px)_and_(max-height:820px)]:gap-[9px]">
+                    {points.map((point, index) => (
+                      <li
+                        key={point}
+                        className={RISE}
+                        style={rise(3 + index)}
+                      >
+                        <div className="flex items-center justify-start gap-3.5 rounded-[14px] border border-white/10 bg-white/5 px-3 py-[9px] text-left text-[13.5px] font-medium leading-[1.45] text-white transition-[background-color,border-color,transform] duration-300 ease-[cubic-bezier(.22,1,.36,1)] hover:translate-x-1 hover:border-[rgba(255,224,78,.4)] hover:bg-white/10 motion-reduce:transition-none min-[761px]:px-3.5 min-[761px]:py-[11px] min-[761px]:text-[14.5px]">
+                          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[rgba(255,224,78,.38)] bg-[rgba(255,224,78,.12)] text-[#ffe04e] min-[761px]:h-7 min-[761px]:w-7">
+                            <CheckIcon delay={600 + index * 200} />
+                          </span>
+                          <span>{point}</span>
+                        </div>
+                      </li>
                     ))}
-                  </div>
-                </div>
+                  </ul>
 
-                <div className="ct-popup-spacer" />
-
-                <div className="ct-popup-side-note">
-                  Creative Crew &mdash; growth, built around your business.
-                </div>
-              </aside>
-
-              <div className="ct-popup-form-area">
-                {sent ? (
-                  <div className="ct-popup-success" aria-live="polite">
-                    <div className="ct-popup-success-icon">
-                      <CheckIcon />
+                  {/* Growth preview card */}
+                  <div
+                    className={`mt-4 hidden w-full max-w-full rounded-2xl border border-white/10 bg-white/[.07] px-[18px] pb-3.5 pt-4 text-left [-webkit-backdrop-filter:blur(8px)] [backdrop-filter:blur(8px)] min-[561px]:block min-[761px]:mt-6 min-[761px]:max-w-[390px] [@media(min-width:761px)_and_(max-height:820px)]:mt-[18px] [@media(min-width:761px)_and_(max-height:760px)]:hidden ${RISE}`}
+                    style={rise(6)}
+                    aria-hidden="true"
+                  >
+                    <div className="mb-3.5 flex items-center justify-between gap-3 text-[12.5px] font-semibold text-white/80">
+                      <span>Your growth, step by step</span>
+                      <span className="inline-flex items-center gap-[5px] rounded-full bg-[rgba(255,224,78,.12)] px-[9px] py-1 text-xs font-bold text-[#ffe04e]">
+                        <TrendIcon />
+                        Rising
+                      </span>
                     </div>
 
-                    <h3>Thank you!</h3>
-
-                    <p>
-                      Your enquiry has been submitted successfully. Our team
-                      will get back to you soon.
-                    </p>
-
-                    <button
-                      className="ct-popup-yellow ct-popup-done"
-                      type="button"
-                      onClick={closePopup}
-                    >
-                      Done
-                    </button>
+                    <div className="flex h-14 items-end gap-2">
+                      {bars.map((height, index) => (
+                        <span
+                          key={index}
+                          className={`flex-1 origin-bottom rounded-b-[3px] rounded-t-md motion-reduce:!animate-none ${
+                            index === bars.length - 1
+                              ? 'bg-[linear-gradient(180deg,#ffe04e,rgba(255,224,78,.25))]'
+                              : 'bg-[linear-gradient(180deg,rgba(196,170,255,.95),rgba(139,92,246,.28))]'
+                          }`}
+                          style={{
+                            height: `${height}%`,
+                            animation:
+                              'ctBarGrow .9s cubic-bezier(.22,1,.36,1) both, ctBarBreath 4.5s ease-in-out infinite',
+                            animationDelay: `${index * 80 + 500}ms, ${
+                              index * 250 + 1600
+                            }ms`,
+                          }}
+                        />
+                      ))}
+                    </div>
                   </div>
-                ) : (
-                  <>
-                    <div className="ct-popup-form-head">
-                      <small>Get in touch</small>
-                      <h3 id="ct-popup-title">Let&rsquo;s talk growth.</h3>
-                      <p>
-                        Share a few details and tell us what you&rsquo;d like
-                        to achieve.
+
+                  <div className="hidden min-h-6 flex-auto min-[761px]:block" />
+
+                  <div className="mt-0 hidden w-full border-t border-white/15 pt-[18px] text-left text-[12.5px] font-medium leading-[1.6] text-white/65 min-[761px]:block [@media(min-width:761px)_and_(max-height:700px)]:hidden">
+                    Creative Crew &mdash; growth, built around your business.
+                  </div>
+                </aside>
+
+                {/* ================= RIGHT: FORM AREA ================= */}
+                <div className="relative min-w-0 bg-[radial-gradient(60%_40%_at_100%_0%,rgba(124,58,237,.1),transparent_70%),linear-gradient(180deg,#ffffff,#fcfaff)] px-5 pb-[22px] pt-6 text-left max-[380px]:px-4 max-[380px]:pb-[18px] max-[380px]:pt-5 min-[761px]:overflow-y-auto min-[761px]:overscroll-contain min-[761px]:px-[38px] min-[761px]:pb-[30px] min-[761px]:pt-10 [@media(min-width:761px)_and_(max-height:820px)]:px-8 [@media(min-width:761px)_and_(max-height:820px)]:pb-6 [@media(min-width:761px)_and_(max-height:820px)]:pt-[30px]">
+                  {/* Flowing violet accent line */}
+                  <span
+                    aria-hidden="true"
+                    className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#7c3aed,#a855f7,#ffe04e,#a855f7,#7c3aed)] ${FLOW}`}
+                  />
+
+                  {sent ? (
+                    <div
+                      className="flex min-h-[380px] flex-col items-start justify-center"
+                      aria-live="polite"
+                    >
+                      <div className="mb-[22px] grid h-[60px] w-[60px] animate-[ctPop_.5s_cubic-bezier(.22,1,.36,1)_both] place-items-center rounded-[18px] bg-[#efe7ff] text-[#5b21b6] motion-reduce:animate-none">
+                        <CheckIcon className="h-[26px] w-[26px]" />
+                      </div>
+
+                      <h3 className="ct-display m-0 mb-2.5 text-[32px] font-extrabold tracking-[-0.03em] text-[#14111f]">
+                        Thank you!
+                      </h3>
+
+                      <p className="m-0 mb-[26px] text-[15px] leading-[1.7] text-[#5b5870]">
+                        Your enquiry has been submitted successfully. Our team
+                        will get back to you soon.
                       </p>
-                    </div>
-
-                    <form
-                      className="ct-popup-form"
-                      onSubmit={handleSubmit}
-                    >
-                      <div className="ct-popup-field">
-                        <label htmlFor="ct-full-name">Full Name *</label>
-                        <input
-                          id="ct-full-name"
-                          name="fullName"
-                          value={form.fullName}
-                          onChange={updateField}
-                          placeholder="Your full name"
-                          autoComplete="name"
-                          required
-                        />
-                      </div>
-
-                      <div className="ct-popup-field">
-                        <label htmlFor="ct-business-name">
-                          Business / Brand *
-                        </label>
-                        <input
-                          id="ct-business-name"
-                          name="businessName"
-                          value={form.businessName}
-                          onChange={updateField}
-                          placeholder="Your business name"
-                          autoComplete="organization"
-                          required
-                        />
-                      </div>
-
-                      <div className="ct-popup-field">
-                        <label htmlFor="ct-email">Email Address *</label>
-                        <input
-                          id="ct-email"
-                          name="email"
-                          type="email"
-                          value={form.email}
-                          onChange={updateField}
-                          placeholder="you@example.com"
-                          autoComplete="email"
-                          required
-                        />
-                      </div>
-
-                      <div className="ct-popup-field">
-                        <label htmlFor="ct-phone">Phone / WhatsApp *</label>
-                        <input
-                          id="ct-phone"
-                          name="phone"
-                          type="tel"
-                          value={form.phone}
-                          onChange={updateField}
-                          placeholder="Your contact number"
-                          autoComplete="tel"
-                          required
-                        />
-                      </div>
-
-                      <div className="ct-popup-field">
-                        <label htmlFor="ct-business-type">
-                          Business Type *
-                        </label>
-
-                        <select
-                          id="ct-business-type"
-                          name="businessType"
-                          value={form.businessType}
-                          onChange={updateField}
-                          required
-                        >
-                          <option value="">Select business type</option>
-                          <option value="E-commerce">E-commerce</option>
-                          <option value="Agency">Agency</option>
-                          <option value="Coaching">Coaching</option>
-                          <option value="Real Estate">Real Estate</option>
-                          <option value="Local Business">
-                            Local Business
-                          </option>
-                          <option value="SaaS / Technology">
-                            SaaS / Technology
-                          </option>
-                          <option value="Other">Other</option>
-                        </select>
-                      </div>
-
-                      <div className="ct-popup-field">
-                        <label htmlFor="ct-website">
-                          Website <span>(Optional)</span>
-                        </label>
-
-                        <input
-                          id="ct-website"
-                          name="website"
-                          type="url"
-                          value={form.website}
-                          onChange={updateField}
-                          placeholder="https://yourwebsite.com"
-                          autoComplete="url"
-                        />
-                      </div>
-
-                      <div className="ct-popup-field full">
-                        <label htmlFor="ct-goal">Your Main Goal *</label>
-
-                        <textarea
-                          id="ct-goal"
-                          name="goal"
-                          value={form.goal}
-                          onChange={updateField}
-                          placeholder="Tell us about your goals, challenges, or what you want to improve..."
-                          required
-                        />
-                      </div>
-
-                      {submitError && (
-                        <p className="ct-popup-error" role="alert">
-                          {submitError}
-                        </p>
-                      )}
 
                       <button
-                        className="ct-popup-yellow ct-popup-submit"
-                        type="submit"
-                        disabled={isSubmitting}
+                        className={`${YELLOW_BTN} !w-auto min-w-40`}
+                        type="button"
+                        onClick={closePopup}
                       >
-                        {isSubmitting
-                          ? 'Please wait...'
-                          : "Yes! Let's Grow My Revenue"}
-
-                        {!isSubmitting && (
-                          <span aria-hidden="true">&rarr;</span>
-                        )}
+                        Done
                       </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mb-[18px] pr-0 min-[761px]:mb-[26px] min-[761px]:pr-12 [@media(min-width:761px)_and_(max-height:820px)]:mb-4">
+                        <small
+                          className={`mb-2 inline-flex items-center gap-2 rounded-full bg-[#f1eaff] px-3 py-1 text-[13px] font-bold text-[#7c3aed] ${RISE}`}
+                          style={rise(0, 250, 60)}
+                        >
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#7c3aed]" />
+                          Get in touch
+                        </small>
 
-                      <p className="ct-popup-privacy">
-                        Your information will be used to respond to your
-                        enquiry.
-                      </p>
-                    </form>
-                  </>
-                )}
+                        <h3
+                          id="ct-popup-title"
+                          className={`ct-display m-0 mb-2 text-[25px] font-extrabold leading-[1.15] tracking-[-0.03em] text-[#14111f] min-[761px]:text-[clamp(26px,2.6vw,33px)] ${RISE}`}
+                          style={rise(1, 250, 60)}
+                        >
+                          Let&rsquo;s talk{' '}
+                          <span
+                            className={`bg-[linear-gradient(90deg,#7c3aed,#a855f7,#7c3aed)] bg-clip-text text-transparent ${FLOW}`}
+                          >
+                            growth.
+                          </span>
+                        </h3>
+
+                        <p
+                          className={`m-0 text-sm leading-[1.65] text-[#5b5870] min-[761px]:text-[14.5px] [@media(min-width:761px)_and_(max-height:700px)]:hidden ${RISE}`}
+                          style={rise(2, 250, 60)}
+                        >
+                          Share a few details and tell us what you&rsquo;d like
+                          to achieve.
+                        </p>
+                      </div>
+
+                      <form
+                        className="grid grid-cols-1 gap-x-3 gap-y-3.5 min-[561px]:grid-cols-2 min-[761px]:gap-x-3.5 min-[761px]:gap-y-4 [@media(min-width:761px)_and_(max-height:820px)]:gap-y-3"
+                        onSubmit={handleSubmit}
+                      >
+                        <div
+                          className={`flex min-w-0 flex-col gap-[7px] ${RISE}`}
+                          style={rise(0, 330, 55)}
+                        >
+                          <label className={LABEL} htmlFor="ct-full-name">
+                            Full Name *
+                          </label>
+                          <input
+                            id="ct-full-name"
+                            name="fullName"
+                            value={form.fullName}
+                            onChange={updateField}
+                            placeholder="Your full name"
+                            autoComplete="name"
+                            required
+                            className={FIELD}
+                          />
+                        </div>
+
+                        <div
+                          className={`flex min-w-0 flex-col gap-[7px] ${RISE}`}
+                          style={rise(1, 330, 55)}
+                        >
+                          <label className={LABEL} htmlFor="ct-business-name">
+                            Business / Brand *
+                          </label>
+                          <input
+                            id="ct-business-name"
+                            name="businessName"
+                            value={form.businessName}
+                            onChange={updateField}
+                            placeholder="Your business name"
+                            autoComplete="organization"
+                            required
+                            className={FIELD}
+                          />
+                        </div>
+
+                        <div
+                          className={`flex min-w-0 flex-col gap-[7px] ${RISE}`}
+                          style={rise(2, 330, 55)}
+                        >
+                          <label className={LABEL} htmlFor="ct-email">
+                            Email Address *
+                          </label>
+                          <input
+                            id="ct-email"
+                            name="email"
+                            type="email"
+                            value={form.email}
+                            onChange={updateField}
+                            placeholder="you@example.com"
+                            autoComplete="email"
+                            required
+                            className={FIELD}
+                          />
+                        </div>
+
+                        <div
+                          className={`flex min-w-0 flex-col gap-[7px] ${RISE}`}
+                          style={rise(3, 330, 55)}
+                        >
+                          <label className={LABEL} htmlFor="ct-phone">
+                            Phone / WhatsApp *
+                          </label>
+                          <input
+                            id="ct-phone"
+                            name="phone"
+                            type="tel"
+                            value={form.phone}
+                            onChange={updateField}
+                            placeholder="Your contact number"
+                            autoComplete="tel"
+                            required
+                            className={FIELD}
+                          />
+                        </div>
+
+                        <div
+                          className={`flex min-w-0 flex-col gap-[7px] ${RISE}`}
+                          style={rise(4, 330, 55)}
+                        >
+                          <label className={LABEL} htmlFor="ct-business-type">
+                            Business Type *
+                          </label>
+
+                          <select
+                            id="ct-business-type"
+                            name="businessType"
+                            value={form.businessType}
+                            onChange={updateField}
+                            required
+                            className={`${FIELD} cursor-pointer`}
+                          >
+                            <option value="">Select business type</option>
+                            <option value="E-commerce">E-commerce</option>
+                            <option value="Agency">Agency</option>
+                            <option value="Coaching">Coaching</option>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Local Business">
+                              Local Business
+                            </option>
+                            <option value="SaaS / Technology">
+                              SaaS / Technology
+                            </option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+
+                        <div
+                          className={`flex min-w-0 flex-col gap-[7px] ${RISE}`}
+                          style={rise(5, 330, 55)}
+                        >
+                          <label className={LABEL} htmlFor="ct-website">
+                            Website{' '}
+                            <span className="font-medium text-[#8b8798]">
+                              (Optional)
+                            </span>
+                          </label>
+
+                          <input
+                            id="ct-website"
+                            name="website"
+                            type="url"
+                            value={form.website}
+                            onChange={updateField}
+                            placeholder="https://yourwebsite.com"
+                            autoComplete="url"
+                            className={FIELD}
+                          />
+                        </div>
+
+                        <div
+                          className={`flex min-w-0 flex-col gap-[7px] min-[561px]:col-span-full ${RISE}`}
+                          style={rise(6, 330, 55)}
+                        >
+                          <label className={LABEL} htmlFor="ct-goal">
+                            Your Main Goal *
+                          </label>
+
+                          <textarea
+                            id="ct-goal"
+                            name="goal"
+                            value={form.goal}
+                            onChange={updateField}
+                            placeholder="Tell us about your goals, challenges, or what you want to improve..."
+                            required
+                            className={`${FIELD} !h-auto min-h-24 resize-y [@media(min-width:761px)_and_(max-height:700px)]:min-h-[72px]`}
+                          />
+                        </div>
+
+                        {submitError && (
+                          <p
+                            className="col-span-full m-0 animate-[ctShake_.4s_ease] rounded-[11px] border border-[#ffd7dc] bg-[#fff1f2] px-3.5 py-[11px] text-[13.5px] leading-[1.55] text-[#9d2737] motion-reduce:animate-none"
+                            role="alert"
+                          >
+                            {submitError}
+                          </p>
+                        )}
+
+                        <button
+                          className={`${YELLOW_BTN} col-span-full mt-1.5 ${RISE}`}
+                          style={rise(7, 330, 55)}
+                          type="submit"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting
+                            ? 'Please wait...'
+                            : "Yes! Let's Grow My Revenue"}
+
+                          {!isSubmitting && (
+                            <span
+                              className="text-[19px] leading-none transition-transform duration-[250ms] ease-[cubic-bezier(.22,1,.36,1)] group-hover:translate-x-[3px]"
+                              aria-hidden="true"
+                            >
+                              &rarr;
+                            </span>
+                          )}
+                        </button>
+
+                        <p className="col-span-full m-0 text-center text-[12.5px] leading-[1.6] text-[#8a869a]">
+                          Your information will be used to respond to your
+                          enquiry.
+                        </p>
+                      </form>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>,
@@ -1498,3 +668,115 @@ export default function Contact() {
     </div>
   )
 }
+
+/* ==================== Font + keyframes (only non-utility CSS) ==================== */
+
+const keyframes = `
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+.ct-display {
+  font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+@keyframes ctOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ctOverlayOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes ctModalIn {
+  0% { opacity: 0; transform: translateY(34px) scale(.92); filter: blur(8px); }
+  60% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes ctModalOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(18px) scale(.96); }
+}
+
+@keyframes ctSpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes ctRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ctFlow {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+@keyframes ctShine {
+  0%, 55% { transform: translateX(0) skewX(-20deg); }
+  100% { transform: translateX(520%) skewX(-20deg); }
+}
+
+@keyframes ctFloatA {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(70px, 60px) scale(1.15); }
+}
+
+@keyframes ctFloatB {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-80px, -60px) scale(1.1); }
+}
+
+@keyframes ctFloatC {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(50px, -40px); }
+  66% { transform: translate(-40px, 30px); }
+}
+
+@keyframes ctGridDrift {
+  from { background-position: 0 0; }
+  to { background-position: 26px 26px; }
+}
+
+@keyframes ctRing {
+  0% { transform: scale(.35); opacity: .9; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+
+@keyframes ctPulse {
+  0% { transform: scale(1); opacity: .7; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+@keyframes ctTwinkle {
+  0%, 100% { opacity: 0; transform: scale(.5); }
+  50% { opacity: .95; transform: scale(1.25); }
+}
+
+@keyframes ctDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes ctBarGrow {
+  from { transform: scaleY(0); opacity: 0; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes ctBarBreath {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(.84); }
+}
+
+@keyframes ctPop {
+  0% { transform: scale(.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes ctShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+`

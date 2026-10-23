@@ -2,6 +2,16 @@
 import { ScanEye } from 'lucide-react'
 import { Button } from './ui'
 
+/* ==========================================================
+   Hero.jsx  (100% Tailwind utility classes)
+   - Same content, same colors, same video controls.
+   - The dot icon in the top pill is removed.
+   - Fluid text sizes that scale on every screen.
+   - Only keyframes + the font import live in the small
+     <style> block at the bottom of this file.
+   - Arbitrary values only, so it works on Tailwind v3 and v4.
+   ========================================================== */
+
 const focusLines = Array(4).fill(
   'Guaranteed Better Funnel Performance. More Value from Every Ad Spend.'
 )
@@ -36,11 +46,69 @@ const services = [
   { text: 'Mobile-first layouts', icon: 'phone' },
 ]
 
+/* ==================== Shared class strings ==================== */
+
+// Violet gradient that slowly shifts (used on accent words)
+const VIOLET_FLOW =
+  'bg-[linear-gradient(110deg,#6d28d9,#9b5cf0,#6d28d9)] bg-[length:200%_100%] bg-clip-text text-transparent animate-[heroSheen_5s_ease-in-out_infinite_alternate] motion-reduce:animate-none'
+
+const MASK =
+  '[mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)] [-webkit-mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)] motion-reduce:[mask-image:none] motion-reduce:[-webkit-mask-image:none]'
+
+// Space between promise-marquee items (the run padding must equal the gap)
+const FOCUS_GAP =
+  'gap-4 min-[480px]:gap-5 md:gap-[clamp(22px,3vw,44px)]'
+const FOCUS_RUN_GAP =
+  'gap-4 pr-4 min-[480px]:gap-5 min-[480px]:pr-5 md:gap-[clamp(22px,3vw,44px)] md:pr-[clamp(22px,3vw,44px)]'
+
+const SERVICE_RUN_GAP =
+  'gap-2 pr-2 min-[480px]:gap-2.5 min-[480px]:pr-2.5 md:gap-3.5 md:pr-3.5'
+
+// Yellow CTA (the "!" wins over your Button component's own styles)
+const HERO_BTN =
+  'site-cta--revenue !relative !isolate !inline-flex !min-h-[50px] !w-full !min-w-0 !max-w-full !items-center !justify-center !gap-2 !overflow-hidden !whitespace-normal !rounded-[13px] !border !border-[#f3b01f] ' +
+  '!bg-[linear-gradient(180deg,#ffee82,#ffe04e_48%,#ffca30)] !px-3.5 !py-3 !text-center !text-[15px] !font-extrabold !leading-[1.35] !text-[#2e0c4d] !no-underline ' +
+  '!shadow-[inset_0_1px_0_#fff8c4,inset_0_-2px_4px_#f5b2144d,0_4px_0_#d18f0a,0_14px_24px_-10px_#f5b323a0] ' +
+  'min-[480px]:!text-base md:!min-h-[54px] md:!rounded-[14px] md:!px-[clamp(14px,4vw,30px)] md:!text-[clamp(15px,1.4vw,17px)] ' +
+  'transition-[transform,box-shadow,filter] duration-200 [-webkit-tap-highlight-color:transparent] ' +
+  'hover:!-translate-y-[3px] hover:!brightness-105 hover:!shadow-[inset_0_1px_0_#fff8c4,0_7px_0_#d18f0a,0_22px_36px_-12px_#f5b323c0] ' +
+  'active:!translate-y-[2px] ' +
+  'focus-visible:!outline focus-visible:!outline-[3px] focus-visible:!outline-offset-[3px] focus-visible:!outline-[#a98af0] ' +
+  'before:pointer-events-none before:absolute before:inset-x-0 before:bottom-1/2 before:top-0 before:-z-10 before:bg-[linear-gradient(180deg,#ffffff40,transparent)] ' +
+  'after:pointer-events-none after:absolute after:inset-y-0 after:-left-[45%] after:-z-10 after:w-[32%] after:animate-[heroShine_5.5s_ease-in-out_2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffff99,transparent)] motion-reduce:after:hidden'
+
+// Colors for the four feature cards
+const TONES = {
+  purple: {
+    card: 'border-[#e3d3ff] bg-[radial-gradient(ellipse_at_100%_0%,#f3eaff,transparent_72%),linear-gradient(150deg,#ffffffef,#ffffffc9)]',
+    tile: 'border-[#e3d3ff] bg-[linear-gradient(145deg,#fff,#f3eaff)] text-[#7c3aed] shadow-[inset_0_1px_0_#fff,0_5px_0_-1px_#bc9be9,0_12px_20px_-12px_#7c3aed]',
+    bar: 'bg-[linear-gradient(90deg,#7c3aed,transparent)]',
+    number: 'border-[#e3d3ff]',
+    ring: 'border-[#7c3aed]/50',
+  },
+  peach: {
+    card: 'border-[#f3d1bd] bg-[radial-gradient(ellipse_at_100%_0%,#ffeadb,transparent_72%),linear-gradient(150deg,#ffffffef,#ffffffc9)]',
+    tile: 'border-[#f3d1bd] bg-[linear-gradient(145deg,#fff,#ffeadb)] text-[#e58a5c] shadow-[inset_0_1px_0_#fff,0_5px_0_-1px_#e9b598,0_12px_20px_-12px_#e58a5c]',
+    bar: 'bg-[linear-gradient(90deg,#e58a5c,transparent)]',
+    number: 'border-[#f3d1bd]',
+    ring: 'border-[#e58a5c]/50',
+  },
+  gold: {
+    card: 'border-[#efddb0] bg-[radial-gradient(ellipse_at_100%_0%,#fff3cd,transparent_72%),linear-gradient(150deg,#ffffffef,#ffffffc9)]',
+    tile: 'border-[#efddb0] bg-[linear-gradient(145deg,#fff,#fff3cd)] text-[#b88619] shadow-[inset_0_1px_0_#fff,0_5px_0_-1px_#dabc67,0_12px_20px_-12px_#b88619]',
+    bar: 'bg-[linear-gradient(90deg,#b88619,transparent)]',
+    number: 'border-[#efddb0]',
+    ring: 'border-[#b88619]/50',
+  },
+}
+
+/* ==================== Icons ==================== */
+
 function Icon({ name, className = '' }) {
   if (name === 'scan-eye') {
     return (
       <ScanEye
-        className={className}
+        className={`block shrink-0 ${className}`}
         size={24}
         strokeWidth={1.7}
         aria-hidden="true"
@@ -112,7 +180,7 @@ function Icon({ name, className = '' }) {
 
   return (
     <svg
-      className={className}
+      className={`block shrink-0 ${className}`}
       width="24"
       height="24"
       viewBox="0 0 24 24"
@@ -156,6 +224,7 @@ function ControlIcon({ name }) {
 
   return (
     <svg
+      className="block h-[18px] w-[18px] shrink-0 sm:h-5 sm:w-5"
       width="20"
       height="20"
       viewBox="0 0 24 24"
@@ -172,8 +241,9 @@ function ControlIcon({ name }) {
   )
 }
 
-/* Reveal elements when they enter the viewport */
-function Reveal({ children, delay = 0, className = '' }) {
+/* ==================== Reveal on scroll ==================== */
+
+function Reveal({ as: Tag = 'div', children, delay = 0, className = '' }) {
   const ref = useRef(null)
   const [seen, setSeen] = useState(false)
 
@@ -200,17 +270,20 @@ function Reveal({ children, delay = 0, className = '' }) {
   }, [])
 
   return (
-    <div
+    <Tag
       ref={ref}
-      className={`premium-hero__reveal ${seen ? 'is-in' : ''} ${className}`}
-      style={{ '--reveal-delay': `${delay}ms` }}
+      style={{ transitionDelay: `${delay}ms` }}
+      className={`min-w-0 max-w-full transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${
+        seen ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+      } ${className}`}
     >
       {children}
-    </div>
+    </Tag>
   )
 }
 
-/* Desktop mouse tilt; no tilt on touchscreens */
+/* ==================== Desktop mouse tilt ==================== */
+
 function useTilt() {
   const ref = useRef(null)
 
@@ -235,16 +308,19 @@ function useTilt() {
     el.style.setProperty('--ry', '0deg')
   }
 
-  return {
-    ref,
-    onPointerMove,
-    onPointerLeave,
-  }
+  return { ref, onPointerMove, onPointerLeave }
 }
 
-/* Vimeo hero video with custom play, sound and fullscreen controls */
+/* ==================== Vimeo hero video ==================== */
+
 const VIMEO_SRC =
   'https://player.vimeo.com/video/1234072596?autoplay=1&muted=1&loop=1&autopause=0&controls=0&playsinline=1&dnt=1&title=0&byline=0&portrait=0'
+
+const VIDEO_BTN =
+  'pointer-events-auto inline-grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/25 bg-[rgba(20,17,31,.6)] p-0 text-white ' +
+  '[-webkit-backdrop-filter:blur(12px)] [backdrop-filter:blur(12px)] [-webkit-tap-highlight-color:transparent] touch-manipulation ' +
+  'transition-[transform,background-color] duration-200 hover:scale-105 hover:bg-[#7c3aed] active:scale-95 ' +
+  'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0] sm:h-10 sm:w-10'
 
 function HeroVideo() {
   const wrapRef = useRef(null)
@@ -319,12 +395,11 @@ function HeroVideo() {
   return (
     <figure
       ref={wrapRef}
-      className="premium-hero__image-wrap premium-hero__video-wrap"
-      style={{ '--hero-video-ratio': '16 / 9' }}
+      className="relative m-0 aspect-[16/9] w-full min-w-0 overflow-hidden bg-[#1b1233]"
     >
       <iframe
         ref={frameRef}
-        className="premium-hero__video premium-hero__vimeo"
+        className="block h-full w-full max-w-full border-0 bg-[#1b1233]"
         src={VIMEO_SRC}
         title="Creative Crew landing page preview"
         allow="autoplay; fullscreen; picture-in-picture"
@@ -333,19 +408,25 @@ function HeroVideo() {
         onLoad={onLoad}
       />
 
+      {/* Soft fade at the bottom so the controls stay readable */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[38%] bg-[linear-gradient(180deg,transparent,#14111f8c)]"
+      />
+
       {/* Tap the video itself to play or pause */}
       <button
         type="button"
-        className="premium-hero__video-toggle"
         onClick={togglePlay}
         aria-label={playing ? 'Pause video' : 'Play video'}
+        className="absolute inset-0 z-[2] h-full w-full cursor-pointer border-0 bg-transparent p-0 [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0]"
       />
 
-      <div className="premium-hero__video-controls">
-        <div className="premium-hero__video-group">
+      <div className="pointer-events-none absolute inset-x-2 bottom-2 z-[3] flex items-center justify-between gap-2 md:inset-x-2.5 md:bottom-2.5">
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            className="premium-hero__video-btn"
+            className={VIDEO_BTN}
             onClick={togglePlay}
             aria-label={playing ? 'Pause video' : 'Play video'}
             aria-pressed={!playing}
@@ -355,7 +436,7 @@ function HeroVideo() {
 
           <button
             type="button"
-            className="premium-hero__video-btn"
+            className={VIDEO_BTN}
             onClick={toggleMute}
             aria-label={muted ? 'Unmute video' : 'Mute video'}
             aria-pressed={!muted}
@@ -366,7 +447,7 @@ function HeroVideo() {
 
         <button
           type="button"
-          className="premium-hero__video-btn"
+          className={VIDEO_BTN}
           onClick={goFullscreen}
           aria-label="Toggle fullscreen"
         >
@@ -377,1447 +458,59 @@ function HeroVideo() {
   )
 }
 
-function IconTile({ name, tone }) {
+/* ==================== Feature card ==================== */
+
+function PointCard({ point, index }) {
+  const tone = TONES[point.tone]
+
   return (
-    <span
-      className={`premium-hero__tile premium-hero__tile--${tone}`}
-      aria-hidden="true"
-    >
-      <Icon name={name} />
-    </span>
+    <Reveal as="li" delay={index * 100} className="h-full">
+      <div
+        className={`group relative h-full min-w-0 overflow-hidden rounded-2xl border px-3 pb-[18px] pt-3.5 shadow-[inset_0_1px_0_#fff,0_24px_38px_-27px_rgba(91,33,182,.5),0_5px_12px_-7px_rgba(91,33,182,.17)] [-webkit-backdrop-filter:blur(20px)] [backdrop-filter:blur(20px)] transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(.22,1,.36,1)] hover:-translate-y-[5px] hover:shadow-[inset_0_1px_0_#fff,0_32px_46px_-26px_rgba(91,33,182,.56),0_5px_12px_-7px_rgba(91,33,182,.17)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 min-[480px]:rounded-[18px] min-[480px]:px-3.5 min-[480px]:pb-5 min-[480px]:pt-4 md:px-5 md:pb-6 md:pt-5 lg:rounded-[26px] lg:px-6 lg:pb-[30px] lg:pt-[26px] ${tone.card}`}
+      >
+        <div className="flex w-full min-w-0 items-center justify-between gap-1.5 md:items-start md:gap-3">
+          {/* Idle bob on the wrapper, hover effects on the tile */}
+          <span
+            className="relative inline-flex animate-[heroBob_4.5s_ease-in-out_infinite] motion-reduce:animate-none"
+            style={{ animationDelay: `${index * 0.4}s` }}
+            aria-hidden="true"
+          >
+            <span
+              className={`pointer-events-none absolute inset-0 rounded-xl border opacity-0 group-hover:animate-[heroRing_1.5s_ease-out_infinite] motion-reduce:hidden md:rounded-2xl ${tone.ring}`}
+            />
+            <span
+              className={`relative grid h-9 w-9 flex-none place-items-center rounded-xl border min-[480px]:h-10 min-[480px]:w-10 md:h-[54px] md:w-[54px] md:rounded-2xl ${tone.tile}`}
+            >
+              <Icon
+                name={point.icon}
+                className="h-[19px] w-[19px] origin-center transition-transform duration-[450ms] ease-[cubic-bezier(.22,1,.36,1)] group-hover:-rotate-6 group-hover:scale-110 min-[480px]:h-5 min-[480px]:w-5 md:h-[25px] md:w-[25px]"
+              />
+            </span>
+          </span>
+
+          <span
+            className={`grid h-7 w-7 flex-none place-items-center rounded-[9px] border bg-white/85 text-xs font-extrabold leading-none tabular-nums text-[#5b3291] shadow-[inset_0_1px_0_#fff,0_4px_10px_rgba(91,33,182,.03)] md:h-[38px] md:w-[38px] md:rounded-xl md:text-[15px] ${tone.number}`}
+            aria-hidden="true"
+          >
+            {String(index + 1).padStart(2, '0')}
+          </span>
+        </div>
+
+        <p className="m-0 mt-3.5 text-[13px] font-semibold leading-[1.55] text-[#5b5870] [overflow-wrap:break-word] min-[480px]:text-sm md:mt-6 md:text-[clamp(15px,1.4vw,17px)] md:leading-[1.65]">
+          {point.text}
+        </p>
+
+        {/* Accent bar grows on hover */}
+        <span
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-x-3.5 bottom-0 h-[3px] origin-left scale-x-[.14] rounded-t-[3px] transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)] group-hover:scale-x-100 motion-reduce:transition-none md:inset-x-5 lg:inset-x-6 ${tone.bar}`}
+        />
+      </div>
+    </Reveal>
   )
 }
 
-const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
-
-  .premium-hero {
-    --ink: #14111f;
-    --ink-soft: #2a2140;
-    --muted: #5b5870;
-    --violet: #7c3aed;
-    --violet-deep: #5b21b6;
-    --indigo: #4f46e5;
-    --lav-100: #efe7ff;
-    --lav-200: #e0d2ff;
-    --dark-1: #1b1233;
-    --dark-2: #140d27;
-    --hero-gutter: clamp(16px, 4vw, 36px);
-    --hero-ease: cubic-bezier(.22, 1, .36, 1);
-    --focus-gap: clamp(22px, 3vw, 44px);
-    --service-gap: 14px;
-
-    position: relative;
-    isolation: isolate;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    overflow-x: clip;
-    padding: var(--hero-top-space, clamp(28px, 5vw, 72px)) 0 clamp(28px, 4vw, 48px);
-    color: var(--ink);
-    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    background:
-      radial-gradient(55% 42% at 100% 0%, #efe6ff, transparent 70%),
-      radial-gradient(40% 34% at 0% 8%, #f6f0ff, transparent 72%),
-      radial-gradient(60% 36% at 85% 65%, #f3ecff, transparent 72%),
-      #fff;
-  }
-
-  .premium-hero,
-  .premium-hero *,
-  .premium-hero *::before,
-  .premium-hero *::after {
-    box-sizing: border-box;
-  }
-
-  .premium-hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image: radial-gradient(#7c3aed17 1px, transparent 1px);
-    background-size: 30px 30px;
-    -webkit-mask-image: linear-gradient(#000a, transparent 55%);
-    mask-image: linear-gradient(#000a, transparent 55%);
-  }
-
-  .premium-hero__blob {
-    position: absolute;
-    z-index: -1;
-    border-radius: 50%;
-    pointer-events: none;
-    filter: blur(70px);
-    animation: premiumHeroDrift 16s ease-in-out infinite alternate;
-  }
-
-  .premium-hero__blob--a {
-    top: 4%;
-    right: -8%;
-    width: min(46vw, 520px);
-    aspect-ratio: 1;
-    background: #7c3aed24;
-  }
-
-  .premium-hero__blob--b {
-    top: 52%;
-    left: -10%;
-    width: min(40vw, 440px);
-    aspect-ratio: 1;
-    background: #ffeadb99;
-    animation-delay: -6s;
-  }
-
-  .premium-hero .premium-hero__container {
-    width: 100%;
-    max-width: 1180px;
-    min-width: 0;
-    margin-inline: auto;
-    padding-inline: var(--hero-gutter);
-  }
-
-  .premium-hero h1,
-  .premium-hero h2,
-  .premium-hero p,
-  .premium-hero ul,
-  .premium-hero figure {
-    margin: 0;
-    overflow-wrap: break-word;
-  }
-
-  .premium-hero ul {
-    padding: 0;
-    list-style: none;
-  }
-
-  .premium-hero svg {
-    display: block;
-    flex-shrink: 0;
-  }
-
-  .premium-hero__reveal {
-    min-width: 0;
-    max-width: 100%;
-    opacity: 0;
-    transform: translateY(24px);
-    transition:
-      opacity .8s var(--hero-ease) var(--reveal-delay, 0ms),
-      transform .8s var(--hero-ease) var(--reveal-delay, 0ms);
-  }
-
-  .premium-hero__reveal.is-in {
-    opacity: 1;
-    transform: none;
-  }
-
-  /* Main hero layout */
-
-  .premium-hero__stage {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: clamp(24px, 5vw, 48px);
-    align-items: center;
-  }
-
-  .premium-hero__copy {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .premium-hero__pill {
-    display: flex;
-    justify-content: flex-start;
-    max-width: 100%;
-    min-width: 0;
-  }
-
-  .premium-hero .premium-hero__eyebrow {
-    position: relative;
-    overflow: hidden;
-    display: inline-flex;
-    align-items: center;
-    gap: 11px;
-    max-width: 100%;
-    padding: 10px 20px;
-    border: 1px solid var(--lav-200);
-    border-radius: 999px;
-    color: var(--ink-soft);
-    background: linear-gradient(180deg, #f6f1ff, var(--lav-100));
-    box-shadow: inset 0 1px 0 #fff, 0 10px 24px -16px #7c3aed80;
-    font-size: clamp(12px, 1.2vw, 14px);
-    font-weight: 600;
-    line-height: 1.6;
-    text-wrap: pretty;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .premium-hero .premium-hero__eyebrow span {
-    display: block;
-    flex: 1 1 auto;
-    width: 100%;
-    min-width: 0;
-    text-align: left;
-  }
-
-  .premium-hero .premium-hero__eyebrow::before {
-    content: "";
-    flex: 0 0 9px;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #8b5cf6, var(--violet-deep));
-    animation: premiumHeroPulse 3s ease-in-out infinite;
-  }
-
-  .premium-hero .premium-hero__eyebrow::after {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 -40%;
-    width: 36%;
-    pointer-events: none;
-    background: linear-gradient(100deg, transparent, #ffffffb3, transparent);
-    transform: skewX(-20deg);
-    animation: premiumHeroShine 6s ease-in-out 1.2s infinite;
-  }
-
-  .premium-hero .premium-hero__title {
-    margin-top: clamp(16px, 2.4vw, 26px);
-    font-family: "Bricolage Grotesque", Inter, sans-serif;
-    font-size: clamp(34px, 4.3vw, 54px);
-    font-weight: 800;
-    line-height: 1.08;
-    letter-spacing: -.035em;
-    text-wrap: balance;
-  }
-
-  .premium-hero__title-lead {
-    display: block;
-    color: var(--ink);
-  }
-
-  .premium-hero__title-middle {
-    display: block;
-    color: var(--ink);
-    white-space: nowrap;
-  }
-
-  .premium-hero__title-accent {
-    display: inline;
-    color: var(--violet);
-    background: none;
-    -webkit-text-fill-color: currentColor;
-  }
-
-  .premium-hero__title-without {
-    display: inline;
-    color: var(--ink);
-  }
-
-  .premium-hero__title-tail {
-    display: block;
-    width: 100%;
-    color: var(--ink);
-    white-space: nowrap;
-    font-size: 0.88em;
-    letter-spacing: -.04em;
-  }
-
-  .premium-hero__title-mobile {
-    display: none;
-  }
-
-  .premium-hero .premium-hero__subtitle {
-    width: 100%;
-    max-width: 540px;
-    margin-top: clamp(14px, 2vw, 20px);
-    color: var(--muted);
-    font-size: clamp(15px, .8vw + 12px, 18.5px);
-    font-weight: 500;
-    line-height: 1.65;
-  }
-
-  .premium-hero__focus-slot {
-    width: 100%;
-    min-width: 0;
-    margin-top: clamp(20px, 3vw, 32px);
-  }
-
-  /* Promise marquee */
-
-  .premium-hero__promise {
-    min-width: 0;
-    overflow: hidden;
-    border: 1px solid var(--lav-200);
-    border-radius: 18px;
-    background: linear-gradient(110deg, #ffffffd9, #f7f2ffd9 65%, #fff4ecd9);
-    -webkit-backdrop-filter: blur(18px);
-    backdrop-filter: blur(18px);
-    box-shadow: inset 0 1px 0 #fff, 0 18px 36px -26px #5b21b68c;
-  }
-
-  .premium-hero__focus-marquee,
-  .premium-hero__marquee {
-    width: 100%;
-    min-width: 0;
-    overflow: hidden;
-    padding-block: 14px;
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
-  }
-
-  .premium-hero__focus-track,
-  .premium-hero__track {
-    display: flex;
-    align-items: center;
-    width: max-content;
-    direction: ltr;
-    will-change: transform;
-    animation: premiumHeroMarquee 52s linear infinite;
-  }
-
-  .premium-hero .premium-hero__focus-run,
-  .premium-hero .premium-hero__marquee-group {
-    display: flex;
-    flex: 0 0 auto;
-    align-items: center;
-    gap: var(--focus-gap);
-    width: max-content;
-    padding: 0 var(--focus-gap) 0 0;
-  }
-
-  .premium-hero__focus-item {
-    display: inline-flex;
-    flex: 0 0 auto;
-    align-items: center;
-    gap: var(--focus-gap);
-    color: var(--ink-soft);
-    font-size: clamp(13px, .6vw + 10px, 17px);
-    font-weight: 700;
-    line-height: 1.4;
-    white-space: nowrap;
-  }
-
-  .premium-hero__focus-item::after {
-    content: "";
-    flex: 0 0 8px;
-    width: 8px;
-    height: 8px;
-    border-radius: 2px;
-    background: linear-gradient(135deg, #8b5cf6, #e58a5c);
-    transform: rotate(45deg);
-  }
-
-  /* Video card */
-
-  .premium-hero__media {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    min-width: 0;
-    margin-inline: auto;
-  }
-
-  .premium-hero__media::before {
-    content: "";
-    position: absolute;
-    inset: 10% -6% -4%;
-    z-index: -1;
-    pointer-events: none;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, #7c3aed4d, transparent 75%);
-    filter: blur(34px);
-    animation: premiumHeroGlow 6s ease-in-out infinite alternate;
-  }
-
-  .premium-hero__card {
-    position: relative;
-    width: 100%;
-    min-width: 0;
-    overflow: hidden;
-    border-radius: clamp(18px, 3vw, 28px);
-    background: var(--dark-1);
-    box-shadow:
-      0 2px 4px #14111f14,
-      0 30px 60px -28px #5b21b6a6,
-      0 50px 90px -50px #14111fb3;
-    transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
-    transition: transform .35s ease-out, box-shadow .5s var(--hero-ease);
-    will-change: transform;
-  }
-
-  .premium-hero__visual {
-    position: relative;
-    isolation: isolate;
-    width: 100%;
-    min-width: 0;
-    padding: 0;
-    background: var(--dark-1);
-  }
-
-  .premium-hero__image-wrap {
-    position: relative;
-    width: 100%;
-    min-width: 0;
-    overflow: hidden;
-  }
-
-  .premium-hero__video-wrap {
-    aspect-ratio: var(--hero-video-ratio, 16 / 9);
-    background: var(--dark-1);
-  }
-
-  .premium-hero__video-wrap::after {
-    content: "";
-    position: absolute;
-    inset: auto 0 0;
-    z-index: 1;
-    height: 38%;
-    pointer-events: none;
-    background: linear-gradient(180deg, transparent, #14111f8c);
-  }
-
-  .premium-hero .premium-hero__video {
-    display: block;
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    border: 0;
-    background: var(--dark-1);
-  }
-
-  /* Tap area over the video (play / pause) */
-
-  .premium-hero__video-toggle {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .premium-hero__video-controls {
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    pointer-events: none;
-  }
-
-  .premium-hero__video-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .premium-hero__video-btn {
-    pointer-events: auto;
-    display: inline-grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border: 1px solid #ffffff40;
-    border-radius: 50%;
-    color: #fff;
-    background: #14111f99;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    cursor: pointer;
-    transition: transform .25s ease, background .25s ease;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  .premium-hero__video-btn:active {
-    transform: scale(.94);
-  }
-
-  .premium-hero__video-btn:focus-visible,
-  .premium-hero__video-toggle:focus-visible,
-  .premium-hero .premium-hero__button:focus-visible {
-    outline: 3px solid #a98af0;
-    outline-offset: 3px;
-  }
-
-  /* CTA panel */
-
-  .premium-hero__panel {
-    position: relative;
-    z-index: 3;
-    margin-top: -1px;
-    padding: clamp(12px, 2vw, 16px) clamp(12px, 2.4vw, 18px) clamp(14px, 2.2vw, 18px);
-    background:
-      radial-gradient(80% 90% at 100% 100%, #7c3aed4d, transparent 70%),
-      linear-gradient(180deg, var(--dark-1), var(--dark-2));
-  }
-
-  .premium-hero__actions {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-  }
-
-  .premium-hero .premium-hero__button.premium-hero__button {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    min-height: 54px;
-    padding: 13px clamp(14px, 4vw, 30px);
-    border: 1px solid #f3b01f;
-    border-radius: 14px;
-    color: #2e0c4d;
-    background: linear-gradient(180deg, #ffee82, #ffe04e 48%, #ffca30);
-    box-shadow:
-      inset 0 1px 0 #fff8c4,
-      inset 0 -2px 4px #f5b2144d,
-      0 4px 0 #d18f0a,
-      0 14px 24px -10px #f5b323a0;
-    font-family: inherit;
-    font-size: clamp(15px, 1.4vw, 17px);
-    font-weight: 800;
-    line-height: 1.35;
-    text-align: center;
-    text-decoration: none;
-    white-space: normal;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .premium-hero .premium-hero__button::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 50%;
-    z-index: -1;
-    pointer-events: none;
-    background: linear-gradient(180deg, #ffffff40, transparent);
-  }
-
-  .premium-hero .premium-hero__button::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -45%;
-    width: 32%;
-    z-index: -1;
-    pointer-events: none;
-    background: linear-gradient(100deg, transparent, #ffffff99, transparent);
-    transform: skewX(-20deg);
-    animation: premiumHeroShine 5.5s ease-in-out 2s infinite;
-  }
-
-  .premium-hero__button-arrow {
-    flex-shrink: 0;
-    transition: transform .25s var(--hero-ease);
-  }
-
-  /* Funnel feature section */
-
-  .premium-hero__showcase {
-    width: 100%;
-    min-width: 0;
-    margin-top: clamp(44px, 8vw, 96px);
-  }
-
-  .premium-hero .premium-hero__intro {
-    width: 100%;
-    max-width: 920px;
-    margin-inline: auto;
-    color: var(--ink);
-    font-family: "Bricolage Grotesque", sans-serif;
-    font-size: 36px;
-    font-weight: 600;
-    line-height: 1.25;
-    letter-spacing: -.02em;
-    text-align: center;
-    text-transform: none;
-    text-wrap: balance;
-  }
-
-  .premium-hero__intro-accent {
-    color: var(--violet-deep);
-  }
-
-  .premium-hero .premium-hero__points {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 20px;
-    width: 100%;
-    margin-top: clamp(26px, 4.4vw, 48px);
-    text-align: left;
-  }
-
-  .premium-hero__point {
-    --card-border: #e3d3ff;
-    --card-tint: #f3eaff;
-    --tile-color: #7c3aed;
-    --tile-base: #bc9be9;
-
-    position: relative;
-    overflow: hidden;
-    min-width: 0;
-    height: 100%;
-    padding: 26px 24px 30px;
-    border: 1px solid var(--card-border);
-    border-radius: 26px;
-    background:
-      radial-gradient(ellipse at 100% 0%, var(--card-tint), transparent 72%),
-      linear-gradient(150deg, #ffffffef, #ffffffc9);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    box-shadow:
-      inset 0 1px 0 #fff,
-      0 24px 38px -27px #5b21b680,
-      0 5px 12px -7px #5b21b62b;
-    transition: transform .4s var(--hero-ease), box-shadow .4s ease;
-  }
-
-  .premium-hero__point::after {
-    content: "";
-    position: absolute;
-    left: 24px;
-    right: 24px;
-    bottom: 0;
-    height: 3px;
-    border-radius: 3px 3px 0 0;
-    background: linear-gradient(90deg, var(--tile-color), transparent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform .5s var(--hero-ease);
-  }
-
-  .premium-hero__reveal.is-in .premium-hero__point {
-    animation: premiumHeroEnter .8s var(--hero-ease) backwards;
-    animation-delay: calc(var(--i, 0) * 100ms + 200ms);
-  }
-
-  .premium-hero__point--peach {
-    --card-border: #f3d1bd;
-    --card-tint: #ffeadb;
-    --tile-color: #e58a5c;
-    --tile-base: #e9b598;
-  }
-
-  .premium-hero__point--gold {
-    --card-border: #efddb0;
-    --card-tint: #fff3cd;
-    --tile-color: #b88619;
-    --tile-base: #dabc67;
-  }
-
-  .premium-hero__point-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    width: 100%;
-    min-width: 0;
-  }
-
-  .premium-hero__tile {
-    display: grid;
-    flex: 0 0 54px;
-    place-items: center;
-    width: 54px;
-    height: 54px;
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    color: var(--tile-color);
-    background: linear-gradient(145deg, #fff, var(--card-tint));
-    box-shadow: inset 0 1px 0 #fff, 0 5px 0 -1px var(--tile-base), 0 12px 20px -12px var(--tile-color);
-  }
-
-  .premium-hero__tile svg {
-    width: 25px;
-    height: 25px;
-    transform-origin: center;
-    transition: transform .45s var(--hero-ease);
-  }
-
-  .premium-hero__point-number {
-    display: grid;
-    flex: 0 0 38px;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    color: #5b3291;
-    background: #ffffffdc;
-    box-shadow: inset 0 1px 0 #fff, 0 4px 10px #5b21b608;
-    font-size: 15px;
-    font-weight: 800;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .premium-hero .premium-hero__point p {
-    margin-top: 24px;
-    color: var(--muted);
-    font-size: clamp(15px, 1.4vw, 17px);
-    font-weight: 600;
-    line-height: 1.65;
-    overflow-wrap: break-word;
-  }
-
-  /* Services marquee */
-
-  .premium-hero__carousel {
-    width: 100%;
-    min-width: 0;
-    margin-top: clamp(24px, 4vw, 48px);
-  }
-
-  .premium-hero__marquee {
-    padding-block: 18px;
-  }
-
-  .premium-hero__track {
-    animation-duration: 46s;
-  }
-
-  .premium-hero .premium-hero__marquee-group {
-    gap: var(--service-gap);
-    padding-right: var(--service-gap);
-  }
-
-  .premium-hero__service {
-    display: inline-flex;
-    flex: 0 0 auto;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 18px;
-    border: 1px solid #e5d7f7;
-    border-radius: 999px;
-    color: var(--muted);
-    background: #ffffffd9;
-    box-shadow: inset 0 1px 0 #fff, 0 10px 20px -16px #5b21b680;
-    font-size: 14px;
-    font-weight: 650;
-    line-height: 1.5;
-    white-space: nowrap;
-  }
-
-  .premium-hero__service-icon {
-    color: var(--violet);
-  }
-
-  .premium-hero__service-icon svg {
-    width: 19px;
-    height: 19px;
-  }
-
-  .premium-hero__promise:focus-within .premium-hero__focus-track,
-  .premium-hero__marquee:focus-within .premium-hero__track {
-    animation-play-state: paused;
-  }
-
-  /* Animation keyframes */
-
-  @keyframes premiumHeroEnter {
-    from { opacity: 0; transform: translateY(22px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes premiumHeroMarquee {
-    from { transform: translate3d(0, 0, 0); }
-    to { transform: translate3d(-50%, 0, 0); }
-  }
-
-  @keyframes premiumHeroPulse {
-    0%, 100% { box-shadow: 0 0 0 0 #7c3aed59; }
-    50% { box-shadow: 0 0 0 6px #7c3aed00; }
-  }
-
-  @keyframes premiumHeroDrift {
-    from { transform: translate3d(0, 0, 0) scale(1); }
-    to { transform: translate3d(3%, 5%, 0) scale(1.1); }
-  }
-
-  @keyframes premiumHeroGlow {
-    from { opacity: .65; }
-    to { opacity: 1; }
-  }
-
-  @keyframes premiumHeroSheen {
-    from { background-position: 0% 50%; }
-    to { background-position: 100% 50%; }
-  }
-
-  @keyframes premiumHeroShine {
-    0%, 55% { transform: translateX(0) skewX(-20deg); }
-    100% { transform: translateX(520%) skewX(-20deg); }
-  }
-
-  /* Desktop */
-
-  @media (min-width: 1024px) {
-    .premium-hero__stage {
-      grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr);
-      gap: clamp(36px, 4vw, 60px);
-    }
-
-    .premium-hero__media {
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: 0;
-    }
-  }
-
-  /* Tablet */
-
-  @media (max-width: 1023px) {
-    .premium-hero__copy {
-      align-items: center;
-      text-align: center;
-    }
-
-    .premium-hero__copy > .premium-hero__reveal {
-      width: 100%;
-    }
-
-    .premium-hero__pill {
-      justify-content: center;
-    }
-
-    .premium-hero .premium-hero__title {
-      text-align: center;
-    }
-
-    .premium-hero__title-middle {
-      display: block;
-      white-space: nowrap;
-    }
-
-    .premium-hero__title-accent {
-      display: inline;
-      margin-top: 0;
-      text-wrap: nowrap;
-    }
-
-    .premium-hero .premium-hero__subtitle {
-      max-width: 620px;
-      margin-inline: auto;
-      text-align: center;
-    }
-
-    .premium-hero .premium-hero__intro {
-      font-size: 32px;
-      line-height: 1.3;
-    }
-
-    .premium-hero .premium-hero__points {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      max-width: 760px;
-      margin-inline: auto;
-      margin-top: 30px;
-    }
-
-    .premium-hero__media {
-      max-width: 560px;
-    }
-  }
-
-  /* Mobile */
-
-  @media (max-width: 767px) {
-    .premium-hero {
-      --hero-gutter: 16px;
-      --focus-gap: 20px;
-      --service-gap: 10px;
-      padding-top: var(--hero-top-space, 20px);
-      padding-bottom: 28px;
-    }
-
-    .premium-hero__stage {
-      gap: 22px;
-    }
-
-    .premium-hero__copy {
-      align-items: center;
-      text-align: center;
-    }
-
-    .premium-hero__pill {
-      width: 100%;
-      justify-content: center;
-      margin-inline: auto;
-    }
-
-    .premium-hero .premium-hero__eyebrow {
-      position: relative;
-      display: flex;
-      width: 100%;
-      max-width: 100%;
-      min-width: 0;
-      align-items: center;
-      justify-content: center;
-      gap: 0;
-      padding: 10px 18px;
-      font-size: clamp(11px, 3.1vw, 13px);
-      line-height: 1.5;
-      white-space: normal;
-      text-align: center;
-      border-radius: 24px;
-      box-sizing: border-box;
-    }
-
-    .premium-hero .premium-hero__eyebrow span {
-      display: block;
-      flex: 1 1 100%;
-      width: 100%;
-      min-width: 0;
-      margin-inline: auto;
-      padding-inline: 12px;
-      text-align: center;
-      text-wrap: balance;
-      overflow-wrap: break-word;
-    }
-
-    .premium-hero .premium-hero__eyebrow::before {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      translate: 0 -50%;
-      flex: none;
-      width: 8px;
-      height: 8px;
-    }
-
-    .premium-hero .premium-hero__title {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 100%;
-      margin-top: 16px;
-      font-size: clamp(25px, 7.2vw, 40px);
-      line-height: 1.08;
-      letter-spacing: -.045em;
-      text-align: center;
-      text-wrap: initial;
-      overflow-wrap: normal;
-    }
-
-    .premium-hero__title-desktop {
-      display: none !important;
-    }
-
-    .premium-hero .premium-hero__title-mobile {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      width: 100%;
-      max-width: 100%;
-      white-space: nowrap;
-    }
-
-    .premium-hero__title-mobile-line {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      white-space: nowrap;
-      text-align: center;
-      line-height: 1.08;
-      letter-spacing: -.05em;
-    }
-
-    .premium-hero__title-mobile-revenue {
-      color: var(--violet);
-    }
-
-    .premium-hero__title-mobile-black {
-      color: var(--ink);
-    }
-
-    .premium-hero__title-lead,
-    .premium-hero__title-middle,
-    .premium-hero__title-tail {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      margin-inline: auto;
-      text-align: center;
-      white-space: nowrap;
-      line-height: 1.1;
-    }
-
-    /* Mobile heading is locked to exactly three centered lines:
-       Generate More / Revenue Without / Spending More */
-    .premium-hero__title-lead {
-      order: 1;
-    }
-
-    .premium-hero__title-middle {
-      order: 2;
-      font-size: 1em;
-      letter-spacing: -.045em;
-    }
-
-    .premium-hero__title-tail {
-      order: 3;
-      font-size: .88em;
-      letter-spacing: -.045em;
-    }
-
-    .premium-hero__title-accent,
-    .premium-hero__title-without {
-      display: inline;
-      white-space: nowrap;
-    }
-
-    .premium-hero .premium-hero__subtitle {
-      max-width: 480px;
-      margin-top: 12px;
-      font-size: 15px;
-      line-height: 1.65;
-      text-wrap: pretty;
-    }
-
-    .premium-hero__focus-slot {
-      margin-top: 18px;
-    }
-
-    .premium-hero__promise {
-      border-radius: 14px;
-    }
-
-    .premium-hero__focus-marquee {
-      padding-block: 12px;
-      -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
-      mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
-    }
-
-    .premium-hero__focus-track {
-      animation-duration: 38s;
-    }
-
-    .premium-hero__focus-item {
-      font-size: clamp(13px, 3.7vw, 15px);
-      line-height: 1.45;
-    }
-
-    .premium-hero__focus-item::after {
-      flex-basis: 7px;
-      width: 7px;
-      height: 7px;
-    }
-
-    .premium-hero__media {
-      width: 100%;
-      max-width: 100%;
-    }
-
-    .premium-hero__card {
-      border-radius: 18px;
-      transform: none;
-      box-shadow: 0 20px 40px -24px #5b21b6a6;
-    }
-
-    .premium-hero__video-controls {
-      left: 8px;
-      right: 8px;
-      bottom: 8px;
-    }
-
-    .premium-hero__video-btn {
-      width: 38px;
-      height: 38px;
-    }
-
-    .premium-hero__panel {
-      padding: 10px 10px 12px;
-    }
-
-    .premium-hero .premium-hero__button.premium-hero__button {
-      min-height: 50px;
-      padding: 12px 14px;
-      gap: 8px;
-      border-radius: 13px;
-      font-size: clamp(15px, 4.2vw, 16.5px);
-      line-height: 1.35;
-    }
-
-    .premium-hero__showcase {
-      margin-top: 44px;
-    }
-
-    .premium-hero .premium-hero__intro {
-      padding-inline: 0;
-      font-size: clamp(24px, 6.4vw, 30px);
-      line-height: 1.3;
-      letter-spacing: -.02em;
-    }
-
-    .premium-hero .premium-hero__points {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 24px;
-    }
-
-    .premium-hero__point {
-      padding: 16px 14px 20px;
-      border-radius: 18px;
-    }
-
-    .premium-hero__point::after {
-      left: 14px;
-      right: 14px;
-    }
-
-    .premium-hero__point-top {
-      align-items: center;
-      gap: 6px;
-    }
-
-    .premium-hero__tile {
-      flex-basis: 40px;
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-    }
-
-    .premium-hero__tile svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .premium-hero__point-number {
-      flex-basis: 28px;
-      width: 28px;
-      height: 28px;
-      border-radius: 9px;
-      font-size: 12px;
-    }
-
-    .premium-hero .premium-hero__point p {
-      margin-top: 14px;
-      font-size: clamp(13px, 3.6vw, 14.5px);
-      line-height: 1.55;
-    }
-
-    .premium-hero__carousel {
-      margin-top: 22px;
-    }
-
-    .premium-hero__marquee {
-      padding-block: 12px;
-    }
-
-    .premium-hero__track {
-      animation-duration: 40s;
-    }
-
-    .premium-hero__service {
-      gap: 8px;
-      padding: 9px 14px;
-      font-size: 13px;
-    }
-
-    .premium-hero__service-icon svg {
-      width: 18px;
-      height: 18px;
-    }
-  }
-
-  /* Small phones */
-
-  @media (max-width: 479px) {
-    .premium-hero {
-      --hero-gutter: 14px;
-      --focus-gap: 16px;
-      --service-gap: 8px;
-    }
-
-    .premium-hero .premium-hero__eyebrow {
-      gap: 7px;
-      padding: 8px 12px;
-      font-size: 11.5px;
-    }
-
-    .premium-hero .premium-hero__title {
-      font-size: clamp(24px, 7.2vw, 36px);
-    }
-
-    .premium-hero .premium-hero__subtitle {
-      font-size: 14.5px;
-    }
-
-    .premium-hero__stage {
-      gap: 20px;
-    }
-
-    .premium-hero .premium-hero__button.premium-hero__button {
-      font-size: 15px;
-    }
-
-    .premium-hero .premium-hero__intro {
-      font-size: 23px;
-      line-height: 1.32;
-    }
-
-    .premium-hero .premium-hero__points {
-      gap: 10px;
-    }
-
-    .premium-hero__point {
-      padding: 14px 12px 18px;
-      border-radius: 16px;
-    }
-
-    .premium-hero__point::after {
-      left: 12px;
-      right: 12px;
-    }
-
-    .premium-hero__point-top {
-      gap: 5px;
-    }
-
-    .premium-hero__tile {
-      flex-basis: 36px;
-      width: 36px;
-      height: 36px;
-    }
-
-    .premium-hero__tile svg {
-      width: 19px;
-      height: 19px;
-    }
-
-    .premium-hero__point-number {
-      flex-basis: 26px;
-      width: 26px;
-      height: 26px;
-      font-size: 11px;
-    }
-
-    .premium-hero .premium-hero__point p {
-      margin-top: 12px;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .premium-hero__video-btn {
-      width: 36px;
-      height: 36px;
-    }
-
-    .premium-hero__video-btn svg {
-      width: 18px;
-      height: 18px;
-    }
-  }
-
-  /* Extra narrow phones */
-
-  @media (max-width: 359px) {
-    .premium-hero {
-      --hero-gutter: 12px;
-      --focus-gap: 14px;
-    }
-
-    .premium-hero .premium-hero__title {
-      font-size: clamp(22px, 7vw, 25px);
-    }
-
-    .premium-hero__title-middle {
-      font-size: 1em;
-    }
-
-    .premium-hero__title-tail {
-      font-size: .88em;
-    }
-
-    .premium-hero .premium-hero__intro {
-      font-size: 21px;
-    }
-
-    .premium-hero .premium-hero__points {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 10px;
-    }
-
-    .premium-hero__point {
-      padding: 16px;
-    }
-
-    .premium-hero .premium-hero__point p {
-      font-size: 14px;
-    }
-
-    .premium-hero__panel {
-      padding-inline: 8px;
-    }
-
-    .premium-hero .premium-hero__button.premium-hero__button {
-      font-size: 14px;
-    }
-  }
-
-  /* Hover effects only on mouse devices */
-
-  @media (hover: hover) and (pointer: fine) {
-    .premium-hero__eyebrow {
-      transition: transform .3s ease, box-shadow .3s ease;
-    }
-
-    .premium-hero__eyebrow:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 28px -14px #7c3aedb3;
-    }
-
-    .premium-hero__promise:hover {
-      box-shadow: 0 22px 40px -24px #5b21b6b3;
-    }
-
-    .premium-hero__point:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 32px 46px -26px #5b21b68f;
-    }
-
-    .premium-hero__point:hover::after {
-      transform: scaleX(1);
-    }
-
-    .premium-hero__point:hover .premium-hero__tile svg {
-      transform: rotate(-6deg) scale(1.08);
-    }
-
-    .premium-hero__card:hover {
-      --lift: -5px;
-      box-shadow: 0 40px 70px -28px #5b21b6c4;
-    }
-
-    .premium-hero__video-btn:hover {
-      background: var(--violet);
-      transform: scale(1.06);
-    }
-
-    .premium-hero .premium-hero__button.premium-hero__button {
-      transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
-    }
-
-    .premium-hero .premium-hero__button.premium-hero__button:hover {
-      transform: translateY(-3px);
-      filter: brightness(1.04) saturate(1.05);
-      box-shadow: 0 7px 0 #d18f0a, 0 22px 36px -12px #f5b323c0;
-    }
-
-    .premium-hero__button:hover .premium-hero__button-arrow {
-      transform: translate(2px, -2px);
-    }
-
-    .premium-hero__service {
-      transition: transform .3s ease, border-color .3s ease;
-    }
-
-    .premium-hero__service:hover {
-      transform: translateY(-3px);
-      border-color: #cdb6f6;
-    }
-
-    .premium-hero__promise:hover .premium-hero__focus-track,
-    .premium-hero__marquee:hover .premium-hero__track {
-      animation-play-state: paused;
-    }
-  }
-
-  /* Reduced-motion accessibility */
-
-  @media (prefers-reduced-motion: reduce) {
-    .premium-hero *,
-    .premium-hero *::before,
-    .premium-hero *::after {
-      animation: none !important;
-      transition: none !important;
-      scroll-behavior: auto !important;
-    }
-
-    .premium-hero__reveal {
-      opacity: 1;
-      transform: none;
-    }
-
-    .premium-hero__card {
-      transform: none;
-    }
-
-    .premium-hero__focus-marquee,
-    .premium-hero__marquee {
-      padding-inline: var(--hero-gutter);
-      -webkit-mask-image: none;
-      mask-image: none;
-    }
-
-    .premium-hero__focus-track,
-    .premium-hero__track {
-      width: 100%;
-      transform: none;
-      flex-wrap: wrap;
-      justify-content: center;
-      white-space: normal;
-    }
-
-    .premium-hero .premium-hero__focus-run,
-    .premium-hero .premium-hero__marquee-group {
-      flex: 1 1 auto;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-      min-width: 0;
-      padding: 0;
-    }
-
-    .premium-hero__focus-run > li:not(:first-child),
-    .premium-hero__focus-track > [aria-hidden="true"],
-    .premium-hero__track > [aria-hidden="true"] {
-      display: none;
-    }
-
-    .premium-hero__focus-item,
-    .premium-hero__service {
-      flex: 0 1 auto;
-      min-width: 0;
-      max-width: 100%;
-      white-space: normal;
-      overflow-wrap: anywhere;
-    }
-
-    .premium-hero__focus-item {
-      text-align: center;
-    }
-
-    .premium-hero__focus-item::after {
-      display: none;
-    }
-  }
-`
+/* ==================== Main component ==================== */
 
 export default function Hero() {
   const tilt = useTilt()
@@ -1825,101 +518,113 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="premium-hero"
+      className="relative isolate w-full min-w-0 max-w-full overflow-x-clip bg-[radial-gradient(55%_42%_at_100%_0%,#efe6ff,transparent_70%),radial-gradient(40%_34%_at_0%_8%,#f6f0ff,transparent_72%),radial-gradient(60%_36%_at_85%_65%,#f3ecff,transparent_72%),#fff] pb-7 pt-[var(--hero-top-space,20px)] font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#14111f] antialiased md:pb-[clamp(28px,4vw,48px)] md:pt-[var(--hero-top-space,clamp(28px,5vw,72px))]"
       aria-labelledby="premium-hero-title"
     >
-      <style>{styles}</style>
+      <style>{keyframes}</style>
 
+      {/* Dotted texture + drifting blobs */}
       <span
-        className="premium-hero__blob premium-hero__blob--a"
         aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 [background-image:radial-gradient(#7c3aed17_1px,transparent_1px)] [background-size:30px_30px] [mask-image:linear-gradient(#000a,transparent_55%)] [-webkit-mask-image:linear-gradient(#000a,transparent_55%)]"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-[-8%] top-[4%] -z-10 aspect-square w-[min(46vw,520px)] animate-[heroDrift_16s_ease-in-out_infinite_alternate] rounded-full bg-[#7c3aed24] blur-[70px] motion-reduce:animate-none"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute left-[-10%] top-[52%] -z-10 aspect-square w-[min(40vw,440px)] animate-[heroDrift_16s_ease-in-out_-6s_infinite_alternate] rounded-full bg-[#ffeadb99] blur-[70px] motion-reduce:animate-none"
       />
 
-      <span
-        className="premium-hero__blob premium-hero__blob--b"
-        aria-hidden="true"
-      />
-
-      <div className="premium-hero__container">
-        <div className="premium-hero__stage">
-          {/* Hero content */}
-
-          <div className="premium-hero__copy">
-
+      <div className="mx-auto w-full min-w-0 max-w-[1180px] px-3 min-[360px]:px-3.5 min-[480px]:px-4 md:px-[clamp(16px,4vw,36px)]">
+        {/* ================= HERO STAGE ================= */}
+        <div className="grid grid-cols-1 items-center gap-5 min-[480px]:gap-[22px] md:gap-[clamp(24px,5vw,48px)] lg:grid-cols-[minmax(0,.94fr)_minmax(0,1.06fr)] lg:gap-[clamp(36px,4vw,60px)]">
+          {/* ---------- Copy ---------- */}
+          <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
+            {/* Pill (no dot icon) */}
             <Reveal className="w-full">
-              <div className="premium-hero__pill w-full">
-                <p className="premium-hero__eyebrow !m-0 !w-full flex-1 text-left">
-                  <span className="block w-full flex-1 text-left">
-                    We Don&rsquo;t Just Build Landing Pages; We Build Complete Automated Funnels.
-                  </span>
-                </p>
-              </div>
+              <p className="relative m-0 w-full overflow-hidden rounded-[26px] border border-[#e0d2ff] bg-[linear-gradient(180deg,#f6f1ff,#efe7ff)] px-4 py-3 text-center text-[clamp(14px,4vw,17px)] font-semibold leading-[1.55] text-[#2a2140] shadow-[inset_0_1px_0_#fff,0_10px_24px_-16px_rgba(124,58,237,.5)] [text-wrap:balance] after:pointer-events-none after:absolute after:inset-y-0 after:-left-[40%] after:w-[36%] after:animate-[heroShine_6s_ease-in-out_1.2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffffb3,transparent)] motion-reduce:after:hidden md:px-5 md:py-3.5 md:text-[clamp(16px,1.65vw,21px)] lg:text-left">
+                We Don&rsquo;t Just Build Landing Pages; We Build Complete
+                Automated Funnels.
+              </p>
             </Reveal>
 
-
-            <Reveal delay={90}>
+            {/* Title */}
+            <Reveal delay={90} className="w-full">
               <h1
                 id="premium-hero-title"
-                className="premium-hero__title"
+                className="font-display m-0 mt-4 w-full text-center text-[clamp(22px,7vw,38px)] font-extrabold leading-[1.08] tracking-[-0.045em] text-[#14111f] md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(38px,6vw,56px)] md:tracking-[-0.035em] lg:text-left lg:text-[clamp(38px,4.3vw,54px)]"
               >
-                <span className="premium-hero__title-desktop">
-                  <span className="premium-hero__title-lead">
-                    Generate More
+                {/* Desktop + tablet: three lines */}
+                <span className="block max-md:hidden">
+                  <span className="block">Generate More</span>
+
+                  <span className="block whitespace-nowrap">
+                    <span className={VIOLET_FLOW}>Revenue</span> Without
                   </span>
 
-                  <span className="premium-hero__title-middle">
-                    <span className="premium-hero__title-accent">Revenue</span>{' '}
-                    <span className="premium-hero__title-without">Without</span>
-                  </span>
-
-                  <span className="premium-hero__title-tail">
+                  <span className="block w-full whitespace-nowrap text-[.88em] tracking-[-0.04em]">
                     Spending More
                   </span>
                 </span>
 
-                <span className="premium-hero__title-mobile" aria-hidden="true">
-                  <span className="premium-hero__title-mobile-line">
-                    <span className="premium-hero__title-mobile-black">Generate More </span>
-                    <span className="premium-hero__title-mobile-revenue">Revenue</span>
+                {/* Phones: two lines that always fit */}
+                <span
+                  className="flex flex-col items-center gap-0.5 whitespace-nowrap md:hidden"
+                  aria-hidden="true"
+                >
+                  <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
+                    Generate More <span className={VIOLET_FLOW}>Revenue</span>
                   </span>
-                  <span className="premium-hero__title-mobile-line premium-hero__title-mobile-black">
+                  <span className="block w-full whitespace-nowrap text-center leading-[1.08] tracking-[-0.05em]">
                     Without Spending More
                   </span>
                 </span>
               </h1>
             </Reveal>
 
-            <Reveal delay={180}>
-              <p className="premium-hero__subtitle">
-                Stop Wasting Ad Spend on Low Conversion Pages.
-                Invest in a High-Converting Automated Funnel.
+            {/* Subtitle */}
+            <Reveal delay={180} className="w-full">
+              <p className="m-0 mx-auto mt-3 w-full max-w-[480px] text-[clamp(14.5px,.8vw+12px,18.5px)] font-medium leading-[1.65] text-[#5b5870] [text-wrap:pretty] md:mt-[clamp(14px,2vw,20px)] md:max-w-[620px] lg:mx-0 lg:max-w-[540px]">
+                Stop Wasting Ad Spend on Low Conversion Pages. Invest in a
+                High-Converting Automated Funnel.
               </p>
             </Reveal>
 
-            <Reveal delay={260} className="premium-hero__focus-slot">
-              <div className="premium-hero__promise">
+            {/* Promise marquee */}
+            <Reveal delay={260} className="mt-[18px] w-full md:mt-[clamp(20px,3vw,32px)]">
+              <div className="min-w-0 overflow-hidden rounded-[14px] border border-[#e0d2ff] bg-[linear-gradient(110deg,#ffffffd9,#f7f2ffd9_65%,#fff4ecd9)] shadow-[inset_0_1px_0_#fff,0_18px_36px_-26px_rgba(91,33,182,.55)] [-webkit-backdrop-filter:blur(18px)] [backdrop-filter:blur(18px)] transition-shadow duration-300 hover:shadow-[inset_0_1px_0_#fff,0_22px_40px_-24px_rgba(91,33,182,.7)] md:rounded-[18px]">
                 <div
-                  className="premium-hero__focus-marquee"
+                  className={`group w-full min-w-0 overflow-hidden py-3 outline-none md:py-3.5 ${MASK}`}
                   tabIndex={0}
                   role="region"
                   aria-label="Funnel performance promise. Focus to pause scrolling."
                 >
-                  <div className="premium-hero__focus-track">
+                  <div className="flex w-max animate-[heroMarquee_38s_linear_infinite] items-center will-change-transform group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_52s_linear_infinite]">
                     {[0, 1].map((copy) => (
                       <ul
                         key={copy}
-                        className="premium-hero__focus-run"
+                        className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center ${FOCUS_RUN_GAP} ${
+                          copy === 1 ? 'motion-reduce:hidden' : ''
+                        }`}
                         aria-hidden={copy === 1 ? true : undefined}
                       >
                         {focusLines.map((line, index) => (
                           <li
                             key={`${copy}-${index}`}
-                            className="premium-hero__focus-item"
+                            className={`inline-flex flex-none items-center whitespace-nowrap text-[clamp(13px,3.7vw,15px)] font-bold leading-[1.45] text-[#2a2140] motion-reduce:whitespace-normal motion-reduce:text-center md:text-[clamp(14px,.6vw+10px,17px)] ${FOCUS_GAP} ${
+                              index > 0 ? 'motion-reduce:hidden' : ''
+                            }`}
                             aria-hidden={
                               copy === 0 && index > 0 ? true : undefined
                             }
                           >
                             <span>{line}</span>
+                            <span
+                              aria-hidden="true"
+                              className="h-[7px] w-[7px] flex-none rotate-45 rounded-sm bg-[linear-gradient(135deg,#8b5cf6,#e58a5c)] motion-reduce:hidden md:h-2 md:w-2"
+                            />
                           </li>
                         ))}
                       </ul>
@@ -1930,95 +635,85 @@ export default function Hero() {
             </Reveal>
           </div>
 
-          {/* Hero video and CTA */}
+          {/* ---------- Video + CTA ---------- */}
+          <Reveal
+            delay={200}
+            className="relative mx-auto w-full max-w-full md:max-w-[560px] lg:ml-auto lg:mr-0 lg:max-w-[600px]"
+          >
+            {/* Violet glow behind the card */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -bottom-[4%] -z-10 inset-x-[-6%] top-[10%] animate-[heroGlow_6s_ease-in-out_infinite_alternate] rounded-full bg-[radial-gradient(closest-side,#7c3aed4d,transparent_75%)] blur-[34px] motion-reduce:animate-none"
+            />
 
-          <Reveal delay={200} className="premium-hero__media">
             <div
-              className="premium-hero__card"
               ref={tilt.ref}
               onPointerMove={tilt.onPointerMove}
               onPointerLeave={tilt.onPointerLeave}
+              className="relative w-full min-w-0 overflow-hidden rounded-[18px] bg-[#1b1233] shadow-[0_20px_40px_-24px_rgba(91,33,182,.65)] transition-[transform,box-shadow] duration-[350ms] ease-out md:rounded-[clamp(18px,3vw,28px)] md:shadow-[0_2px_4px_#14111f14,0_30px_60px_-28px_#5b21b6a6,0_50px_90px_-50px_#14111fb3] md:will-change-transform md:[transform:perspective(1100px)_rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))_translateY(var(--lift,0px))] md:hover:[--lift:-5px] md:hover:shadow-[0_2px_4px_#14111f14,0_40px_70px_-28px_#5b21b6c4,0_50px_90px_-50px_#14111fb3] md:motion-reduce:[transform:none]"
             >
-              <div className="premium-hero__visual">
+              <div className="relative isolate w-full min-w-0 bg-[#1b1233]">
                 <HeroVideo />
               </div>
 
-              <div className="premium-hero__panel">
-                <div className="premium-hero__actions">
-                  <Button className="site-cta--revenue premium-hero__button">
-                    Yes! Let's Grow My Revenue
-                  </Button>
+              <div className="relative z-[3] -mt-px bg-[radial-gradient(80%_90%_at_100%_100%,#7c3aed4d,transparent_70%),linear-gradient(180deg,#1b1233,#140d27)] px-2.5 pb-3 pt-2.5 min-[360px]:px-2.5 md:px-[clamp(12px,2.4vw,18px)] md:pb-[clamp(14px,2.2vw,18px)] md:pt-[clamp(12px,2vw,16px)]">
+                <div className="flex w-full justify-center">
+                  <Button className={HERO_BTN}>Yes! Let's Grow My Revenue</Button>
                 </div>
               </div>
             </div>
           </Reveal>
         </div>
 
-        {/* Funnel features */}
-
-        <Reveal className="premium-hero__showcase">
+        {/* ================= FUNNEL FEATURES ================= */}
+        <Reveal className="mt-11 w-full md:mt-[clamp(44px,8vw,96px)]">
           <section aria-labelledby="premium-hero-funnel-heading">
             <h2
               id="premium-hero-funnel-heading"
-              className="premium-hero__intro"
+              className="font-display m-0 mx-auto w-full max-w-[920px] text-center text-[clamp(22px,4.6vw+6px,36px)] font-semibold normal-case leading-[1.3] tracking-[-0.02em] text-[#14111f] [text-wrap:balance]"
             >
               At{' '}
-              <span className="premium-hero__intro-accent">
-                Creative Crew,
-              </span>{' '}
+              <span className="font-bold text-[#5b21b6]">Creative Crew,</span>{' '}
               We Simplify Growth With A Complete Funnel System That Works
               Seamlessly.
             </h2>
 
-            <ul className="premium-hero__points">
+            <ul className="m-0 mx-auto mt-6 grid w-full list-none grid-cols-1 gap-2.5 p-0 text-left min-[360px]:grid-cols-2 min-[480px]:gap-3 md:mt-[30px] md:max-w-[760px] md:gap-5 lg:mt-[clamp(26px,4.4vw,48px)] lg:max-w-none lg:grid-cols-4">
               {points.map((point, index) => (
-                <li
-                  key={point.text}
-                  className={`premium-hero__point premium-hero__point--${point.tone}`}
-                  style={{ '--i': index }}
-                >
-                  <div className="premium-hero__point-top">
-                    <IconTile name={point.icon} tone={point.tone} />
-
-                    <span
-                      className="premium-hero__point-number"
-                      aria-hidden="true"
-                    >
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                  </div>
-
-                  <p>{point.text}</p>
-                </li>
+                <PointCard key={point.text} point={point} index={index} />
               ))}
             </ul>
           </section>
         </Reveal>
       </div>
 
-      {/* Services marquee */}
-
-      <Reveal className="premium-hero__carousel">
+      {/* ================= SERVICES MARQUEE (full width) ================= */}
+      <Reveal className="mt-[22px] w-full md:mt-[clamp(24px,4vw,48px)]">
         <div
-          className="premium-hero__marquee"
+          className={`group w-full min-w-0 overflow-hidden py-3 outline-none md:py-[18px] ${MASK}`}
           tabIndex={0}
           role="region"
           aria-label="Landing page services. Focus to pause scrolling."
         >
-          <div className="premium-hero__track">
+          <div className="flex w-max animate-[heroMarquee_40s_linear_infinite] items-center will-change-transform group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center md:animate-[heroMarquee_46s_linear_infinite]">
             {[0, 1].map((copy) => (
               <ul
                 key={copy}
-                className="premium-hero__marquee-group"
+                className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-3 motion-reduce:p-0 ${SERVICE_RUN_GAP} ${
+                  copy === 1 ? 'motion-reduce:hidden' : ''
+                }`}
                 aria-hidden={copy === 1 ? true : undefined}
               >
                 {services.map((service) => (
                   <li
                     key={service.text}
-                    className="premium-hero__service"
+                    className="inline-flex flex-none items-center gap-2 whitespace-nowrap rounded-full border border-[#e5d7f7] bg-white/85 px-3.5 py-[9px] text-[13px] font-[650] leading-normal text-[#5b5870] shadow-[inset_0_1px_0_#fff,0_10px_20px_-16px_rgba(91,33,182,.5)] transition-[transform,border-color] duration-300 hover:-translate-y-[3px] hover:border-[#cdb6f6] motion-reduce:whitespace-normal motion-reduce:transition-none md:gap-2.5 md:px-[18px] md:py-3 md:text-sm"
                   >
-                    <span className="premium-hero__service-icon">
-                      <Icon name={service.icon} />
+                    <span className="text-[#7c3aed]">
+                      <Icon
+                        name={service.icon}
+                        className="h-[18px] w-[18px] md:h-[19px] md:w-[19px]"
+                      />
                     </span>
 
                     <span>{service.text}</span>
@@ -2032,3 +727,48 @@ export default function Hero() {
     </section>
   )
 }
+
+/* ==================== Font + keyframes (only non-utility CSS) ==================== */
+
+const keyframes = `
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+.font-display {
+  font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+@keyframes heroMarquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes heroDrift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(3%, 5%, 0) scale(1.1); }
+}
+
+@keyframes heroGlow {
+  from { opacity: .65; }
+  to { opacity: 1; }
+}
+
+@keyframes heroSheen {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
+}
+
+@keyframes heroShine {
+  0%, 55% { transform: translateX(0) skewX(-20deg); }
+  100% { transform: translateX(520%) skewX(-20deg); }
+}
+
+@keyframes heroBob {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -3px, 0); }
+}
+
+@keyframes heroRing {
+  0% { opacity: .7; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+`

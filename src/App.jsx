@@ -19,7 +19,7 @@ export default function App() {
         <ImageCarousel />
         <Video />
         <Process />
-        <Audience />
+        {/* <Audience /> */}
         <Why />
         <FAQ />
       </main>

@@ -1,6 +1,14 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { Button } from './ui'
 
+/* ==========================================================
+   Problems.jsx  (100% Tailwind utility classes)
+   - Only the Google font import, keyframes and .font-display
+     live in the tiny <style> block at the bottom of this file.
+   - Gradients use arbitrary values, so they work on
+     Tailwind v3 AND v4.
+   ========================================================== */
+
 /* ==================== Content ==================== */
 
 const ctaNote = ''
@@ -64,6 +72,22 @@ const items = [
 ]
 
 const numberFormatter = new Intl.NumberFormat('en-US')
+
+/* ==================== Shared Tailwind class strings ==================== */
+
+// Purple gradient text
+const GRADIENT_TEXT =
+  'bg-[linear-gradient(110deg,#6a359b,#9a5ad4_55%,#6a359b)] bg-clip-text text-transparent'
+
+// Pill label (same look for both sections, same gap under it)
+const PILL =
+  'mb-3.5 flex w-fit max-w-full items-center justify-center gap-2.5 rounded-full border border-[#ddcdf0] ' +
+  'bg-[linear-gradient(180deg,#ffffffe6,#f6effbc0)] px-[13px] py-[9px] text-[11px] font-[650] leading-[1.6] ' +
+  'text-[#6b3b8c] shadow-[0_8px_24px_#68428a0d,inset_0_1px_0_#fff] [text-wrap:balance] ' +
+  'md:px-[18px] md:py-2.5 md:text-xs'
+
+const PILL_DOT =
+  'h-2 w-2 shrink-0 rounded-full bg-[linear-gradient(135deg,#a066d6,#7542a4)] shadow-[0_0_0_4px_#8750b814] max-[359px]:hidden'
 
 /* ==================== Motion hooks ==================== */
 
@@ -191,36 +215,39 @@ function Reveal({
       {...props}
       ref={ref}
       className={[
-        'comparison-reveal',
-        ready ? 'is-motion-ready' : '',
-        visible ? 'is-visible' : '',
+        'min-w-0',
+        ready
+          ? 'transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(.22,1,.36,1)]'
+          : '',
+        ready && !visible ? 'translate-y-[22px] opacity-0' : 'translate-y-0 opacity-100',
         className,
       ]
         .filter(Boolean)
         .join(' ')}
-      style={{ ...style, '--reveal-delay': `${delay}ms` }}
+      style={{ ...style, transitionDelay: ready ? `${delay}ms` : undefined }}
     >
       {children}
     </Tag>
   )
 }
 
-function Icon({ type, className = '' }) {
+function Icon({ type, className = 'h-6 w-6', strokeWidth = 2.2 }) {
   return (
     <svg
-      className={className}
+      className={`block shrink-0 ${className}`}
       width="24"
       height="24"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.2"
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
       focusable="false"
     >
       {type === 'check' && <path d="m5 12 4 4L19 6" />}
+      {type === 'cross' && <path d="M6 6l12 12M18 6 6 18" />}
       {type === 'arrow' && <path d="M5 12h14M13 6l6 6-6 6" />}
       {type === 'enquiry' && (
         <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z" />
@@ -229,11 +256,54 @@ function Icon({ type, className = '' }) {
   )
 }
 
+/* ---------- Liquid glass status icon ----------
+   type="cross" -> red glass tile with a cut (X)
+   type="check" -> green glass tile with a right (tick)
+   No outer shadow or glow, so the tile lines up exactly with the text.
+   Every class is written out in full so Tailwind can see it. */
+
+const GLASS_TONES = {
+  cross: {
+    glass:
+      'bg-[linear-gradient(145deg,rgba(255,255,255,.9),rgba(255,255,255,.3)_45%,rgba(240,84,110,.5))] ' +
+      'text-[#d12f4a] ' +
+      'shadow-[inset_0_2px_0_rgba(255,255,255,1),inset_0_-8px_12px_-6px_rgba(240,84,110,.55),inset_0_0_0_1px_rgba(255,255,255,.45)]',
+  },
+  check: {
+    glass:
+      'bg-[linear-gradient(145deg,rgba(255,255,255,.9),rgba(255,255,255,.3)_45%,rgba(34,192,122,.5))] ' +
+      'text-[#13804f] ' +
+      'shadow-[inset_0_2px_0_rgba(255,255,255,1),inset_0_-8px_12px_-6px_rgba(34,192,122,.55),inset_0_0_0_1px_rgba(255,255,255,.45)]',
+  },
+}
+
+function StatusIcon({ type }) {
+  const tone = GLASS_TONES[type]
+
+  return (
+    <span
+      aria-hidden="true"
+      className={`relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[13px] border border-white/90 backdrop-blur-xl backdrop-saturate-200 transition-transform duration-300 ease-out group-hover:scale-110 motion-reduce:transition-none min-[360px]:h-11 min-[360px]:w-11 min-[360px]:rounded-[14px] sm:h-12 sm:w-12 sm:rounded-2xl lg:h-14 lg:w-14 lg:rounded-[18px] ${tone.glass}`}
+    >
+      {/* Top gloss */}
+      <span className="pointer-events-none absolute left-1 right-1 top-[3px] h-1/2 rounded-b-[50%] rounded-t-[10px] bg-[linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,0))] lg:left-1.5 lg:right-1.5 lg:rounded-t-[14px]" />
+      {/* Tiny specular highlight */}
+      <span className="pointer-events-none absolute left-1.5 top-1.5 h-1 w-2.5 -rotate-[30deg] rounded-full bg-white/90 lg:left-2 lg:top-2 lg:h-1.5 lg:w-3" />
+
+      <Icon
+        type={type}
+        strokeWidth={3.2}
+        className="relative z-10 h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7"
+      />
+    </span>
+  )
+}
+
 function Connector() {
   return (
-    <div className="comparison-link" aria-hidden="true">
-      <span className="comparison-link-arrow">
-        <Icon type="arrow" />
+    <div className="hidden place-items-center md:grid" aria-hidden="true">
+      <span className="grid h-[34px] w-[34px] animate-[linkNudge_2.8s_ease-in-out_infinite] place-items-center rounded-full border border-[#ddcdf0] bg-white/85 text-[#7542a4] shadow-[0_5px_14px_#7542a410] motion-reduce:animate-none">
+        <Icon type="arrow" className="h-4 w-4" />
       </span>
     </div>
   )
@@ -242,19 +312,24 @@ function Connector() {
 function RevenueButton({ intro = false }) {
   return (
     <Button
-      className={`site-cta--revenue comparison-cta-button ${intro ? 'comparison-intro-button' : ''
-        }`}
+      className={`site-cta--revenue comparison-cta-button ${
+        intro ? 'comparison-intro-button' : ''
+      } max-md:w-full max-md:max-w-[420px]`}
     >
       Yes! Let's Grow My Revenue
     </Button>
   )
 }
 
-function ProofVisual() {
+function ProofVisual({ playing }) {
+  const play = playing
+    ? '[animation-play-state:running]'
+    : '[animation-play-state:paused]'
+
   if (proofImage) {
     return (
       <img
-        className="comparison-proof-photo"
+        className="block aspect-[4/3] h-auto w-full rounded-[17px] object-cover shadow-[0_14px_32px_#30204516] md:rounded-[20px]"
         src={proofImage}
         alt={proofImageAlt}
         width="640"
@@ -266,55 +341,83 @@ function ProofVisual() {
   }
 
   return (
-    <div className="comparison-proof-stage">
-      <div className="comparison-proof-phone">
-        <div className="comparison-proof-phone-notch" aria-hidden="true" />
+    <div className="flex min-w-0 flex-nowrap items-center justify-center gap-[clamp(8px,2.5vw,14px)] md:flex-wrap md:gap-7 lg:gap-6">
+      {/* Phone */}
+      <div
+        className={`relative w-[48%] min-w-0 max-w-full basis-[48%] animate-[phoneFloat_7s_ease-in-out_infinite] rounded-[23px] border-4 border-[#302045] bg-white px-2 pb-[11px] pt-6 shadow-[0_18px_28px_#3020451c] motion-reduce:animate-none md:w-[202px] md:flex-none md:basis-[202px] md:rounded-[30px] md:border-[6px] md:px-3 md:pb-4 md:pt-[27px] ${play}`}
+      >
+        <div
+          className="absolute left-1/2 top-0 h-3 w-[76px] -translate-x-1/2 rounded-b-[10px] bg-[#302045]"
+          aria-hidden="true"
+        />
 
-        <div className="comparison-proof-ad-head" aria-hidden="true">
-          <span className="comparison-proof-avatar" />
-          <span className="comparison-proof-bar comparison-proof-bar--head" />
-          <span className="comparison-proof-sponsored">Sponsored</span>
+        <div
+          className="mb-3 grid grid-cols-[25px_minmax(0,1fr)] items-center gap-x-2 gap-y-[3px]"
+          aria-hidden="true"
+        >
+          <span className="row-span-2 h-[25px] w-[25px] rounded-full bg-[linear-gradient(135deg,#9a5ad4,#e1c9f5)]" />
+          <span className="block h-1.5 w-[76%] rounded-full bg-[#e8dff0]" />
+          <span className="text-[8px] text-[#6c607e]">Sponsored</span>
         </div>
 
-        <div className="comparison-proof-ad-image" aria-hidden="true">
-          <img src="/imge/Neeraj10.png" alt="" loading="lazy" />
+        <div
+          className="relative aspect-[1.12] overflow-hidden rounded-[13px] bg-[linear-gradient(145deg,#eee2fa,#d9c2ed)]"
+          aria-hidden="true"
+        >
+          <img
+            src="/imge/Neeraj10.png"
+            alt=""
+            loading="lazy"
+            className="block h-full w-full object-cover"
+          />
         </div>
 
-        <div className="comparison-proof-ad-lines" aria-hidden="true">
-          <span className="comparison-proof-bar comparison-proof-bar--strong" />
-          <span className="comparison-proof-bar" />
-          <span className="comparison-proof-bar comparison-proof-bar--short" />
+        <div className="grid gap-2 py-[15px]" aria-hidden="true">
+          <span className="block h-1.5 w-[90%] rounded-full bg-[#bfa4d6]" />
+          <span className="block h-1.5 w-full rounded-full bg-[#e8dff0]" />
+          <span className="block h-1.5 w-[64%] rounded-full bg-[#e8dff0]" />
         </div>
 
         {/* Same Button as the other CTAs, so it opens the same form popup */}
-        <Button className="site-cta--revenue comparison-proof-ad-button">
+        <Button className="site-cta--revenue !relative !m-0 !flex !min-h-0 !w-full !min-w-0 !items-center !justify-center !gap-2 !rounded-[9px] !border !border-[#f3b01f] !bg-[linear-gradient(180deg,#ffee82,#ffe04e_48%,#ffca30)] !p-2.5 !text-[10px] !font-extrabold !leading-[1.4] !text-[#2e0c4d] !shadow-[inset_0_1px_0_#fff8c4,0_3px_0_0_#d18f0a,0_8px_12px_-6px_#f5b323a0] active:!translate-y-0.5">
           <span>Learn more</span>
-
         </Button>
       </div>
 
-      <div className="comparison-proof-notes" aria-hidden="true">
-        <div className="comparison-proof-note">
-          <span className="comparison-proof-note-icon">
-            <Icon type="enquiry" />
+      {/* Notes */}
+      <div
+        className="min-w-0 flex-1 basis-0 md:max-w-[300px] md:basis-[190px]"
+        aria-hidden="true"
+      >
+        <div
+          className={`flex animate-[noteFloat_8s_ease-in-out_infinite] items-start gap-2 rounded-[14px] border border-[#e4d8f3] bg-white/95 px-[9px] py-[11px] shadow-[0_10px_24px_#7542a410,inset_0_1px_0_#fff] motion-reduce:animate-none md:gap-3 md:rounded-[18px] md:px-3.5 md:py-[17px] ${play}`}
+        >
+          <span className="grid h-[27px] w-[27px] shrink-0 animate-[iconBob_5.2s_ease-in-out_infinite] place-items-center rounded-[10px] border border-[#e0cfee] bg-[linear-gradient(145deg,#fff,#f0e4fa)] text-[#7542a4] motion-reduce:animate-none md:h-8 md:w-8 md:rounded-[13px]">
+            <Icon type="enquiry" className="h-[15px] w-[15px] md:h-[17px] md:w-[17px]" />
           </span>
 
-          <div>
-            <strong>New enquiry</strong>
-            <p>“Hi, could you share pricing and availability?”</p>
+          <div className="min-w-0">
+            <strong className="block text-[10px] leading-[1.45] md:text-xs">New enquiry</strong>
+            <p className="mt-1.5 text-[9.5px] leading-[1.55] text-[#6c607e] md:text-[11px] md:leading-[1.65]">
+              “Hi, could you share pricing and availability?”
+            </p>
           </div>
         </div>
 
-        <span className="comparison-proof-note-link" />
+        <span className="ml-[21px] block h-4 w-px bg-[linear-gradient(#b99bd4,#b4d8c3)] md:ml-[30px] md:h-[22px]" />
 
-        <div className="comparison-proof-note comparison-proof-note--done">
-          <span className="comparison-proof-note-icon">
-            <Icon type="check" />
+        <div
+          className={`flex animate-[noteFloat_8s_ease-in-out_infinite] items-start gap-2 rounded-[14px] border border-[#cfe5da] bg-[linear-gradient(140deg,#fff,#eef9f2)] px-[9px] py-[11px] shadow-[0_10px_24px_#7542a410,inset_0_1px_0_#fff] [animation-delay:-3s] motion-reduce:animate-none md:gap-3 md:rounded-[18px] md:px-3.5 md:py-[17px] ${play}`}
+        >
+          <span className="grid h-[27px] w-[27px] shrink-0 animate-[iconBob_5.2s_ease-in-out_infinite] place-items-center rounded-[10px] border border-[#cfe5da] bg-[#e7f5ec] text-[#20734e] motion-reduce:animate-none md:h-8 md:w-8 md:rounded-[13px]">
+            <Icon type="check" className="h-[15px] w-[15px] md:h-[17px] md:w-[17px]" />
           </span>
 
-          <div>
-            <strong>Booking confirmed</strong>
-            <p>Your team continues the conversation.</p>
+          <div className="min-w-0">
+            <strong className="block text-[10px] leading-[1.45] md:text-xs">Booking confirmed</strong>
+            <p className="mt-1.5 text-[9.5px] leading-[1.55] text-[#6c607e] md:text-[11px] md:leading-[1.65]">
+              Your team continues the conversation.
+            </p>
           </div>
         </div>
       </div>
@@ -322,1275 +425,60 @@ function ProofVisual() {
   )
 }
 
-/* ==================== Styles ==================== */
-
-const styles = `
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Inter:wght@400;500;600;700;800&display=swap');
-
-.landing-comparison {
-  --c-ink: #302045;
-  --c-muted: #6c607e;
-  --c-red: #b83e51;
-  --c-green: #20734e;
-  --c-purple: #7542a4;
-
-  /* Gap between a pill label and the heading under it.
-     One value, used by BOTH sections, on desktop AND mobile. */
-  --c-eyebrow-gap: 14px;
-
-  /* Amber Glow button look (same as the Hero.jsx button) */
-  --btn-text: #2e0c4d;
-  --btn-bg: linear-gradient(180deg, #ffee82 0%, #ffe04e 48%, #ffca30 100%);
-  --btn-border: #f3b01f;
-  --btn-shadow:
-    inset 0 1px 0 #fff8c4,
-    inset 0 -2px 4px #f5b2144d,
-    0 5px 0 0 #d18f0a,
-    0 16px 28px -10px #f5b323a0;
-  --btn-shadow-active:
-    inset 0 1px 0 #fff8c4,
-    inset 0 -2px 4px #f5b2144d,
-    0 1px 0 0 #d18f0a,
-    0 8px 16px -8px #f5b323a0;
-  --btn-shadow-hover:
-    inset 0 1px 0 #fff8c4,
-    inset 0 -2px 4px #f5b2144d,
-    0 8px 0 0 #d18f0a,
-    0 24px 38px -12px #f5b323c0;
-
-  --c-ease: cubic-bezier(.22, 1, .36, 1);
-  --c-ease-spring: cubic-bezier(.34, 1.56, .64, 1);
-  position: relative;
-  isolation: isolate;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  overflow-x: clip;
-  padding: clamp(64px, 8vw, 116px) 0;
-  color: var(--c-ink);
-  background:
-    radial-gradient(ellipse at 6% 6%, #eee3ffc0, transparent 42%),
-    radial-gradient(ellipse at 96% 82%, #e9dcfb90, transparent 42%),
-    linear-gradient(180deg, #fff, #fcfaff 60%, #f8f3ff);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
-    BlinkMacSystemFont, "Segoe UI", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-.landing-comparison,
-.landing-comparison *,
-.landing-comparison *::before,
-.landing-comparison *::after {
-  box-sizing: border-box;
-}
-
-.landing-comparison h2,
-.landing-comparison h3,
-.landing-comparison p {
-  overflow-wrap: anywhere;
-  margin-block: 0;
-}
-
-.landing-comparison svg {
-  display: block;
-  flex-shrink: 0;
-  max-width: 100%;
-}
-
-.landing-comparison img {
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-
-.landing-comparison::before,
-.landing-comparison::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  width: min(30vw, 360px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(circle, #d9c2f860, transparent 70%);
-}
-
-.landing-comparison::before { top: 0; left: 0; }
-.landing-comparison::after { bottom: 0; right: 0; }
-
-.comparison-container {
-  width: min(1200px, calc(100% - 48px));
-  min-width: 0;
-  margin-inline: auto;
-}
-
-/* ---------- Entrances ---------- */
-
-.comparison-reveal {
-  min-width: 0;
-}
-
-.comparison-reveal.is-motion-ready:not(.is-visible) {
-  opacity: 0;
-  transform: translate3d(0, 22px, 0);
-}
-
-.comparison-reveal.is-motion-ready {
-  transition:
-    opacity 800ms var(--c-ease) var(--reveal-delay, 0ms),
-    transform 800ms var(--c-ease) var(--reveal-delay, 0ms);
-}
-
-.comparison-reveal.is-visible {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
-/* ---------- Intro ---------- */
-
-.comparison-intro {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr);
-  align-items: center;
-  gap: clamp(32px, 5vw, 72px);
-  margin-bottom: clamp(64px, 8vw, 100px);
-}
-
-.comparison-intro-left,
-.comparison-intro-right,
-.comparison-proof-left,
-.comparison-proof-right {
-  min-width: 0;
-}
-
-/* Same pill look as .comparison-eyebrow */
-.comparison-intro-eyebrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: fit-content;
-  max-width: 100%;
-  margin: 0 0 22px;
-  padding: 10px 18px;
-  border: 1px solid #ddcdf0;
-  border-radius: 999px;
-  color: #6b3b8c;
-  background: linear-gradient(180deg, #ffffffe6, #f6effbc0);
-  box-shadow: 0 8px 24px #68428a0d, inset 0 1px 0 #fff;
-  font-size: 12px;
-  font-weight: 650;
-  line-height: 1.6;
-  text-wrap: balance;
-}
-
-.comparison-intro-eyebrow::before,
-.comparison-eyebrow::before {
-  content: "";
-  flex: 0 0 8px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #a066d6, #7542a4);
-  box-shadow: 0 0 0 4px #8750b814;
-}
-
-.comparison-intro h2,
-.comparison-header h2,
-.comparison-proof-title,
-.comparison-cta h3 {
-  margin: 0;
-  font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui,
-    -apple-system, "Segoe UI", sans-serif;
-  font-weight: 800;
-  letter-spacing: -.035em;
-  text-wrap: balance;
-}
-
-.comparison-intro h2 {
-  font-size: clamp(30px, 4vw, 48px);
-  line-height: 1.16;
-}
-
-.comparison-intro h2 span,
-.comparison-header h2 span,
-.comparison-proof-title span,
-.comparison-proof-number {
-  color: var(--c-purple);
-  background: linear-gradient(110deg, #6a359b, #9a5ad4 55%, #6a359b);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.comparison-intro-card {
-  position: relative;
-  padding: clamp(26px, 3vw, 40px);
-  border: 1px solid #e4d8f3;
-  border-radius: 28px;
-  background: linear-gradient(150deg, #ffffffee, #f8f2fdd0);
-  box-shadow: 0 18px 48px #5b21b611, inset 0 1px 0 #fff;
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  transition:
-    transform 450ms var(--c-ease),
-    box-shadow 450ms ease,
-    border-color 350ms ease;
-}
-
-.comparison-intro-lead {
-  margin: 0;
-  color: var(--c-ink);
-  font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui,
-    -apple-system, "Segoe UI", sans-serif;
-  font-size: clamp(19px, 1.9vw, 23px);
-  font-weight: 700;
-  line-height: 1.4;
-  letter-spacing: -.02em;
-  text-wrap: balance;
-}
-
-.comparison-intro-body {
-  position: relative;
-  margin: 18px 0 0;
-  padding-top: 18px;
-  color: var(--c-muted);
-  font-size: clamp(15px, 1.3vw, 16.5px);
-  line-height: 1.75;
-  text-wrap: pretty;
-}
-
-/* Soft divider between the lead and the body copy */
-.comparison-intro-body::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 44px;
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #ffca30, #ffe04e);
-}
-
-.comparison-intro-card strong { color: var(--c-ink); font-weight: 750; }
-
-/* "Let's Fix That." gets a purple tone with an amber marker underline */
-.comparison-intro-fix {
-  color: var(--c-purple);
-  font-weight: 800;
-  background: linear-gradient(transparent 62%, #ffe04e8c 62%);
-  padding-inline: 2px;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-}
-
-/* Stats */
-.comparison-intro-stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin: 22px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.comparison-intro-stats li {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-  padding: 14px 16px;
-  border: 1px solid #e4d8f3;
-  border-radius: 18px;
-  background: linear-gradient(145deg, #fff, #f6eefb);
-  box-shadow: 0 8px 20px #7542a40d, inset 0 1px 0 #fff;
-}
-
-.comparison-intro-stats strong {
-  font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(24px, 2.4vw, 30px);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -.03em;
-  font-variant-numeric: tabular-nums lining-nums;
-  color: var(--c-purple);
-  background: linear-gradient(110deg, #6a359b, #9a5ad4 55%, #6a359b);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.comparison-intro-stats span {
-  color: var(--c-muted);
-  font-size: 12.5px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.comparison-intro-action { margin-top: 28px; padding-bottom: 5px; }
-
-/* ---------- Header ---------- */
-
-.comparison-header {
-  max-width: 860px;
-  margin-inline: auto;
-  text-align: center;
-}
-
-.comparison-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  max-width: 100%;
-  margin-bottom: 22px;
-  padding: 10px 18px;
-  border: 1px solid #ddcdf0;
-  border-radius: 999px;
-  color: #6b3b8c;
-  background: linear-gradient(180deg, #ffffffe6, #f6effbc0);
-  box-shadow: 0 8px 24px #68428a0d, inset 0 1px 0 #fff;
-  font-size: 12px;
-  font-weight: 650;
-  line-height: 1.6;
-  text-wrap: balance;
-}
-
-.comparison-header h2 {
-  font-size: clamp(30px, 4.2vw, 46px);
-  line-height: 1.16;
-}
-
-.comparison-header p {
-  max-width: 560px;
-  margin: 20px auto 0;
-  color: var(--c-muted);
-  font-size: clamp(15px, 1.3vw, 17px);
-  line-height: 1.8;
-  text-wrap: pretty;
-}
-
-.comparison-board { margin-top: clamp(36px, 5vw, 60px); }
-
-/* ---------- Board ---------- */
-
-.comparison-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
-  align-items: stretch;
-  row-gap: 20px;
-}
-
-.comparison-pair { display: contents; }
-
-/* Red (problem) cells use these colors by default. */
-.comparison-cell {
-  --cell-accent: #b83e51;
-  --cell-text: #9a4757;
-  --cell-border: #efd6de;
-  --cell-tint: #fff1f5;
-  --cell-hover: #e6c3cd;
-  position: relative;
-  min-width: 0;
-  border: 1px solid var(--cell-border);
-  border-radius: 24px;
-  background: linear-gradient(130deg, #fffffff0, var(--cell-tint));
-  box-shadow: 0 1px 2px #4422600a, 0 12px 30px #44226009, inset 0 1px 0 #fff;
-}
-
-/* Green (solution) cells: same shade family, green instead of red. */
-.comparison-cell--solution {
-  --cell-accent: #20734e;
-  --cell-text: #3b6f56;
-  --cell-border: #cfe5da;
-  --cell-tint: #eef9f2;
-  --cell-hover: #b7dbc8;
-}
-
-.comparison-group-heading {
-  padding: 20px 26px;
-  margin-bottom: 4px;
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
-}
-
-.comparison-group-title {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-
-.comparison-group-title h3 {
-  margin: 0;
-  color: var(--cell-accent);
-  font-size: clamp(19px, 1.8vw, 23px);
-  font-weight: 750;
-  line-height: 1.35;
-  letter-spacing: -.025em;
-}
-
-.comparison-item {
-  padding: 26px;
-  transition:
-    transform 420ms var(--c-ease),
-    box-shadow 420ms ease,
-    border-color 350ms ease;
-}
-
-.comparison-item-inner {
-  display: flex;
-  align-items: flex-start;
-  min-width: 0;
-}
-
-.comparison-copy {
-  flex: 1;
-  min-width: 0;
-  padding-right: 44px;
-}
-
-.comparison-number {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  display: grid;
-  place-items: center;
-  min-width: 38px;
-  height: 28px;
-  padding-inline: 7px;
-  border: 1px solid var(--cell-border);
-  border-radius: 9px;
-  color: var(--cell-accent);
-  background: #ffffffd9;
-  box-shadow: 0 3px 8px #4422600a;
-  font-size: 12.5px;
-  font-weight: 750;
-  letter-spacing: .02em;
-  font-variant-numeric: tabular-nums;
-}
-
-.comparison-copy h3 {
-  margin: 0;
-  color: var(--cell-accent);
-  font-size: clamp(18px, 1.6vw, 21px);
-  font-weight: 750;
-  line-height: 1.32;
-  letter-spacing: -.028em;
-  text-wrap: balance;
-}
-
-.comparison-copy p {
-  margin: 8px 0 0;
-  color: var(--cell-text);
-  font-size: 14.5px;
-  line-height: 1.7;
-  text-wrap: pretty;
-}
-
-.comparison-link {
-  display: grid;
-  place-items: center;
-}
-
-.comparison-link-arrow {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid #ddcdf0;
-  border-radius: 50%;
-  color: var(--c-purple);
-  background: #ffffffd9;
-  box-shadow: 0 5px 14px #7542a410;
-  animation: comparison-link-nudge 2.8s ease-in-out infinite;
-}
-
-.comparison-link-arrow svg { width: 16px; height: 16px; }
-
-/* ---------- CTA ---------- */
-
-.comparison-cta {
-  display: grid;
-  justify-items: center;
-  gap: 28px;
-  margin-top: clamp(40px, 5vw, 60px);
-  padding: clamp(36px, 5vw, 58px) 28px;
-  border: 1px solid #e2d1ef;
-  border-radius: 28px;
-  text-align: center;
-  background:
-    radial-gradient(ellipse at 50% 0%, #eadcf875, transparent 70%),
-    linear-gradient(150deg, #fff, #f6eefbe8);
-  box-shadow: 0 18px 44px #7542a40b, inset 0 1px 0 #fff;
-}
-
-.comparison-cta h3 {
-  max-width: 760px;
-  font-size: clamp(25px, 3.3vw, 38px);
-  line-height: 1.22;
-}
-
-.comparison-cta-action {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding-bottom: 5px;
-}
-
-.comparison-cta-note {
-  margin: -10px 0 0;
-  color: var(--c-muted);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-/* ---------- Proof ---------- */
-
-.comparison-proof {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.03fr);
-  align-items: center;
-  gap: clamp(32px, 5vw, 68px);
-  margin-top: clamp(60px, 8vw, 100px);
-}
-
-.comparison-proof-visual {
-  position: relative;
-  padding: clamp(22px, 3vw, 34px);
-  border: 1px solid #e1d2ef;
-  border-radius: 30px;
-  background:
-    radial-gradient(ellipse at 20% 12%, #ffffffec, transparent 65%),
-    linear-gradient(145deg, #f4eafd, #ece0f8);
-  box-shadow: 0 22px 50px #7542a416, inset 0 1px 0 #fff;
-  transition:
-    transform 550ms var(--c-ease),
-    box-shadow 550ms ease;
-}
-
-.comparison-proof-photo {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: 20px;
-  box-shadow: 0 14px 32px #30204516;
-}
-
-.comparison-proof-stage {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 24px;
-  min-width: 0;
-}
-
-.comparison-proof-phone {
-  position: relative;
-  flex: 0 1 202px;
-  width: 202px;
-  max-width: 100%;
-  min-width: 0;
-  padding: 27px 12px 16px;
-  border: 6px solid #302045;
-  border-radius: 30px;
-  background: #fff;
-  box-shadow: 0 18px 28px #3020451c;
-  animation: comparison-phone-float 7s ease-in-out infinite;
-  animation-play-state: paused;
-}
-
-.comparison-proof-phone-notch {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 76px;
-  height: 12px;
-  border-radius: 0 0 10px 10px;
-  background: #302045;
-  transform: translateX(-50%);
-}
-
-.comparison-proof-ad-head {
-  display: grid;
-  grid-template-columns: 25px minmax(0, 1fr);
-  align-items: center;
-  gap: 3px 8px;
-  margin-bottom: 12px;
-}
-
-.comparison-proof-avatar {
-  grid-row: span 2;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #9a5ad4, #e1c9f5);
-}
-
-.comparison-proof-bar {
-  display: block;
-  width: 100%;
-  height: 6px;
-  border-radius: 999px;
-  background: #e8dff0;
-}
-
-.comparison-proof-bar--head { width: 76%; }
-.comparison-proof-sponsored { font-size: 8px; color: #6c607e; }
-
-.comparison-proof-ad-image {
-  position: relative;
-  aspect-ratio: 1.12;
-  overflow: hidden;
-  border-radius: 13px;
-  background: linear-gradient(145deg, #eee2fa, #d9c2ed);
-}
-
-.comparison-proof-ad-image img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.comparison-proof-blob {
-  position: absolute;
-  border-radius: 25px;
-  box-shadow: inset 0 1px 0 #ffffff70;
-}
-
-.comparison-proof-blob--a {
-  width: 65%;
-  height: 54%;
-  top: 18%;
-  left: 10%;
-  background: linear-gradient(140deg, #fff, #f0e6fa);
-  transform: rotate(-13deg);
-}
-
-.comparison-proof-blob--b {
-  width: 45%;
-  height: 50%;
-  bottom: 10%;
-  right: 6%;
-  background: linear-gradient(140deg, #a46bd6, #7542a4);
-  transform: rotate(13deg);
-}
-
-.comparison-proof-blob--c {
-  width: 27%;
-  height: 29%;
-  top: 13%;
-  right: 8%;
-  border-radius: 50%;
-  background: #ffffffa0;
-}
-
-.comparison-proof-ad-lines {
-  display: grid;
-  gap: 8px;
-  padding-block: 15px;
-}
-
-.comparison-proof-bar--strong { width: 90%; background: #bfa4d6; }
-.comparison-proof-bar--short { width: 64%; }
-
-/* Phone mock "Learn more" button: same amber look, scaled down */
-.landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
-  margin: 0;
-  padding: 10px;
-  border: 1px solid var(--btn-border);
-  border-radius: 9px;
-  color: var(--btn-text);
-  background: var(--btn-bg);
-  box-shadow:
-    inset 0 1px 0 #fff8c4,
-    0 3px 0 0 #d18f0a,
-    0 8px 12px -6px #f5b323a0;
-  font-family: inherit;
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1.4;
-  text-decoration: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  transition: transform 220ms ease, box-shadow 220ms ease;
-}
-
-.landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button svg {
-  width: 13px;
-  height: 13px;
-}
-
-.landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button:active {
-  transform: translateY(2px);
-  box-shadow:
-    inset 0 1px 0 #fff8c4,
-    0 1px 0 0 #d18f0a,
-    0 4px 8px -6px #f5b323a0;
-}
-
-.landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button:focus-visible {
-  outline: 3px solid #a98af0;
-  outline-offset: 3px;
-}
-
-.comparison-proof-notes {
-  flex: 1 1 190px;
-  min-width: 0;
-  max-width: 300px;
-}
-
-.comparison-proof-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 17px 14px;
-  border: 1px solid #e4d8f3;
-  border-radius: 18px;
-  background: #fffffff2;
-  box-shadow: 0 10px 24px #7542a410, inset 0 1px 0 #fff;
-  animation: comparison-note-float 8s ease-in-out infinite;
-  animation-play-state: paused;
-}
-
-.comparison-proof-note--done {
-  border-color: #cfe5da;
-  background: linear-gradient(140deg, #fff, #eef9f2);
-  animation-delay: -3s;
-}
-
-.comparison-proof-note > div { min-width: 0; }
-
-.comparison-proof-note-icon {
-  display: grid;
-  place-items: center;
-  flex: 0 0 32px;
-  width: 32px;
-  height: 32px;
-  border: 1px solid #e0cfee;
-  border-radius: 13px;
-  color: var(--c-purple);
-  background: linear-gradient(145deg, #fff, #f0e4fa);
-  will-change: transform;
-  animation: comparison-icon-bob 5.2s ease-in-out infinite;
-}
-
-.comparison-proof-note-icon svg { width: 17px; height: 17px; }
-
-.comparison-proof-note--done .comparison-proof-note-icon {
-  color: var(--c-green);
-  border-color: #cfe5da;
-  background: #e7f5ec;
-}
-
-.comparison-proof-note strong {
-  display: block;
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.comparison-proof-note p {
-  margin: 6px 0 0;
-  color: var(--c-muted);
-  font-size: 11px;
-  line-height: 1.65;
-}
-
-.comparison-proof-note-link {
-  display: block;
-  width: 1px;
-  height: 22px;
-  margin-left: 30px;
-  background: linear-gradient(#b99bd4, #b4d8c3);
-}
-
-.comparison-proof.is-proof-visible .comparison-proof-phone,
-.comparison-proof.is-proof-visible .comparison-proof-note {
-  animation-play-state: running;
-}
-
-@keyframes comparison-phone-float {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -5px, 0); }
-}
-
-@keyframes comparison-note-float {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -3px, 0); }
-}
-
-@keyframes comparison-icon-bob {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -3px, 0); }
-}
-
-@keyframes comparison-link-nudge {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, 3px, 0); }
-}
-
-.comparison-proof-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 9px;
-  margin-bottom: 23px;
-}
-
-/* Invisible final value fixes the width so the counter never jitters. */
-
-.comparison-proof-counter {
-  display: inline-grid;
-  white-space: nowrap;
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(52px, 5.5vw, 76px);
-  font-weight: 800;
-  line-height: 1.12;
-  letter-spacing: -.05em;
-  font-variant-numeric: tabular-nums lining-nums;
-  font-feature-settings: "tnum";
-}
-
-.comparison-proof-counter > span {
-  grid-area: 1 / 1;
-}
-
-.comparison-proof-counter-reserve {
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.comparison-proof-number {
-  justify-self: end;
-}
-
-.comparison-proof-stat-label {
-  color: #6b3b8c;
-  font-size: 11px;
-  font-weight: 750;
-  line-height: 1.6;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-
-.comparison-proof-title {
-  font-size: clamp(28px, 3vw, 38px);
-  line-height: 1.2;
-}
-
-.comparison-proof-lead {
-  margin: 18px 0 0;
-  color: var(--c-muted);
-  font-size: 15.5px;
-  line-height: 1.8;
-  text-wrap: pretty;
-}
-
-.comparison-proof-lead strong { color: var(--c-ink); }
-
-.comparison-proof-tagline {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px 18px;
-  margin: 23px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.comparison-proof-tagline li {
-  color: #6b3b8c;
-  font-size: 12px;
-  font-weight: 650;
-  line-height: 1.6;
-}
-
-/* ---------- Hover (only on devices with accurate hover input) ---------- */
-
-@media (hover: hover) and (pointer: fine) {
-  .comparison-intro-card:hover {
-    transform: translate3d(0, -4px, 0);
-    border-color: #ccb0e2;
-    box-shadow: 0 24px 52px #5b21b619, inset 0 1px 0 #fff;
-  }
-
-  .comparison-item:hover {
-    transform: translate3d(0, -3px, 0);
-    border-color: var(--cell-hover);
-    box-shadow: 0 18px 36px #44226014, inset 0 1px 0 #fff;
-  }
-
-  .comparison-proof-visual:hover {
-    transform: translate3d(0, -4px, 0);
-    box-shadow: 0 28px 55px #7542a41c, inset 0 1px 0 #fff;
-  }
-}
-
-/* Touch feedback instead of hover on phones and tablets */
-
-@media (hover: none) {
-  .comparison-item:active {
-    transform: scale(.985);
-  }
-}
-
-/* ---------- Tablet ---------- */
-
-@media (max-width: 1023px) {
-  .comparison-intro,
-  .comparison-proof {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 32px;
-  }
-
-  .comparison-intro-left,
-  .comparison-intro-right,
-  .comparison-proof-left,
-  .comparison-proof-right {
-    width: 100%;
-    max-width: 720px;
-    margin-inline: auto;
-  }
-
-  .comparison-intro h2 { font-size: clamp(32px, 5vw, 44px); }
-
-  .comparison-grid {
-    grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr);
-    row-gap: 18px;
-  }
-
-  .comparison-group-heading,
-  .comparison-item { padding: 22px 18px; }
-
-  .comparison-proof-stage { gap: 28px; }
-  .comparison-proof-notes { max-width: 300px; }
-}
-
-/* ---------- Mobile ---------- */
-
-@media (max-width: 767px) {
-  .landing-comparison { padding: 56px 0 72px; }
-  .comparison-container { width: calc(100% - 32px); }
-
-  .comparison-intro {
-    gap: 26px;
-    margin-bottom: 54px;
-  }
-
-  /* Intro heading block: centered on mobile */
-  .comparison-intro-left { text-align: center; }
-
-  .comparison-intro-eyebrow {
-    margin: 0 auto 20px;
-    padding: 9px 13px;
-    font-size: 11px;
-  }
-
-  .comparison-intro h2 {
-    max-width: 17em;
-    margin-inline: auto;
-    font-size: clamp(28px, 8vw, 36px);
-    line-height: 1.16;
-    letter-spacing: -.032em;
-  }
-
-  .comparison-header h2 {
-    font-size: clamp(28px, 7.6vw, 38px);
-    line-height: 1.18;
-  }
-
-  .comparison-intro-card {
-    padding: 24px 20px;
-    border-radius: 24px;
-  }
-
-  .comparison-intro-lead { font-size: 19px; line-height: 1.38; }
-  .comparison-intro-body {
-    margin-top: 16px;
-    padding-top: 16px;
-    font-size: 15px;
-    line-height: 1.7;
-  }
-
-  .comparison-intro-stats { gap: 10px; margin-top: 20px; }
-  .comparison-intro-stats li { padding: 12px 12px; border-radius: 16px; }
-  .comparison-intro-stats strong { font-size: 24px; }
-  .comparison-intro-stats span { font-size: 12px; }
-
-  .comparison-intro-action {
-    display: flex;
-    justify-content: center;
-    margin-top: 24px;
-  }
-
-  .landing-comparison a.comparison-intro-button,
-  .comparison-cta-action a.comparison-cta-button {
-    width: 100%;
-    max-width: 420px;
-  }
-
-  .comparison-eyebrow {
-    padding: 9px 13px;
-    font-size: 11px;
-    margin-bottom: 20px;
-  }
-
-  .comparison-header p { font-size: 15px; }
-  .comparison-board { margin-top: 32px; }
-
-  /* Single column: all problems first, then all solutions. */
-
-  .comparison-grid {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 14px;
-  }
-
-  .comparison-group-heading--problem { order: 0; }
-
-  .comparison-pair > .comparison-item:not(.comparison-cell--solution) {
-    order: calc(var(--i) + 1);
-  }
-
-  .comparison-group-heading--solution {
-    order: 500;
-    margin-top: 22px;
-  }
-
-  .comparison-pair > .comparison-cell--solution {
-    order: calc(var(--i) + 501);
-  }
-
-  .comparison-spacer,
-  .comparison-link { display: none; }
-
-  .comparison-group-heading {
-    margin-bottom: 0;
-    padding: 16px;
-    text-align: left;
-    border-radius: 22px;
-  }
-
-  .comparison-group-title h3 { font-size: 20px; }
-
-  .comparison-item {
-    padding: 20px 16px;
-    border-radius: 22px;
-  }
-
-  .comparison-number { top: 12px; right: 12px; }
-  .comparison-copy { padding-right: 38px; }
-  .comparison-copy h3 { font-size: 17.5px; }
-  .comparison-copy p { font-size: 14.5px; line-height: 1.6; }
-
-  .comparison-cta {
-    gap: 25px;
-    padding: 36px 20px 40px;
-    border-radius: 24px;
-  }
-
-  .comparison-cta h3 { font-size: clamp(24px, 6.5vw, 30px); }
-
-  .comparison-proof { margin-top: 54px; gap: 34px; }
-
-  .comparison-proof-visual {
-    padding: 20px 14px;
-    border-radius: 24px;
-  }
-
-  .comparison-proof-photo { border-radius: 17px; }
-  .landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button {
-    justify-content: center;
-  }
-
-  .landing-comparison .comparison-proof-ad-button.comparison-proof-ad-button svg {
-    position: absolute;
-    right: 10px;
-  }
-
-  .comparison-proof-stage {
-    flex-wrap: nowrap;
-    gap: clamp(8px, 2.5vw, 14px);
-  }
-
-  .comparison-proof-phone {
-    flex: 0 1 48%;
-    width: 48%;
-    padding: 24px 8px 11px;
-    border-width: 4px;
-    border-radius: 23px;
-  }
-
-  .comparison-proof-notes {
-    flex: 1 1 0;
-    max-width: none;
-  }
-
-  .comparison-proof-note {
-    gap: 8px;
-    padding: 11px 9px;
-    border-radius: 14px;
-  }
-
-  .comparison-proof-note-icon {
-    flex-basis: 27px;
-    width: 27px;
-    height: 27px;
-    border-radius: 10px;
-  }
-
-  .comparison-proof-note-icon svg { width: 15px; height: 15px; }
-  .comparison-proof-note strong { font-size: 10px; }
-  .comparison-proof-note p { font-size: 9.5px; line-height: 1.55; }
-  .comparison-proof-note-link { height: 16px; margin-left: 21px; }
-
-  .comparison-proof-stat { margin-bottom: 20px; }
-  .comparison-proof-counter { font-size: clamp(58px, 16vw, 72px); }
-  .comparison-proof-title { font-size: clamp(28px, 7.2vw, 36px); }
-  .comparison-proof-lead { font-size: 16px; }
-
-  .comparison-proof-tagline {
-    gap: 5px 8px;
-    margin-top: 34px;
-    padding: 18px 16px;
-    border: 1px solid #e5d9f1;
-    border-radius: 22px;
-    background: linear-gradient(140deg, #fffffff2, #f8f2fbd9);
-  }
-
-  .comparison-proof-tagline li {
-    color: var(--c-muted);
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.8;
-  }
-}
-
-/* ---------- Very small phones ---------- */
-
-@media (max-width: 359px) {
-  .comparison-container { width: calc(100% - 24px); }
-
-  .comparison-intro h2,
-  .comparison-header h2 { font-size: 26px; }
-
-  .comparison-intro-card { padding: 22px 16px; }
-  .comparison-intro-lead { font-size: 18px; }
-  .comparison-intro-body { font-size: 14.5px; }
-  .comparison-intro-stats { grid-template-columns: minmax(0, 1fr); }
-  .comparison-item { padding: 18px 14px; }
-
-  .comparison-group-title h3 { font-size: 18px; }
-  .comparison-copy { padding-right: 34px; }
-  .comparison-copy h3 { font-size: 16.5px; }
-  .comparison-eyebrow::before,
-  .comparison-intro-eyebrow::before { display: none; }
-  .comparison-cta { padding: 32px 16px 36px; }
-  .comparison-proof-stat-label { letter-spacing: .08em; }
-}
-
-/* ---------- Reduced motion: no transforms, animations or hover movement ---------- */
-
-@media (prefers-reduced-motion: reduce) {
-  .landing-comparison *,
-  .landing-comparison *::before,
-  .landing-comparison *::after {
-    animation: none !important;
-    transition: none !important;
-  }
-
-  .comparison-reveal,
-  .comparison-reveal.is-motion-ready:not(.is-visible) {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  .comparison-intro-card:hover,
-  .comparison-item:hover,
-  .comparison-proof-visual:hover,
-  .landing-comparison a.comparison-cta-button:hover,
-  .landing-comparison a.comparison-cta-button:active,
-  .comparison-item:active {
-    transform: none !important;
-  }
-}
-
-/* ---------- Mobile heading block: header text centered ---------- */
-
-@media (max-width: 767px) {
-  .landing-comparison .comparison-header {
-    text-align: center;
-    margin-inline: auto;
-    padding-inline: 0;
-  }
-
-  .landing-comparison .comparison-header p {
-    margin: 24px auto 0;
-    line-height: 1.8;
-  }
-}
-
-/* ==========================================================
-   SAME PILL -> HEADING GAP IN BOTH SECTIONS (desktop + mobile)
-
-   Section 1: "More Value From Every Click"  -> "You're Getting Clicks..."
-   Section 2: "Common Landing Page Problems" -> "Getting Clicks, But Not..."
-
-   Both pills now use the same display, padding and margin, and both
-   headings use the same line-height and zero margin, so the gap is
-   identical. Change the gap in ONE place: --c-eyebrow-gap (top of CSS).
-   Keep this block at the very end of the stylesheet.
-   ========================================================== */
-
-.landing-comparison .comparison-intro-eyebrow,
-.landing-comparison .comparison-eyebrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: fit-content;
-  max-width: 100%;
-  margin-block: 0 var(--c-eyebrow-gap);
-  padding: 10px 18px;
-}
-
-/* Header pill sits in the centered header, so center it as a block. */
-.landing-comparison .comparison-eyebrow {
-  margin-inline: auto;
-}
-
-.landing-comparison .comparison-intro h2,
-.landing-comparison .comparison-header h2 {
-  margin: 0;
-  line-height: 1.16;
-}
-
-/* Keep the intro heading centered on mobile (margin: 0 above would reset it) */
-@media (max-width: 767px) {
-  .landing-comparison .comparison-intro-eyebrow,
-  .landing-comparison .comparison-eyebrow {
-    padding: 9px 13px;
-  }
-
-  .landing-comparison .comparison-intro-eyebrow {
-    margin-inline: auto;
-  }
-
-  .landing-comparison .comparison-intro h2 {
-    margin-inline: auto;
-  }
+/* ==================== Problem / solution cards ==================== */
+
+const CARD_TONES = {
+  problem: {
+    card:
+      'border-[#efd6de] bg-[linear-gradient(130deg,#fffffff0,#fff1f5)] hover:border-[#e6c3cd] max-md:[order:var(--op)]',
+    title: 'text-[#b83e51]',
+    text: 'text-[#9a4757]',
+    number: 'border-[#efd6de] text-[#b83e51]',
+  },
+  solution: {
+    card:
+      'border-[#cfe5da] bg-[linear-gradient(130deg,#fffffff0,#eef9f2)] hover:border-[#b7dbc8] max-md:[order:var(--os)]',
+    title: 'text-[#20734e]',
+    text: 'text-[#3b6f56]',
+    number: 'border-[#cfe5da] text-[#20734e]',
+  },
+}
+
+function PairCard({ kind, number, title, description, delay, motionProps }) {
+  const tone = CARD_TONES[kind]
+
+  return (
+    <article
+      className={`group relative min-w-0 rounded-[22px] border px-3.5 py-4 shadow-[0_1px_2px_#4422600a,0_12px_30px_#44226009,inset_0_1px_0_#fff] min-[360px]:px-4 min-[360px]:py-5 transition duration-[420ms] ease-[cubic-bezier(.22,1,.36,1)] hover:-translate-y-[3px] hover:shadow-[0_18px_36px_#44226014,inset_0_1px_0_#fff] active:scale-[.985] motion-reduce:transition-none motion-reduce:hover:translate-y-0 md:rounded-3xl md:px-[18px] md:py-5 md:active:scale-100 lg:px-[26px] lg:py-6 ${tone.card}`}
+    >
+      <span
+        className={`absolute right-3 top-3 grid h-7 min-w-[38px] place-items-center rounded-[9px] border bg-white/85 px-[7px] text-[12.5px] font-bold tabular-nums tracking-[0.02em] shadow-[0_3px_8px_#4422600a] md:right-4 md:top-4 ${tone.number}`}
+      >
+        {number}
+      </span>
+
+      <Reveal {...motionProps} delay={delay}>
+        {/* Icon on the left, text on the right, both centered on the same line */}
+        <div className="flex items-center gap-3 min-[360px]:gap-3.5 lg:gap-4">
+          <StatusIcon type={kind === 'problem' ? 'cross' : 'check'} />
+
+          <div className="min-w-0 flex-1 pr-10 lg:pr-11">
+            <h3
+              className={`text-base font-bold leading-[1.3] tracking-[-0.028em] [text-wrap:balance] min-[360px]:text-[17.5px] md:text-[clamp(17px,1.9vw,21px)] ${tone.title}`}
+            >
+              {title}
+            </h3>
+            <p
+              className={`mt-1.5 text-sm leading-[1.55] [text-wrap:pretty] min-[360px]:text-[14.5px] md:mt-2 md:leading-[1.65] ${tone.text}`}
+            >
+              {description}
+            </p>
+          </div>
+        </div>
+      </Reveal>
+    </article>
+  )
 }
-`
 
 /* ==================== Complete component ==================== */
 
@@ -1605,97 +493,133 @@ export default function Problems() {
   const motionProps = { reducedMotion }
 
   return (
-    <section className="landing-comparison" aria-labelledby={headingId}>
+    <section
+      className="relative isolate w-full min-w-0 max-w-full overflow-x-clip bg-[radial-gradient(ellipse_at_6%_6%,#eee3ffc0,transparent_42%),radial-gradient(ellipse_at_96%_82%,#e9dcfb90,transparent_42%),linear-gradient(180deg,#fff,#fcfaff_60%,#f8f3ff)] py-14 font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[#302045] antialiased md:py-[clamp(64px,8vw,116px)]"
+      aria-labelledby={headingId}
+    >
       <style>{styles}</style>
 
-      <div className="comparison-container">
-        {/* Intro */}
-        <div className="comparison-intro">
-          <Reveal {...motionProps} className="comparison-intro-left">
-            <p className="comparison-intro-eyebrow">
+      {/* Soft corner glows */}
+      <div className="pointer-events-none absolute left-0 top-0 -z-10 aspect-square w-[min(30vw,360px)] rounded-full bg-[radial-gradient(circle,#d9c2f860,transparent_70%)]" />
+      <div className="pointer-events-none absolute bottom-0 right-0 -z-10 aspect-square w-[min(30vw,360px)] rounded-full bg-[radial-gradient(circle,#d9c2f860,transparent_70%)]" />
+
+      <div className="mx-auto w-[calc(100%_-_24px)] min-w-0 max-w-[1200px] min-[360px]:w-[calc(100%_-_32px)] md:w-[calc(100%_-_48px)]">
+        {/* ============ Intro ============ */}
+        <div className="mb-14 grid items-center gap-[26px] md:mb-[clamp(64px,8vw,100px)] md:gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.04fr)] lg:gap-[clamp(32px,5vw,72px)]">
+          <Reveal
+            {...motionProps}
+            className="mx-auto w-full max-w-[720px] max-md:text-center lg:mx-0 lg:max-w-none"
+          >
+            <p className={`${PILL} max-md:mx-auto`}>
+              <span className={PILL_DOT} />
               More Value From Every Click
             </p>
 
-            <h2>
+            <h2 className="font-display text-[clamp(28px,8vw,36px)] font-extrabold leading-[1.16] tracking-[-0.032em] [text-wrap:balance] max-md:mx-auto max-md:max-w-[17em] md:text-[clamp(32px,5vw,44px)] lg:text-[clamp(30px,4vw,48px)] lg:tracking-[-0.035em]">
               You’re Getting Clicks.{' '}
-              <span>But Are They Turning Into Customers?</span>
+              <span className={GRADIENT_TEXT}>
+                But Are They Turning Into Customers?
+              </span>
             </h2>
           </Reveal>
 
           <Reveal
             {...motionProps}
             delay={80}
-            className="comparison-intro-right"
+            className="mx-auto w-full max-w-[720px] lg:mx-0 lg:max-w-none"
           >
-            <div className="comparison-intro-card">
-              <p className="comparison-intro-lead">
+            <div className="relative rounded-3xl border border-[#e4d8f3] bg-[linear-gradient(150deg,#ffffffee,#f8f2fdd0)] px-5 py-6 shadow-[0_18px_48px_#5b21b611,inset_0_1px_0_#fff] backdrop-blur-[22px] transition duration-[450ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none md:rounded-[28px] md:p-[clamp(26px,3vw,40px)] md:hover:-translate-y-1 md:hover:border-[#ccb0e2] md:hover:shadow-[0_24px_52px_#5b21b619,inset_0_1px_0_#fff]">
+              <p className="font-display text-[19px] font-bold leading-[1.38] tracking-[-0.02em] [text-wrap:balance] md:text-[clamp(19px,1.9vw,23px)] md:leading-[1.4]">
                 Unclear offers and distracting pages stop interested visitors
                 from taking the next step.
               </p>
 
-              <p className="comparison-intro-body">
-                <span className="comparison-intro-fix">Let’s Fix That.</span>{' '}
-                At <strong>Creative Crew</strong>, we build complete growth
+              <p className="relative mt-4 pt-4 text-[15px] leading-[1.7] text-[#6c607e] [text-wrap:pretty] md:mt-[18px] md:pt-[18px] md:text-[clamp(15px,1.3vw,16.5px)] md:leading-[1.75]">
+                <span className="absolute left-0 top-0 h-[3px] w-11 rounded-full bg-[linear-gradient(90deg,#ffca30,#ffe04e)]" />
+                <span className="px-0.5 font-extrabold text-[#7542a4] [box-decoration-break:clone] [-webkit-box-decoration-break:clone] bg-[linear-gradient(transparent_62%,#ffe04e8c_62%)]">
+                  Let’s Fix That.
+                </span>{' '}
+                At <strong className="font-bold text-[#302045]">Creative Crew</strong>, we build complete growth
                 systems with high-converting landing pages, custom tracking,
                 smart automations, and analytics—all designed to convert more
                 leads into clients and generate more revenue for your business.
               </p>
 
-              <ul className="comparison-intro-stats">
-                <li>
-                  <strong>2,000+</strong>
-                  <span>Landing pages created</span>
-                </li>
-                <li>
-                  <strong>1,000+</strong>
-                  <span>Professionals grew revenue</span>
-                </li>
+              <ul className="mt-5 grid list-none grid-cols-1 gap-2.5 p-0 min-[360px]:grid-cols-2 md:mt-[22px] md:gap-3">
+                {[
+                  ['2,000+', 'Landing pages created'],
+                  ['1,000+', 'Professionals grew revenue'],
+                ].map(([figure, label]) => (
+                  <li
+                    key={label}
+                    className="flex min-w-0 flex-col gap-1 rounded-2xl border border-[#e4d8f3] bg-[linear-gradient(145deg,#fff,#f6eefb)] px-3 py-3 shadow-[0_8px_20px_#7542a40d,inset_0_1px_0_#fff] md:rounded-[18px] md:px-4 md:py-3.5"
+                  >
+                    <strong
+                      className={`font-display text-2xl font-extrabold leading-[1.1] tracking-[-0.03em] tabular-nums md:text-[clamp(24px,2.4vw,30px)] ${GRADIENT_TEXT}`}
+                    >
+                      {figure}
+                    </strong>
+                    <span className="text-xs font-semibold leading-[1.4] text-[#6c607e] md:text-[12.5px]">
+                      {label}
+                    </span>
+                  </li>
+                ))}
               </ul>
 
-              <div className="comparison-intro-action">
+              <div className="mt-6 pb-[5px] max-md:flex max-md:justify-center md:mt-7">
                 <RevenueButton intro />
               </div>
             </div>
           </Reveal>
         </div>
 
-        {/* Problems and solutions */}
-        <Reveal {...motionProps} as="header" className="comparison-header">
-          <span className="comparison-eyebrow">
+        {/* ============ Problems and solutions ============ */}
+        <Reveal
+          {...motionProps}
+          as="header"
+          className="mx-auto max-w-[860px] text-center"
+        >
+          <span className={`${PILL} mx-auto`}>
+            <span className={PILL_DOT} />
             Common Landing Page Problems &amp; Solutions
           </span>
 
-          <h2 id={headingId}>
-            Getting Clicks, But <span>Not Enough Enquiries?</span>
+          <h2
+            id={headingId}
+            className="font-display text-[clamp(27px,7vw,36px)] font-extrabold leading-[1.16] tracking-[-0.035em] [text-wrap:balance] md:text-[clamp(29px,3.9vw,42px)]"
+          >
+            Getting Clicks, But{' '}
+            <span className={GRADIENT_TEXT}>Not Enough Enquiries?</span>
           </h2>
 
-          <p>
+          <p className="mx-auto mt-6 max-w-[560px] text-[15px] leading-[1.8] text-[#6c607e] [text-wrap:pretty] md:mt-5 md:text-[clamp(15px,1.3vw,17px)]">
             Visitors decide in seconds. If your message is unclear or the next
             step is hard, they leave.
           </p>
         </Reveal>
 
-        <div className="comparison-board">
-          <div className="comparison-grid">
+        <div className="mt-8 md:mt-[clamp(36px,5vw,60px)]">
+          {/* Mobile: one column, all problems first then all solutions (via order). */}
+          <div className="grid grid-cols-1 gap-y-3.5 md:grid-cols-[minmax(0,1fr)_46px_minmax(0,1fr)] md:gap-y-[18px] lg:grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] lg:gap-y-5">
             <Reveal
               {...motionProps}
-              className="comparison-cell comparison-group-heading comparison-group-heading--problem"
+              className="relative min-w-0 px-4 py-4 text-left md:mb-1 md:px-[18px] md:py-[22px] lg:px-[26px] lg:py-5"
             >
-              <div className="comparison-group-title">
-                <h3>What Holds Visitors Back</h3>
-              </div>
+              <h3 className="text-[23px] font-bold leading-[1.35] tracking-[-0.025em] text-[#b83e51] md:text-[clamp(22px,2.1vw,27px)]">
+                What Holds Visitors Back
+              </h3>
             </Reveal>
 
-            <div className="comparison-spacer" aria-hidden="true" />
+            <div className="hidden md:block" aria-hidden="true" />
 
             <Reveal
               {...motionProps}
               delay={60}
-              className="comparison-cell comparison-cell--solution comparison-group-heading comparison-group-heading--solution"
+              className="relative min-w-0 px-4 py-4 text-left max-md:order-[500] max-md:mt-5 md:mb-1 md:px-[18px] md:py-[22px] lg:px-[26px] lg:py-5"
             >
-              <div className="comparison-group-title">
-                <h3>How We Fix It</h3>
-              </div>
+              <h3 className="text-[23px] font-bold leading-[1.35] tracking-[-0.025em] text-[#20734e] md:text-[clamp(22px,2.1vw,27px)]">
+                How We Fix It
+              </h3>
             </Reveal>
 
             {items.map(({ problem, solution }, index) => {
@@ -1703,116 +627,147 @@ export default function Problems() {
 
               return (
                 <div
-                  className="comparison-pair"
+                  className="contents"
                   key={problem.title}
-                  style={{ '--i': index }}
+                  style={{ '--op': index + 1, '--os': index + 501 }}
                 >
-                  <article className="comparison-cell comparison-item">
-                    <span className="comparison-number">{number}</span>
-
-                    <Reveal
-                      {...motionProps}
-                      delay={Math.min(index * 35, 140)}
-                    >
-                      <div className="comparison-item-inner">
-                        <div className="comparison-copy">
-                          <h3>{problem.title}</h3>
-                          <p>{problem.description}</p>
-                        </div>
-                      </div>
-                    </Reveal>
-                  </article>
+                  <PairCard
+                    kind="problem"
+                    number={number}
+                    title={problem.title}
+                    description={problem.description}
+                    delay={Math.min(index * 35, 140)}
+                    motionProps={motionProps}
+                  />
 
                   <Connector />
 
-                  <article className="comparison-cell comparison-cell--solution comparison-item">
-                    <span className="comparison-number">{number}</span>
-
-                    <Reveal
-                      {...motionProps}
-                      delay={Math.min(index * 35 + 60, 200)}
-                    >
-                      <div className="comparison-item-inner">
-                        <div className="comparison-copy">
-                          <h3>{solution.title}</h3>
-                          <p>{solution.description}</p>
-                        </div>
-                      </div>
-                    </Reveal>
-                  </article>
+                  <PairCard
+                    kind="solution"
+                    number={number}
+                    title={solution.title}
+                    description={solution.description}
+                    delay={Math.min(index * 35 + 60, 200)}
+                    motionProps={motionProps}
+                  />
                 </div>
               )
             })}
           </div>
         </div>
 
-        {/* CTA */}
+        {/* ============ CTA ============ */}
         <Reveal {...motionProps}>
-          <div className="comparison-cta">
-            <h3>Ready To Turn More Visits Into Conversations?</h3>
+          <div className="mt-10 grid justify-items-center gap-[25px] rounded-3xl border border-[#e2d1ef] bg-[radial-gradient(ellipse_at_50%_0%,#eadcf875,transparent_70%),linear-gradient(150deg,#fff,#f6eefbe8)] px-5 pb-10 pt-9 text-center shadow-[0_18px_44px_#7542a40b,inset_0_1px_0_#fff] min-[360px]:px-5 md:mt-[clamp(40px,5vw,60px)] md:gap-7 md:rounded-[28px] md:px-7 md:py-[clamp(36px,5vw,58px)]">
+            <h3 className="font-display max-w-[760px] text-[clamp(24px,6.5vw,30px)] font-extrabold leading-[1.22] tracking-[-0.035em] [text-wrap:balance] md:text-[clamp(25px,3.3vw,38px)]">
+              Ready To Turn More Visits Into Conversations?
+            </h3>
 
-            <div className="comparison-cta-action">
+            <div className="flex w-full justify-center pb-[5px]">
               <RevenueButton />
             </div>
 
-            {ctaNote ? <p className="comparison-cta-note">{ctaNote}</p> : null}
+            {ctaNote ? (
+              <p className="-mt-2.5 text-[13px] leading-[1.6] text-[#6c607e]">
+                {ctaNote}
+              </p>
+            ) : null}
           </div>
         </Reveal>
 
-        {/* Counter starts when this proof section enters the viewport. */}
+        {/* ============ Proof (counter starts when this enters the viewport) ============ */}
         <div
           ref={proofRef}
-          className={`comparison-proof ${proofVisible ? 'is-proof-visible' : ''
-            }`}
+          className="mt-[54px] grid items-center gap-[34px] md:mt-[clamp(60px,8vw,100px)] md:gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.03fr)] lg:gap-[clamp(32px,5vw,68px)]"
         >
-          <Reveal {...motionProps} className="comparison-proof-left">
-            <div className="comparison-proof-visual">
-              <ProofVisual />
+          <Reveal
+            {...motionProps}
+            className="mx-auto w-full max-w-[720px] lg:mx-0 lg:max-w-none"
+          >
+            <div className="relative rounded-3xl border border-[#e1d2ef] bg-[radial-gradient(ellipse_at_20%_12%,#ffffffec,transparent_65%),linear-gradient(145deg,#f4eafd,#ece0f8)] px-3.5 py-5 shadow-[0_22px_50px_#7542a416,inset_0_1px_0_#fff] transition duration-[550ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none md:rounded-[30px] md:p-[clamp(22px,3vw,34px)] md:hover:-translate-y-1 md:hover:shadow-[0_28px_55px_#7542a41c,inset_0_1px_0_#fff]">
+              <ProofVisual playing={proofVisible} />
             </div>
           </Reveal>
 
           <Reveal
             {...motionProps}
             delay={80}
-            className="comparison-proof-right"
+            className="mx-auto w-full max-w-[720px] lg:mx-0 lg:max-w-none"
           >
-            <div className="comparison-proof-stat">
+            <div className="mb-5 flex flex-col items-start gap-[9px] md:mb-[23px]">
               <span
-                className="comparison-proof-counter"
+                className="inline-grid whitespace-nowrap font-[Inter,ui-sans-serif,system-ui,sans-serif] text-[clamp(58px,16vw,72px)] font-extrabold leading-[1.12] tracking-[-0.05em] tabular-nums md:text-[clamp(52px,5.5vw,76px)]"
                 role="img"
                 aria-label="More than 2,000"
               >
+                {/* Invisible final value fixes the width so the counter never jitters. */}
                 <span
-                  className="comparison-proof-counter-reserve"
+                  className="pointer-events-none invisible [grid-area:1/1]"
                   aria-hidden="true"
                 >
                   2,000+
                 </span>
 
-                <span className="comparison-proof-number" aria-hidden="true">
+                <span
+                  className={`justify-self-end [grid-area:1/1] ${GRADIENT_TEXT}`}
+                  aria-hidden="true"
+                >
                   {numberFormatter.format(value)}
                   {complete ? '+' : ''}
                 </span>
               </span>
 
-              <span className="comparison-proof-stat-label">
+              <span className="text-[11px] font-bold uppercase leading-[1.6] tracking-[.08em] text-[#6b3b8c] min-[360px]:tracking-[.12em]">
                 Landing Pages Built
               </span>
             </div>
 
-            <h2 className="comparison-proof-title">
-              Built To Turn <span>Clicks Into Customers.</span>
+            <h2 className="font-display text-[clamp(28px,7.2vw,36px)] font-extrabold leading-[1.2] tracking-[-0.035em] [text-wrap:balance] md:text-[clamp(28px,3vw,38px)]">
+              Built To Turn{' '}
+              <span className={GRADIENT_TEXT}>Clicks Into Customers.</span>
             </h2>
 
-            <p className="comparison-proof-lead">
-              At <strong>Creative Crew</strong>, we combine landing pages,
-              automation and tracking to create a clearer path from interest to
-              enquiry.
+            <p className="mt-[18px] text-base leading-[1.8] text-[#6c607e] [text-wrap:pretty] md:text-[15.5px]">
+              At <strong className="text-[#302045]">Creative Crew</strong>, we
+              combine landing pages, automation and tracking to create a
+              clearer path from interest to enquiry.
             </p>
-
           </Reveal>
         </div>
       </div>
     </section>
   )
 }
+
+/* ==================== The only non-utility CSS ====================
+   Tailwind can't import fonts or declare keyframes by itself, so those
+   live here. If your tailwind config already has these animations
+   you can delete the keyframes. */
+
+const styles = `
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+.font-display {
+  font-family: "Bricolage Grotesque", Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+@keyframes phoneFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -5px, 0); }
+}
+
+@keyframes noteFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -3px, 0); }
+}
+
+@keyframes iconBob {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -3px, 0); }
+}
+
+@keyframes linkNudge {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, 3px, 0); }
+}
+`

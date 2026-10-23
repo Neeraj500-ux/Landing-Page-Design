@@ -1,7 +1,14 @@
-
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { why } from '../data'
 import { Container } from './ui'
+
+/* ==========================================================
+   Why.jsx  (100% Tailwind utility classes)
+   - Same colors, same content as before.
+   - Only keyframes live in the small <style> block at the
+     bottom (Tailwind cannot declare keyframes by itself).
+   - Arbitrary values only, so it works on Tailwind v3 and v4.
+   ========================================================== */
 
 /* ---------------------------------------------------------------
    ICONS
@@ -37,6 +44,7 @@ const iconSet = [
 function WhyIcon({ index }) {
   return (
     <svg
+      className="block h-5 w-5 transition-transform duration-500 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:-rotate-[8deg] group-hover:scale-110 min-[360px]:h-6 min-[360px]:w-6"
       width="24"
       height="24"
       viewBox="0 0 24 24"
@@ -54,6 +62,75 @@ function WhyIcon({ index }) {
 }
 
 /* ---------------------------------------------------------------
+   SHARED CLASS STRINGS
+---------------------------------------------------------------- */
+
+// Moving purple -> orange gradient used on text and thin bars
+const FLOW_GRADIENT =
+  'bg-[linear-gradient(120deg,#6D35C9,#FF8A3D,#6D35C9)] bg-[length:200%_100%] animate-[gradientShift_5s_ease-in-out_infinite_alternate] motion-reduce:animate-none'
+
+const GRADIENT_TEXT = `${FLOW_GRADIENT} bg-clip-text text-transparent`
+
+const EASE = 'ease-[cubic-bezier(.2,.7,.2,1)]'
+
+/* ---------------------------------------------------------------
+   REVEAL ON SCROLL (fade + lift + de-blur, once)
+---------------------------------------------------------------- */
+function useInViewOnce(ref, threshold = 0.15) {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    if (visible) return
+    const el = ref.current
+    if (!el) return
+
+    if (typeof IntersectionObserver === 'undefined') {
+      setVisible(true)
+      return
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true)
+          io.disconnect()
+        }
+      },
+      { threshold, rootMargin: '0px 0px -6% 0px' },
+    )
+
+    io.observe(el)
+    return () => io.disconnect()
+  }, [ref, visible, threshold])
+
+  return visible
+}
+
+function Reveal({ as: Tag = 'div', delay = 0, className = '', children, ...props }) {
+  const ref = useRef(null)
+  const visible = useInViewOnce(ref)
+
+  return (
+    <Tag
+      {...props}
+      ref={ref}
+      style={{ transitionDelay: `${delay}ms` }}
+      className={[
+        'transition-[opacity,transform,filter] duration-[900ms]',
+        EASE,
+        'motion-reduce:translate-y-0 motion-reduce:scale-100 motion-reduce:opacity-100 motion-reduce:blur-0 motion-reduce:transition-none',
+        visible
+          ? 'translate-y-0 scale-100 opacity-100 blur-0'
+          : 'translate-y-7 scale-[.97] opacity-0 blur-[6px]',
+        className,
+      ].join(' ')}
+    >
+      {children}
+    </Tag>
+  )
+}
+
+/* ---------------------------------------------------------------
    ANIMATED COUNTER
 ---------------------------------------------------------------- */
 function Counter({ value, suffix = '', duration = 1800 }) {
@@ -62,6 +139,16 @@ function Counter({ value, suffix = '', duration = 1800 }) {
   useEffect(() => {
     const element = counterRef.current
     if (!element) return
+
+    const reduce =
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (reduce) {
+      element.textContent = `${value}${suffix}`
+      return
+    }
 
     let frameId
     let observer
@@ -74,11 +161,7 @@ function Counter({ value, suffix = '', duration = 1800 }) {
       const startTime = performance.now()
 
       const animate = (currentTime) => {
-        const progress = Math.min(
-          (currentTime - startTime) / duration,
-          1
-        )
-
+        const progress = Math.min((currentTime - startTime) / duration, 1)
         const easedProgress = 1 - Math.pow(1 - progress, 4)
         const currentValue = Math.round(easedProgress * value)
 
@@ -102,7 +185,7 @@ function Counter({ value, suffix = '', duration = 1800 }) {
             observer.disconnect()
           }
         },
-        { threshold: 0.3 }
+        { threshold: 0.3 },
       )
 
       observer.observe(element)
@@ -117,8 +200,8 @@ function Counter({ value, suffix = '', duration = 1800 }) {
   return (
     <span
       ref={counterRef}
-      className="wy-stat__num"
       aria-label={`${value}${suffix}`}
+      className={`block whitespace-nowrap text-[40px] font-extrabold leading-none tracking-[-0.04em] tabular-nums min-[360px]:text-[clamp(44px,6.5vw,68px)] ${GRADIENT_TEXT}`}
     >
       0{suffix}
     </span>
@@ -132,17 +215,28 @@ function WhyBackdrop() {
   const dots = Array.from({ length: 16 })
 
   return (
-    <div className="wy-backdrop" aria-hidden="true">
-      <span className="wy-orb wy-orb--1 wy-float" />
-      <span className="wy-orb wy-orb--2 wy-float-b" />
-      <span className="wy-orb wy-orb--3 wy-float" />
-      <span className="wy-grid" />
+    <div
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      aria-hidden="true"
+    >
+      {/* Floating color orbs */}
+      <span className="absolute -left-40 -top-[140px] h-[min(520px,80vw)] w-[min(520px,80vw)] animate-[orbFloat_10s_ease-in-out_infinite] rounded-full bg-[radial-gradient(circle,#9B5CF0_0%,transparent_70%)] opacity-[.55] blur-[90px] will-change-transform motion-reduce:animate-none" />
+      <span className="absolute right-[-200px] top-[30%] h-[min(560px,85vw)] w-[min(560px,85vw)] animate-[orbFloatB_13s_ease-in-out_infinite] rounded-full bg-[radial-gradient(circle,#FF8A3D_0%,transparent_70%)] opacity-[.45] blur-[90px] will-change-transform motion-reduce:animate-none" />
+      <span className="absolute bottom-[-160px] left-[30%] h-[min(440px,75vw)] w-[min(440px,75vw)] animate-[orbFloat_10s_ease-in-out_infinite] rounded-full bg-[radial-gradient(circle,#6D35C9_0%,transparent_70%)] opacity-40 blur-[90px] will-change-transform motion-reduce:animate-none" />
 
-      <div className="wy-dots">
+      {/* Slowly drifting grid */}
+      <span className="absolute inset-0 animate-[gridDrift_24s_linear_infinite] opacity-50 [background-image:linear-gradient(rgba(109,53,201,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(109,53,201,.05)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_40%,#000_40%,transparent_80%)] [-webkit-mask-image:radial-gradient(ellipse_70%_60%_at_50%_40%,#000_40%,transparent_80%)] motion-reduce:animate-none" />
+
+      {/* Rising sparkles */}
+      <div className="absolute inset-0 motion-reduce:hidden">
         {dots.map((_, i) => (
           <span
             key={i}
-            className="wy-dot"
+            className={`absolute h-1 w-1 animate-[dotFloat_8s_linear_infinite] rounded-full opacity-0 ${
+              i % 3 === 0
+                ? 'bg-[#FF8A3D] shadow-[0_0_8px_2px_rgba(255,138,61,.5)]'
+                : 'bg-[#9B5CF0] shadow-[0_0_8px_2px_rgba(155,92,240,.5)]'
+            }`}
             style={{
               left: `${(i * 47) % 100}%`,
               top: `${(i * 61) % 100}%`,
@@ -157,179 +251,206 @@ function WhyBackdrop() {
 }
 
 /* ---------------------------------------------------------------
-   MAIN COMPONENT
+   ONE CARD
 ---------------------------------------------------------------- */
-export default function Why() {
-  const rootRef = useRef(null)
+function WhyCard({ index, title, desc }) {
+  const warm = index % 2 === 1
 
-  useEffect(() => {
-    const root = rootRef.current
-    if (!root) return
-
-    const targets = root.querySelectorAll('[data-wy]')
-    root.classList.add('wy-armed')
-
-    if (typeof IntersectionObserver === 'undefined') {
-      targets.forEach((el) => el.classList.add('wy-in'))
-      return
-    }
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('wy-in')
-            io.unobserve(entry.target)
-          }
-        })
-      },
-      {
-        threshold: 0.15,
-        rootMargin: '0px 0px -6% 0px',
-      }
-    )
-
-    targets.forEach((el) => io.observe(el))
-
-    return () => io.disconnect()
-  }, [])
-
+  // Cursor-follow spotlight
   const spotlight = (e) => {
     const rect = e.currentTarget.getBoundingClientRect()
-
-    e.currentTarget.style.setProperty(
-      '--mx',
-      `${e.clientX - rect.left}px`
-    )
-
-    e.currentTarget.style.setProperty(
-      '--my',
-      `${e.clientY - rect.top}px`
-    )
+    e.currentTarget.style.setProperty('--mx', `${e.clientX - rect.left}px`)
+    e.currentTarget.style.setProperty('--my', `${e.clientY - rect.top}px`)
   }
 
   return (
+    <div
+      onPointerMove={spotlight}
+      /* Outer shell = the 1px gradient border. Inner layers sit on top. */
+      className="group relative isolate h-full overflow-hidden rounded-[clamp(1.25rem,2vw,1.75rem)] bg-[linear-gradient(135deg,rgba(255,255,255,.95),rgba(109,53,201,.18)_45%,rgba(255,138,61,.25))] shadow-[0_1px_2px_rgba(48,32,69,.05),0_14px_30px_-18px_rgba(109,53,201,.35),0_32px_60px_-38px_rgba(48,32,69,.35)] transition-[transform,box-shadow] duration-[450ms] ease-[cubic-bezier(.2,.7,.2,1)] hover:-translate-y-1.5 hover:shadow-[0_1px_2px_rgba(48,32,69,.05),0_24px_44px_-18px_rgba(109,53,201,.45),0_44px_76px_-42px_rgba(48,32,69,.42)] active:scale-[.985] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100"
+    >
+      {/* Spinning light that glows around the border on hover */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 aspect-square w-[180%] -translate-x-1/2 -translate-y-1/2 animate-[wySpin_6s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0deg,#9B5CF0_70deg,#FF8A3D_130deg,transparent_200deg)] opacity-0 transition-opacity duration-500 group-hover:opacity-100 motion-reduce:hidden"
+      />
+
+      {/* Glass surface */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-px z-0 rounded-[inherit] bg-[linear-gradient(145deg,rgba(255,255,255,.96),rgba(250,246,255,.88))] [backdrop-filter:blur(16px)_saturate(160%)] [-webkit-backdrop-filter:blur(16px)_saturate(160%)]"
+      />
+
+      {/* Cursor spotlight */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-px z-[1] rounded-[inherit] bg-[radial-gradient(260px_circle_at_var(--mx,50%)_var(--my,0%),rgba(155,92,240,.16),rgba(255,138,61,.06)_55%,transparent_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+      />
+
+      {/* Shine sweep (plays once each time you hover) */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-1/4 -translate-x-full bg-[linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent)] opacity-0 group-hover:animate-[shine_1.1s_ease-out] motion-reduce:hidden"
+      />
+
+      {/* Top highlight line */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute left-[10%] right-[10%] top-px z-[3] h-px bg-[linear-gradient(90deg,transparent,#fff,transparent)]"
+      />
+
+      {/* Content */}
+      <div className="relative z-10 flex h-full flex-col px-[1.1rem] pb-6 pt-[1.1rem] min-[360px]:px-[clamp(1.25rem,2vw,1.75rem)] min-[360px]:pt-[clamp(1.25rem,2vw,1.75rem)] min-[360px]:pb-[clamp(1.75rem,2.4vw,2.25rem)]">
+        {/* Icon + number on one line */}
+        <div className="flex items-center justify-between gap-3">
+          {/* Idle bob lives on the wrapper, hover effects on the tile inside */}
+          <span
+            className="relative inline-flex animate-[tileBob_4.5s_ease-in-out_infinite] motion-reduce:animate-none"
+            style={{ animationDelay: `${index * 0.35}s` }}
+          >
+            {/* Pulse ring on hover */}
+            <span
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-0 rounded-[14px] border opacity-0 group-hover:animate-[ringPulse_1.5s_ease-out_infinite] motion-reduce:hidden min-[360px]:rounded-2xl ${
+                warm ? 'border-[#FF8A3D]/60' : 'border-[#9B5CF0]/60'
+              }`}
+            />
+
+            <span
+              className={`relative grid h-11 w-11 shrink-0 place-items-center rounded-[14px] border shadow-[0_8px_16px_-10px_rgba(109,53,201,.55),inset_0_1px_0_#fff] transition-transform duration-500 ease-[cubic-bezier(.2,.7,.2,1)] group-hover:-translate-y-0.5 min-[360px]:h-[3.25rem] min-[360px]:w-[3.25rem] min-[360px]:rounded-2xl ${
+                warm
+                  ? 'border-[rgba(255,138,61,.28)] bg-[linear-gradient(145deg,#fff,#FFE8D8)] text-[#E36F2C]'
+                  : 'border-[rgba(109,53,201,.18)] bg-[linear-gradient(145deg,#fff,#EFE4FB)] text-[#6D35C9]'
+              }`}
+            >
+              {/* inner hairline */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-[3px] rounded-[11px] border border-white/80"
+              />
+              <WhyIcon index={index} />
+            </span>
+          </span>
+
+          <span
+            aria-hidden="true"
+            className="grid h-7 min-w-8 shrink-0 place-items-center rounded-full border border-[rgba(109,53,201,.12)] bg-white/70 px-[.55rem] text-[.7rem] font-bold tabular-nums tracking-[.06em] text-[rgba(48,32,69,.55)] shadow-[inset_0_1px_0_#fff] transition-colors duration-300 group-hover:text-[#6D35C9]"
+          >
+            {String(index + 1).padStart(2, '0')}
+          </span>
+        </div>
+
+        <h3 className="mt-[clamp(18px,2vw,22px)] text-[clamp(1.05rem,1.6vw,1.25rem)] font-bold leading-[1.35] tracking-[-0.015em] text-[#26103d] [overflow-wrap:break-word] [text-wrap:balance] transition-colors duration-300 group-hover:text-[#4a1f93]">
+          {title}
+        </h3>
+
+        <p className="mt-2.5 text-[clamp(.9rem,1.3vw,1rem)] leading-[1.7] text-[rgba(48,32,69,.68)] [overflow-wrap:break-word] [text-wrap:pretty]">
+          {desc}
+        </p>
+      </div>
+
+      {/* Accent bar that grows on hover */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 left-6 right-6 z-[4] h-[3px] origin-left scale-x-[.16] rounded-t-[3px] bg-[linear-gradient(90deg,#6D35C9,#FF8A3D)] transition-transform duration-[600ms] ease-[cubic-bezier(.2,.7,.2,1)] group-hover:scale-x-100 motion-reduce:scale-x-100 motion-reduce:transition-none"
+      />
+    </div>
+  )
+}
+
+/* ---------------------------------------------------------------
+   MAIN COMPONENT
+---------------------------------------------------------------- */
+export default function Why() {
+  return (
     <section
-      ref={rootRef}
-      className="wy-section"
+      className="relative isolate overflow-hidden bg-[radial-gradient(ellipse_70%_45%_at_50%_0%,rgba(155,92,240,.12),transparent_70%),linear-gradient(180deg,#ffffff_0%,#faf7ff_50%,#f3ecfa_100%)] py-[clamp(56px,7vw,110px)] font-[Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe_UI',sans-serif] text-[#26103d] antialiased"
       aria-label="Why choose Creative Crew"
     >
-      <style>{css}</style>
+      <style>{keyframes}</style>
 
       <WhyBackdrop />
 
       <Container>
-        <div className="wy-header">
+        {/* ================= HEADER ================= */}
+        <div className="relative z-10 mb-[clamp(32px,4.5vw,56px)] grid grid-cols-1 items-end gap-[clamp(28px,3.5vw,40px)] min-[900px]:grid-cols-[minmax(0,1.05fr)_minmax(0,.95fr)] min-[900px]:gap-[clamp(40px,6vw,80px)]">
           {/* LEFT: HEADING */}
-          <div className="wy-header__left">
-            <div className="wy-eyebrow" data-wy>
+          <div className="flex min-w-0 flex-col items-start text-left">
+            <Reveal className="mb-4 inline-flex min-w-0 items-center gap-2.5">
               <span
-                className="wy-eyebrow-line"
                 aria-hidden="true"
+                className={`inline-block h-0.5 w-7 shrink-0 rounded-full ${FLOW_GRADIENT}`}
               />
-              <span className="wy-eyebrow-text">
+              <span className="whitespace-nowrap text-xs font-bold uppercase tracking-[.14em] text-[#6D35C9]">
                 Why it works
               </span>
-            </div>
+            </Reveal>
 
-            <h2 className="wy-title" data-wy>
-              Why{' '}
-              <span className="wy-title__accent">
-                Creative Crew?
-              </span>
-            </h2>
+            <Reveal delay={80} as="div" className="min-w-0">
+              <h2 className="m-0 max-w-[15ch] text-[26px] font-extrabold leading-[1.08] tracking-[-0.035em] text-[#26103d] [overflow-wrap:break-word] [text-wrap:balance] min-[360px]:text-[clamp(30px,4.6vw,52px)]">
+                Why{' '}
+                <span className={GRADIENT_TEXT}>Creative Crew?</span>
+              </h2>
+            </Reveal>
 
-            <p className="wy-subtitle" data-wy>
-              Your Expertise Deserves a Page That Explains It Well.
-            </p>
+            <Reveal delay={160} className="min-w-0">
+              <p className="mt-[clamp(14px,1.8vw,20px)] max-w-[42ch] text-[clamp(15px,1.5vw,18px)] font-normal leading-[1.65] tracking-[-0.005em] text-[rgba(48,32,69,.68)] [overflow-wrap:break-word] [text-wrap:pretty]">
+                Your Expertise Deserves a Page That Explains It Well.
+              </p>
+            </Reveal>
 
-            <div
-              data-wy
-              aria-hidden="true"
-              className="wy-rule"
-            />
+            <Reveal delay={240}>
+              <span
+                aria-hidden="true"
+                className={`mt-[clamp(20px,2.4vw,28px)] block h-1 w-14 rounded-full ${FLOW_GRADIENT}`}
+              />
+            </Reveal>
           </div>
 
           {/* RIGHT: ANIMATED STATISTICS */}
           <div
-            className="wy-header__right"
             aria-label="Our approach"
+            className="grid min-w-0 grid-cols-2 items-start gap-[clamp(16px,4vw,32px)] min-[900px]:flex min-[900px]:flex-wrap min-[900px]:items-end min-[900px]:justify-end min-[900px]:gap-[clamp(24px,3.4vw,48px)]"
           >
-            <div className="wy-stat">
+            <Reveal delay={120} className="relative flex min-w-0 flex-col gap-2 pl-2.5 min-[360px]:pl-3.5 md:gap-3 md:pl-5">
+              <span
+                aria-hidden="true"
+                className="absolute bottom-0 left-0 top-0 w-[3px] rounded-full bg-[linear-gradient(180deg,#6D35C9,#FF8A3D)] opacity-60"
+              />
               <Counter value={6} duration={1600} />
-
-              <span className="wy-stat__label">
+              <span className="text-[13px] font-semibold leading-[1.4] tracking-[-0.01em] text-[rgba(48,32,69,.72)] min-[360px]:text-[clamp(14px,1.5vw,18px)]">
                 Reasons to
                 <br />
                 build it right
               </span>
-            </div>
+            </Reveal>
 
-            <div className="wy-stat">
-              <Counter
-                value={100}
-                suffix="%"
-                duration={2000}
+            <Reveal delay={220} className="relative flex min-w-0 flex-col gap-2 pl-2.5 min-[360px]:pl-3.5 md:gap-3 md:pl-5">
+              <span
+                aria-hidden="true"
+                className="absolute bottom-0 left-0 top-0 w-[3px] rounded-full bg-[linear-gradient(180deg,#6D35C9,#FF8A3D)] opacity-60"
               />
-
-              <span className="wy-stat__label">
+              <Counter value={100} suffix="%" duration={2000} />
+              <span className="text-[13px] font-semibold leading-[1.4] tracking-[-0.01em] text-[rgba(48,32,69,.72)] min-[360px]:text-[clamp(14px,1.5vw,18px)]">
                 Focused on
                 <br />
                 your goal
               </span>
-            </div>
+            </Reveal>
           </div>
         </div>
 
-        {/* WHY CHOOSE US CARDS */}
-        <ul className="wy-grid-list">
+        {/* ================= WHY CHOOSE US CARDS ================= */}
+        <ul className="relative z-10 m-0 grid list-none grid-cols-1 gap-[clamp(14px,1.8vw,22px)] p-0 min-[640px]:grid-cols-2 min-[1080px]:grid-cols-3">
           {why.map(([title, desc], i) => (
-            <li
+            <Reveal
+              as="li"
               key={title}
-              data-wy
-              style={{ '--d': `${(i % 3) * 90}ms` }}
-              className="wy-item min-w-0"
+              delay={(i % 3) * 90}
+              className="min-w-0"
             >
-              <div
-                onPointerMove={spotlight}
-                className="wy-glass wy-card"
-              >
-                <span
-                  aria-hidden="true"
-                  className="wy-spot"
-                />
-
-                <div className="wy-card__top">
-                  <span
-                    className={`wy-tile ${
-                      i % 2 ? 'wy-tile--warm' : ''
-                    }`}
-                  >
-                    <WhyIcon index={i} />
-                  </span>
-
-                  <span
-                    aria-hidden="true"
-                    className="wy-num"
-                  >
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                </div>
-
-                <h3 className="wy-card__title">
-                  {title}
-                </h3>
-
-                <p className="wy-card__desc">
-                  {desc}
-                </p>
-
-                <span
-                  aria-hidden="true"
-                  className="wy-bar"
-                />
-              </div>
-            </li>
+              <WhyCard index={i} title={title} desc={desc} />
+            </Reveal>
           ))}
         </ul>
       </Container>
@@ -338,617 +459,53 @@ export default function Why() {
 }
 
 /* ---------------------------------------------------------------
-   STYLES
+   KEYFRAMES (the only non-utility CSS)
 ---------------------------------------------------------------- */
-const css = `
-.wy-section{
-  position:relative;
-  isolation:isolate;
-  overflow:hidden;
-  padding-block:clamp(56px,7vw,110px);
-  background:
-    radial-gradient(ellipse 70% 45% at 50% 0%,rgba(155,92,240,.12),transparent 70%),
-    linear-gradient(180deg,#ffffff 0%,#faf7ff 50%,#f3ecfa 100%);
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  color:#26103d;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
+const keyframes = `
+@keyframes wySpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-.wy-section *,
-.wy-section *::before,
-.wy-section *::after{
-  box-sizing:border-box;
+@keyframes orbFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -18px, 0); }
 }
 
-/* BACKDROP */
-.wy-backdrop{
-  position:absolute;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-  overflow:hidden;
+@keyframes orbFloatB {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-14px, 16px, 0); }
 }
 
-.wy-orb{
-  position:absolute;
-  border-radius:50%;
-  filter:blur(90px);
-  opacity:.55;
-  will-change:transform;
+@keyframes dotFloat {
+  0% { opacity: 0; transform: translateY(0) scale(.6); }
+  20% { opacity: .85; }
+  80% { opacity: .5; }
+  100% { opacity: 0; transform: translateY(-140px) scale(1); }
 }
 
-.wy-orb--1{
-  width:min(520px,80vw);
-  height:min(520px,80vw);
-  top:-140px;
-  left:-160px;
-  background:radial-gradient(circle,#9B5CF0 0%,transparent 70%);
+@keyframes gridDrift {
+  from { background-position: 0 0; }
+  to { background-position: 56px 56px; }
 }
 
-.wy-orb--2{
-  width:min(560px,85vw);
-  height:min(560px,85vw);
-  top:30%;
-  right:-200px;
-  background:radial-gradient(circle,#FF8A3D 0%,transparent 70%);
-  opacity:.45;
+@keyframes gradientShift {
+  from { background-position: 0% 50%; }
+  to { background-position: 100% 50%; }
 }
 
-.wy-orb--3{
-  width:min(440px,75vw);
-  height:min(440px,75vw);
-  bottom:-160px;
-  left:30%;
-  background:radial-gradient(circle,#6D35C9 0%,transparent 70%);
-  opacity:.4;
+@keyframes shine {
+  0% { opacity: 1; transform: translateX(-120%) skewX(-14deg); }
+  100% { opacity: 1; transform: translateX(520%) skewX(-14deg); }
 }
 
-.wy-grid{
-  position:absolute;
-  inset:0;
-  background-image:
-    linear-gradient(rgba(109,53,201,.05) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(109,53,201,.05) 1px,transparent 1px);
-  background-size:56px 56px;
-  mask-image:radial-gradient(ellipse 70% 60% at 50% 40%,#000 40%,transparent 80%);
-  -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 40%,#000 40%,transparent 80%);
-  opacity:.5;
+@keyframes ringPulse {
+  0% { opacity: .7; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.55); }
 }
 
-.wy-dots{
-  position:absolute;
-  inset:0;
-}
-
-.wy-dot{
-  position:absolute;
-  width:4px;
-  height:4px;
-  border-radius:50%;
-  background:#9B5CF0;
-  box-shadow:0 0 8px 2px rgba(155,92,240,.5);
-  opacity:0;
-  animation:wy-dot-float 8s linear infinite;
-}
-
-.wy-dot:nth-child(3n){
-  background:#FF8A3D;
-  box-shadow:0 0 8px 2px rgba(255,138,61,.5);
-}
-
-@keyframes wy-dot-float{
-  0%{opacity:0;transform:translateY(0) scale(.6)}
-  20%{opacity:.85}
-  80%{opacity:.5}
-  100%{opacity:0;transform:translateY(-140px) scale(1)}
-}
-
-/* HEADER */
-.wy-header{
-  position:relative;
-  z-index:1;
-  display:grid;
-  grid-template-columns:minmax(0,1fr);
-  gap:clamp(28px,3.5vw,40px);
-  align-items:end;
-  margin-bottom:clamp(32px,4.5vw,56px);
-}
-
-.wy-header__left{
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  text-align:left;
-}
-
-.wy-eyebrow{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:16px;
-  min-width:0;
-}
-
-.wy-eyebrow-line{
-  display:inline-block;
-  width:28px;
-  height:2px;
-  border-radius:999px;
-  background:linear-gradient(90deg,#6D35C9,#FF8A3D);
-  flex:0 0 auto;
-}
-
-.wy-eyebrow-text{
-  color:#6D35C9;
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  white-space:nowrap;
-}
-
-.wy-title{
-  margin:0;
-  color:#26103d;
-  font-size:clamp(30px,4.6vw,52px);
-  font-weight:800;
-  line-height:1.08;
-  letter-spacing:-.035em;
-  text-wrap:balance;
-  overflow-wrap:break-word;
-  max-width:15ch;
-}
-
-.wy-title__accent{
-  background:linear-gradient(120deg,#6D35C9 0%,#FF8A3D 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-  color:transparent;
-}
-
-.wy-subtitle{
-  margin:clamp(14px,1.8vw,20px) 0 0;
-  color:rgba(48,32,69,.68);
-  font-size:clamp(15px,1.5vw,18px);
-  font-weight:400;
-  line-height:1.65;
-  letter-spacing:-.005em;
-  max-width:42ch;
-  text-wrap:pretty;
-  overflow-wrap:break-word;
-}
-
-.wy-rule{
-  display:block;
-  width:56px;
-  height:4px;
-  border-radius:999px;
-  margin-top:clamp(20px,2.4vw,28px);
-  background:linear-gradient(90deg,#6D35C9,#FF8A3D);
-  transform-origin:left;
-}
-
-/* STATISTICS */
-.wy-header__right{
-  display:flex;
-  flex-wrap:wrap;
-  gap:clamp(24px,3.4vw,48px);
-  min-width:0;
-  align-items:flex-end;
-  justify-content:flex-start;
-}
-
-.wy-stat{
-  display:flex;
-  flex-direction:column;
-  gap:clamp(8px,1vw,12px);
-  padding-left:clamp(14px,1.6vw,20px);
-  border-left:3px solid rgba(109,53,201,.22);
-  min-width:0;
-}
-
-.wy-stat__num{
-  display:block;
-  font-size:clamp(44px,6.5vw,68px);
-  font-weight:800;
-  letter-spacing:-.04em;
-  line-height:1;
-  white-space:nowrap;
-  background:linear-gradient(120deg,#6D35C9,#FF8A3D);
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-  color:transparent;
-  font-variant-numeric:tabular-nums lining-nums;
-}
-
-.wy-stat__label{
-  font-size:clamp(14px,1.5vw,18px);
-  line-height:1.4;
-  letter-spacing:-.01em;
-  color:rgba(48,32,69,.72);
-  font-weight:600;
-}
-
-/* CARD GRID */
-.wy-grid-list{
-  position:relative;
-  z-index:1;
-  display:grid;
-  grid-template-columns:minmax(0,1fr);
-  gap:clamp(14px,1.8vw,22px);
-  margin:0;
-  padding:0;
-  list-style:none;
-}
-
-.wy-item{
-  min-width:0;
-}
-
-/* GLASS CARDS */
-.wy-glass{
-  position:relative;
-  overflow:hidden;
-  isolation:isolate;
-  height:100%;
-  background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(255,255,255,.6));
-  border:1px solid rgba(255,255,255,.95);
-  -webkit-backdrop-filter:blur(16px) saturate(160%);
-  backdrop-filter:blur(16px) saturate(160%);
-  box-shadow:
-    inset 0 1px 0 #fff,
-    inset 0 -1px 0 rgba(109,53,201,.06),
-    0 1px 2px rgba(48,32,69,.05),
-    0 14px 30px -18px rgba(109,53,201,.35),
-    0 32px 60px -38px rgba(48,32,69,.35);
-  transition:transform .45s cubic-bezier(.2,.7,.2,1),box-shadow .45s ease;
-}
-
-.wy-glass::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  padding:1px;
-  pointer-events:none;
-  z-index:2;
-  background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(109,53,201,.16) 45%,rgba(255,138,61,.22));
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-}
-
-.wy-glass::after{
-  content:'';
-  position:absolute;
-  left:10%;
-  right:10%;
-  top:0;
-  height:1px;
-  pointer-events:none;
-  z-index:2;
-  background:linear-gradient(90deg,transparent,#fff,transparent);
-}
-
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  .wy-glass{
-    background:rgba(255,255,255,.95);
-  }
-}
-
-.wy-spot{
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  pointer-events:none;
-  z-index:0;
-  opacity:0;
-  background:radial-gradient(
-    260px circle at var(--mx,50%) var(--my,0%),
-    rgba(155,92,240,.16),
-    rgba(255,138,61,.06) 55%,
-    transparent 75%
-  );
-  transition:opacity .4s ease;
-}
-
-.wy-card{
-  display:flex;
-  flex-direction:column;
-  border-radius:clamp(1.25rem,2vw,1.75rem);
-  padding:clamp(1.25rem,2vw,1.75rem);
-  padding-bottom:clamp(1.75rem,2.4vw,2.25rem);
-}
-
-.wy-card__top{
-  position:relative;
-  z-index:1;
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-}
-
-.wy-card__title{
-  position:relative;
-  z-index:1;
-  margin:clamp(18px,2vw,22px) 0 0;
-  font-size:clamp(1.05rem,1.6vw,1.25rem);
-  font-weight:700;
-  line-height:1.35;
-  letter-spacing:-.015em;
-  color:#26103d;
-  overflow-wrap:break-word;
-  text-wrap:balance;
-}
-
-.wy-card__desc{
-  position:relative;
-  z-index:1;
-  margin:10px 0 0;
-  font-size:clamp(.9rem,1.3vw,1rem);
-  line-height:1.7;
-  color:rgba(48,32,69,.68);
-  overflow-wrap:break-word;
-  text-wrap:pretty;
-}
-
-/* ICON TILES */
-.wy-tile{
-  position:relative;
-  display:grid;
-  place-items:center;
-  flex:0 0 auto;
-  border-radius:16px;
-  width:3.25rem;
-  height:3.25rem;
-  color:#6D35C9;
-  background:linear-gradient(145deg,#fff,#EFE4FB);
-  border:1px solid rgba(109,53,201,.18);
-  box-shadow:0 5px 0 -1px rgba(109,53,201,.22),0 14px 22px -14px rgba(109,53,201,.6),inset 0 1px 0 #fff;
-  transition:transform .45s cubic-bezier(.2,.7,.2,1);
-}
-
-.wy-tile::before{
-  content:'';
-  position:absolute;
-  inset:3px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.8);
-  pointer-events:none;
-}
-
-.wy-tile svg{
-  transition:transform .45s cubic-bezier(.2,.7,.2,1);
-}
-
-.wy-tile--warm{
-  color:#E36F2C;
-  background:linear-gradient(145deg,#fff,#FFE8D8);
-  border-color:rgba(255,138,61,.28);
-  box-shadow:0 5px 0 -1px rgba(255,138,61,.28),0 14px 22px -14px rgba(255,138,61,.7),inset 0 1px 0 #fff;
-}
-
-/* CARD NUMBERS */
-.wy-num{
-  display:grid;
-  place-items:center;
-  flex:0 0 auto;
-  min-width:2rem;
-  height:1.75rem;
-  padding:0 .55rem;
-  border-radius:9999px;
-  font-size:.7rem;
-  font-weight:700;
-  letter-spacing:.06em;
-  font-variant-numeric:tabular-nums;
-  color:rgba(48,32,69,.55);
-  background:rgba(255,255,255,.7);
-  border:1px solid rgba(109,53,201,.12);
-  box-shadow:inset 0 1px 0 #fff;
-}
-
-/* ACCENT BAR */
-.wy-bar{
-  position:absolute;
-  left:1.5rem;
-  right:1.5rem;
-  bottom:0;
-  height:3px;
-  border-radius:3px 3px 0 0;
-  pointer-events:none;
-  z-index:1;
-  background:linear-gradient(90deg,#6D35C9,#FF8A3D);
-  transform:scaleX(.16);
-  transform-origin:left;
-  transition:transform .6s cubic-bezier(.2,.7,.2,1);
-}
-
-/* HOVER */
-@media (hover:hover) and (pointer:fine){
-  .wy-glass:hover{
-    transform:translate3d(0,-6px,0);
-    box-shadow:
-      inset 0 1px 0 #fff,
-      inset 0 -1px 0 rgba(109,53,201,.08),
-      0 1px 2px rgba(48,32,69,.05),
-      0 24px 44px -18px rgba(109,53,201,.45),
-      0 44px 76px -42px rgba(48,32,69,.42);
-  }
-
-  .wy-glass:hover .wy-spot{
-    opacity:1;
-  }
-
-  .wy-glass:hover .wy-bar{
-    transform:scaleX(1);
-  }
-
-  .wy-glass:hover .wy-tile{
-    transform:translate3d(0,-2px,0);
-  }
-
-  .wy-glass:hover .wy-tile svg{
-    transform:rotate(-8deg) scale(1.1);
-  }
-}
-
-/* SCROLL REVEAL */
-.wy-armed .wy-item{
-  opacity:0;
-  transform:translate3d(0,28px,0);
-  transition:opacity .8s ease var(--d,0ms),transform .9s cubic-bezier(.2,.7,.2,1) var(--d,0ms);
-}
-
-.wy-armed .wy-item.wy-in{
-  opacity:1;
-  transform:none;
-}
-
-.wy-armed .wy-rule{
-  opacity:0;
-  transform:scaleX(.3);
-  transition:opacity .7s ease .15s,transform .8s cubic-bezier(.2,.7,.2,1) .15s;
-}
-
-.wy-armed .wy-rule.wy-in{
-  opacity:1;
-  transform:none;
-}
-
-/* FLOATING ANIMATIONS */
-@keyframes wy-float{
-  0%,100%{transform:translate3d(0,0,0)}
-  50%{transform:translate3d(0,-18px,0)}
-}
-
-@keyframes wy-float-b{
-  0%,100%{transform:translate3d(0,0,0)}
-  50%{transform:translate3d(-14px,16px,0)}
-}
-
-.wy-float{
-  animation:wy-float 10s ease-in-out infinite;
-  will-change:transform;
-}
-
-.wy-float-b{
-  animation:wy-float-b 13s ease-in-out infinite;
-  will-change:transform;
-}
-
-/* RESPONSIVE */
-@media (max-width:899px){
-  .wy-header__right{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:clamp(16px,4vw,32px);
-    align-items:start;
-  }
-}
-
-@media (min-width:640px){
-  .wy-grid-list{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-}
-
-@media (min-width:900px){
-  .wy-header{
-    grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
-    gap:clamp(40px,6vw,80px);
-  }
-
-  .wy-header__right{
-    justify-content:flex-end;
-    align-items:flex-end;
-    text-align:left;
-  }
-}
-
-@media (min-width:1080px){
-  .wy-grid-list{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-}
-
-@media (max-width:359px){
-  .wy-card{
-    padding:1.1rem;
-    padding-bottom:1.5rem;
-  }
-
-  .wy-tile{
-    width:2.75rem;
-    height:2.75rem;
-    border-radius:14px;
-  }
-
-  .wy-tile svg{
-    width:20px;
-    height:20px;
-  }
-
-  .wy-title{
-    font-size:26px;
-  }
-
-  .wy-header__right{
-    gap:14px;
-  }
-
-  .wy-stat{
-    padding-left:10px;
-  }
-
-  .wy-stat__num{
-    font-size:40px;
-  }
-
-  .wy-stat__label{
-    font-size:13px;
-  }
-}
-
-/* REDUCED MOTION */
-@media (prefers-reduced-motion:reduce){
-  .wy-armed .wy-item,
-  .wy-armed .wy-rule{
-    opacity:1!important;
-    transform:none!important;
-    transition:none!important;
-  }
-
-  .wy-float,
-  .wy-float-b,
-  .wy-dot{
-    animation:none!important;
-  }
-
-  .wy-dot{
-    display:none;
-  }
-
-  .wy-glass,
-  .wy-tile,
-  .wy-tile svg,
-  .wy-bar,
-  .wy-spot{
-    transition:none!important;
-  }
-
-  .wy-glass:hover,
-  .wy-glass:hover .wy-tile,
-  .wy-glass:hover .wy-tile svg{
-    transform:none!important;
-  }
-
-  .wy-bar{
-    transform:scaleX(1)!important;
-  }
+@keyframes tileBob {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -3px, 0); }
 }
 `
