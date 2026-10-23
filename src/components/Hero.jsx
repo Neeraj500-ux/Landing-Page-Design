@@ -528,8 +528,9 @@ export default function Hero() {
         <div className="mx-auto grid max-w-[720px] grid-cols-1 items-center gap-5 min-[480px]:gap-[22px] md:gap-[clamp(24px,5vw,40px)] lg:max-w-none lg:grid-cols-[minmax(0,.94fr)_minmax(0,1.06fr)] lg:gap-[clamp(28px,3.5vw,60px)]">
           {/* ---------- Copy ---------- */}
           <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
-            <Reveal className="w-full">
-              <p className="relative m-0 w-full overflow-hidden rounded-[22px] border border-[#e0d2ff] bg-[linear-gradient(180deg,#f6f1ff,#efe7ff)] px-3.5 py-2.5 text-center text-[clamp(13.5px,3.9vw,17px)] font-semibold leading-[1.5] text-[#2a2140] shadow-[inset_0_1px_0_#fff,0_10px_24px_-16px_rgba(124,58,237,.5)] [overflow-wrap:break-word] [text-wrap:balance] after:pointer-events-none after:absolute after:inset-y-0 after:-left-[40%] after:w-[36%] after:animate-[heroShine_6s_ease-in-out_1.2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffffb3,transparent)] motion-reduce:after:hidden min-[480px]:rounded-[26px] min-[480px]:px-4 min-[480px]:py-3 min-[480px]:leading-[1.55] md:px-5 md:py-3.5 md:text-[clamp(16px,1.65vw,21px)] lg:text-left lg:text-[clamp(15px,1.45vw,19px)]">
+            {/* Top pill: container-type makes the font scale with the pill width on desktop */}
+            <Reveal className="w-full [container-type:inline-size]">
+              <p className="relative m-0 w-full overflow-hidden rounded-[22px] border border-[#e0d2ff] bg-[linear-gradient(180deg,#f6f1ff,#efe7ff)] px-3.5 py-2.5 text-center text-[clamp(13.5px,3.9vw,17px)] font-semibold leading-[1.5] text-[#2a2140] shadow-[inset_0_1px_0_#fff,0_10px_24px_-16px_rgba(124,58,237,.5)] [overflow-wrap:break-word] [text-wrap:balance] after:pointer-events-none after:absolute after:inset-y-0 after:-left-[40%] after:w-[36%] after:animate-[heroShine_6s_ease-in-out_1.2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffffb3,transparent)] motion-reduce:after:hidden min-[480px]:rounded-[26px] min-[480px]:px-4 min-[480px]:py-3 min-[480px]:leading-[1.55] md:px-5 md:py-3.5 md:text-[clamp(16px,1.65vw,21px)] lg:px-6 lg:py-4 lg:text-left lg:whitespace-nowrap lg:text-[clamp(15px,4.2cqw,26px)]">
                 We Don’t Just Build Landing Pages.
                 <br />
                 We Build Complete Automated Funnels.
