@@ -93,7 +93,7 @@ function Lightbox({ index, onClose, onStep }) {
       {item && (
         <div className="grid max-h-[94dvh] w-[min(520px,100%)] animate-[wr-pop_450ms_cubic-bezier(0.22,1,0.36,1)_both] gap-3 rounded-[24px] border border-white/20 bg-[linear-gradient(150deg,rgba(255,255,255,0.15),rgba(255,255,255,0.04))] p-3 shadow-[0_44px_90px_-30px_rgba(0,0,0,0.85),0_0_80px_-30px_rgba(188,143,255,0.5)] backdrop-blur-[26px] motion-reduce:animate-none sm:p-4">
           <div className="flex items-center justify-between px-1">
-            <span className="text-xs font-medium text-slate-600 sm:text-sm">
+            <span className="text-xs font-medium text-white/80 sm:text-sm">
               {index + 1} of {reviews.length}
             </span>
             <button type="button" onClick={onClose} aria-label="Close preview" className={ICON_BUTTON}>
@@ -101,7 +101,7 @@ function Lightbox({ index, onClose, onStep }) {
             </button>
           </div>
 
-          <div className="grid place-items-center overflow-hidden rounded-2xl p-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)] sm:p-3 [background:radial-gradient(circle_at_18%_12%,rgba(244,114,182,0.5),transparent_55%),radial-gradient(circle_at_88%_92%,rgba(255,215,106,0.38),transparent_55%),linear-gradient(135deg,#5b2f8f,#2b1245)]">
+          <div className="grid place-items-center overflow-hidden rounded-2xl p-2 shadow-[inset_0_0_0_1px_rgba(124,58,237,0.16)] sm:p-3 [background:radial-gradient(circle_at_15%_10%,rgba(244,114,182,0.25),transparent_55%),radial-gradient(circle_at_90%_95%,rgba(168,85,247,0.28),transparent_55%),linear-gradient(135deg,#f1e8ff,#faefff)]">
             <img
               key={item.image}
               src={item.image}
@@ -248,15 +248,15 @@ export default function WhatsAppReviews() {
         "relative isolate w-full min-w-0 overflow-hidden text-slate-900",
         FONT_DISPLAY,
         "pb-14 pt-14 sm:pb-16 sm:pt-16 md:pb-20 md:pt-20 lg:pb-24 lg:pt-24",
-        "[background:radial-gradient(circle_at_0%_0%,rgba(196,160,255,0.45),transparent_45%),radial-gradient(circle_at_100%_0%,rgba(232,121,249,0.2),transparent_45%),radial-gradient(circle_at_0%_100%,rgba(167,139,250,0.32),transparent_45%),radial-gradient(circle_at_100%_100%,rgba(216,180,254,0.45),transparent_45%),linear-gradient(160deg,#ffffff_0%,#f6f0ff_50%,#ede2ff_100%)]"
+        "[background:radial-gradient(circle_at_0%_0%,rgba(216,190,255,0.5),transparent_45%),radial-gradient(circle_at_100%_0%,rgba(240,200,255,0.3),transparent_45%),radial-gradient(circle_at_0%_100%,rgba(205,185,255,0.4),transparent_45%),radial-gradient(circle_at_100%_100%,rgba(225,200,255,0.5),transparent_45%),linear-gradient(160deg,#ffffff_0%,#faf6ff_50%,#f3ebff_100%)]"
       )}
     >
       {/* BACKGROUND: soft light-purple glows only (no grid lines) */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <span className="absolute -left-24 -top-24 h-[320px] w-[320px] rounded-full bg-[#c4a0ff]/40 blur-[90px] sm:h-[440px] sm:w-[440px]" />
-        <span className="absolute -right-24 -top-24 h-[300px] w-[300px] rounded-full bg-[#e9b8ff]/35 blur-[90px] sm:h-[400px] sm:w-[400px]" />
-        <span className="absolute -bottom-28 -left-24 h-[320px] w-[320px] rounded-full bg-[#b79bff]/35 blur-[90px] sm:h-[440px] sm:w-[440px]" />
-        <span className="absolute -bottom-28 -right-24 h-[300px] w-[300px] rounded-full bg-[#d8b4fe]/45 blur-[90px] sm:h-[400px] sm:w-[400px]" />
+        <span className="absolute -left-24 -top-24 h-[320px] w-[320px] rounded-full bg-[#d9c2ff]/45 blur-[90px] sm:h-[440px] sm:w-[440px]" />
+        <span className="absolute -right-24 -top-24 h-[300px] w-[300px] rounded-full bg-[#f0d4ff]/40 blur-[90px] sm:h-[400px] sm:w-[400px]" />
+        <span className="absolute -bottom-28 -left-24 h-[320px] w-[320px] rounded-full bg-[#cdb8ff]/40 blur-[90px] sm:h-[440px] sm:w-[440px]" />
+        <span className="absolute -bottom-28 -right-24 h-[300px] w-[300px] rounded-full bg-[#e2cbff]/50 blur-[90px] sm:h-[400px] sm:w-[400px]" />
       </div>
 
       <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-7 md:px-9 lg:px-12">
@@ -358,7 +358,7 @@ export default function WhatsAppReviews() {
 
       {/* TRUST LINE */}
       <div className="mx-auto mt-10 flex flex-col items-center gap-4 px-5 sm:mt-12">
-        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-white/70 sm:text-sm">
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-slate-700 sm:text-sm">
           {["Real Conversations", "Real Clients", "Real Results"].map((t) => (
             <span key={t} className="flex items-center gap-1.5">
               <span className="text-purple-500">✓</span>

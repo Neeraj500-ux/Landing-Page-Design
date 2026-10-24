@@ -272,8 +272,8 @@ function CarouselRow({ images, offset = 0, reverse = false, revealed, paused, on
         className={cx(
           "flex w-max will-change-transform",
           reverse
-            ? "animate-[cc-scroll_48s_linear_-18s_infinite_reverse] md:animate-[cc-scroll_58s_linear_-18s_infinite_reverse]"
-            : "animate-[cc-scroll_44s_linear_infinite] md:animate-[cc-scroll_54s_linear_infinite]",
+            ? "animate-[cc-scroll_25s_linear_-18s_infinite_reverse] md:animate-[cc-scroll_30s_linear_-18s_infinite_reverse]"
+            : "animate-[cc-scroll_22s_linear_infinite] md:animate-[cc-scroll_27s_linear_infinite]",
           paused && "[animation-play-state:paused]",
           "group-hover/row:[animation-play-state:paused]",
           "group-focus-within/row:[animation-play-state:paused]",
