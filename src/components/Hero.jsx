@@ -443,12 +443,15 @@ export default function Hero() {
               <Button className={HERO_BTN}>Yes! Let's Grow My Revenue</Button>
             </div>
 
-            {/* IMAGE: no floating. Attached at the bottom with violet colour fill + bottom line */}
+            {/* IMAGE:
+                - phones: FULL SCREEN WIDTH (cancels the side padding with negative margin)
+                - md and up: normal width
+                Violet colour fill + bottom line run edge to edge of the image */}
             <div
               ref={tilt.ref}
               onPointerMove={tilt.onPointerMove}
               onPointerLeave={tilt.onPointerLeave}
-              className="relative w-full min-w-0 transition-transform duration-[350ms] ease-out lg:will-change-transform lg:[transform:perspective(1100px)_rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))_translateY(var(--lift,0px))] lg:hover:[--lift:-5px] lg:motion-reduce:[transform:none]"
+              className="relative -mx-4 w-[calc(100%+2rem)] max-w-none min-w-0 transition-transform duration-[350ms] ease-out min-[480px]:-mx-5 min-[480px]:w-[calc(100%+2.5rem)] md:mx-0 md:w-full lg:will-change-transform lg:[transform:perspective(1100px)_rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))_translateY(var(--lift,0px))] lg:hover:[--lift:-5px] lg:motion-reduce:[transform:none]"
             >
               <img
                 src="/images/Neeraj19.png"
@@ -458,16 +461,16 @@ export default function Hero() {
                 decoding="async"
               />
 
-              {/* Colour fill from the bottom (fades upward) */}
+              {/* Colour fill from the bottom (fades upward), edge to edge */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-[26%] bg-[linear-gradient(180deg,rgba(167,139,250,0)_0%,rgba(167,139,250,.28)_45%,rgba(124,58,237,.5)_100%)]"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-[30%] bg-[linear-gradient(180deg,rgba(167,139,250,0)_0%,rgba(167,139,250,.3)_45%,rgba(124,58,237,.55)_100%)]"
               />
 
-              {/* Line at the very bottom */}
+              {/* Line at the very bottom, edge to edge */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-[4px] bg-[linear-gradient(90deg,#6d28d9,#a855f7,#6d28d9)] md:h-[5px]"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-[5px] bg-[linear-gradient(90deg,#6d28d9,#a855f7,#6d28d9)]"
               />
             </div>
 
