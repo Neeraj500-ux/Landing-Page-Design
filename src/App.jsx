@@ -1,4 +1,3 @@
-
 import Hero from "./components/Hero";
 import Problems from "./components/Problems";
 import Audience from "./components/Audience";
@@ -9,6 +8,7 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import ImageCarousel from "./components/ImageCarousel";
 import Video from "./components/Video";
+import WhatsAppReviews from "./components/WhatsAppReviews";
 
 export default function App() {
   return (
@@ -17,7 +17,12 @@ export default function App() {
         <Hero />
         <Problems />
         <ImageCarousel />
+         {/* WhatsApp Reviews */}
+        <WhatsAppReviews />
+
         <Video />
+
+        
         <Process />
         {/* <Audience /> */}
         <Why />

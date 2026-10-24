@@ -1,72 +1,52 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-/**
- * ImageCarousel — Tailwind CSS version.
- *
- * Requirements
- * - Tailwind CSS v3.4+ or v4 (arbitrary values, named groups, `backdrop:` and
- *   `open:` variants are used).
- * - Tailwind v3 only: set `future: { hoverOnlyWhenSupported: true }` in
- *   tailwind.config so hover effects (and hover-to-pause) don't stick on touch
- *   screens. Tailwind v4 does this by default.
- *
- * The only raw CSS left is the font import and the @keyframes at the bottom of
- * the file, because utilities can't declare keyframes. You can move them into
- * tailwind.config (theme.extend.keyframes) if you prefer.
- */
+/* ----------------------------- DATA ----------------------------- */
 
-/* -------------------------------------------------------------------------- */
-/*  Data                                                                      */
-/* -------------------------------------------------------------------------- */
+const makeImages = (from, to, names) =>
+  names.slice(from - 1, to).map((name, i) => ({
+    src: `/images/Neeraj17%20(${from + i}).jpeg`,
+    alt: `Landing Page Design ${name}`,
+  }));
 
-const topImages = [
-  { src: "/images/Neeraj3.png", alt: "Consultant Landing Page" },
-  { src: "/images/Neeraj4.png", alt: "Trainer Landing Page" },
-  { src: "/images/Neeraj5.png", alt: "Coach Landing Page" },
-  { src: "/images/Neeraj6.png", alt: "Custom Landing Page" },
-];
+const NAMES = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve"];
 
-const bottomImages = [
-  { src: "/images/Neeraj7.png", alt: "Landing Page Design One" },
-  { src: "/images/Neeraj8.png", alt: "Landing Page Design Two" },
-  { src: "/images/Neeraj9.png", alt: "Landing Page Design Three" },
-  { src: "/images/Neeraj10.png", alt: "Landing Page Design Four" },
-];
-
-// One flat list so the lightbox can step through every design.
+const topImages = makeImages(1, 6, NAMES);
+const bottomImages = makeImages(7, 12, NAMES);
 const allImages = [...topImages, ...bottomImages];
 
-/* -------------------------------------------------------------------------- */
-/*  Shared class strings                                                      */
-/* -------------------------------------------------------------------------- */
+/* ---------------------------- SHARED ---------------------------- */
 
 const cx = (...parts) => parts.filter(Boolean).join(" ");
 
 const FONT_DISPLAY =
   "[font-family:'Bricolage_Grotesque','Avenir_Next',system-ui,-apple-system,'Segoe_UI',sans-serif]";
-const FONT_ACCENT =
-  "[font-family:'Instrument_Serif','Iowan_Old_Style',Georgia,serif]";
-
+const FONT_ACCENT = "[font-family:'Instrument_Serif','Iowan_Old_Style',Georgia,serif]";
 const FOCUS_RING =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#ffd76a]";
 
 const ROW_MASK = cx(
-  "[mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]",
-  "[-webkit-mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]",
-  "motion-reduce:[mask-image:none] motion-reduce:[-webkit-mask-image:none]"
+  "[mask-image:linear-gradient(to_right,transparent,#000_5%,#000_95%,transparent)]",
+  "[-webkit-mask-image:linear-gradient(to_right,transparent,#000_5%,#000_95%,transparent)]",
+  "sm:[mask-image:linear-gradient(to_right,transparent,#000_7%,#000_93%,transparent)]",
+  "sm:[-webkit-mask-image:linear-gradient(to_right,transparent,#000_7%,#000_93%,transparent)]",
+  "lg:[mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]",
+  "lg:[-webkit-mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]",
+  "motion-reduce:[mask-image:none]",
+  "motion-reduce:[-webkit-mask-image:none]"
 );
 
 const ICON_BUTTON = cx(
-  "grid h-[42px] w-[42px] shrink-0 cursor-pointer place-items-center rounded-full md:h-11 md:w-11",
+  "grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full",
+  "sm:h-[42px] sm:w-[42px] md:h-11 md:w-11",
   "border border-white/25 text-white",
   "bg-[linear-gradient(135deg,rgba(255,255,255,0.16),rgba(255,255,255,0.05))]",
-  "transition-[transform,background-color,color,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+  "transition-[transform,background-color,color,border-color] duration-300",
+  "ease-[cubic-bezier(0.22,1,0.36,1)]",
   "hover:border-[rgba(255,215,106,0.7)] hover:bg-[rgba(255,215,106,0.16)] hover:text-[#ffd76a]",
   "active:scale-[0.92]",
   FOCUS_RING
 );
 
-// Traffic-light dots: idle grey that light up on card hover/focus, or always lit.
 const LIGHTS_IDLE = [
   "bg-white/[0.28] group-hover/card:bg-[#f472b6] group-hover/card:shadow-[0_0_8px_rgba(244,114,182,0.7)] group-focus-within/card:bg-[#f472b6]",
   "bg-white/[0.28] delay-[60ms] group-hover/card:bg-[#ffd76a] group-hover/card:shadow-[0_0_8px_rgba(255,215,106,0.7)] group-focus-within/card:bg-[#ffd76a]",
@@ -74,7 +54,6 @@ const LIGHTS_IDLE = [
 ];
 const LIGHTS_LIT = ["bg-[#f472b6]", "bg-[#ffd76a]", "bg-[#bc8fff]"];
 
-// Entrance for header elements (stagger comes from an inline transition-delay).
 const reveal = (revealed) =>
   cx(
     "[transition:opacity_800ms_cubic-bezier(0.22,1,0.36,1),transform_800ms_cubic-bezier(0.22,1,0.36,1)]",
@@ -82,9 +61,7 @@ const reveal = (revealed) =>
     "motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none"
   );
 
-/* -------------------------------------------------------------------------- */
-/*  Icons (inline SVG, no dependencies)                                       */
-/* -------------------------------------------------------------------------- */
+/* ----------------------------- ICONS ---------------------------- */
 
 const iconProps = {
   width: 18,
@@ -120,31 +97,27 @@ const NextIcon = () => (
   </svg>
 );
 
-/* -------------------------------------------------------------------------- */
-/*  BrowserBar — the window chrome that frames every landing page             */
-/* -------------------------------------------------------------------------- */
+/* --------------------------- BROWSER BAR ------------------------- */
 
 function BrowserBar({ label, lit = false, children }) {
   const lights = lit ? LIGHTS_LIT : LIGHTS_IDLE;
 
   return (
-    <span
-      aria-hidden="true"
-      className="flex h-[30px] items-center gap-[9px] pl-1.5 pr-1 md:h-[34px] md:gap-3"
-    >
-      <span className="flex shrink-0 gap-1.5">
+    <span className="flex h-[29px] items-center gap-2 pl-1.5 pr-1 sm:h-[31px] sm:gap-[9px] md:h-[34px] md:gap-3">
+      <span className="flex shrink-0 gap-1 sm:gap-1.5">
         {lights.map((tone, index) => (
           <span
             key={index}
             className={cx(
-              "h-[9px] w-[9px] rounded-full transition-[background-color,box-shadow] duration-[350ms]",
+              "h-[7px] w-[7px] rounded-full transition-[background-color,box-shadow] duration-[350ms]",
+              "sm:h-2 sm:w-2 md:h-[9px] md:w-[9px]",
               tone
             )}
           />
         ))}
       </span>
 
-      <span className="min-w-0 flex-1 truncate rounded-full bg-[rgba(12,3,24,0.42)] px-[11px] py-[5px] text-[11px] font-medium leading-[1.3] tracking-[0.01em] text-white/[0.84] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] md:px-3.5 md:py-1.5 md:text-xs">
+      <span className="min-w-0 flex-1 truncate rounded-full bg-[rgba(12,3,24,0.42)] px-2.5 py-[5px] text-[10px] font-medium leading-[1.3] tracking-[0.01em] text-white/[0.84] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] sm:px-[11px] sm:text-[11px] md:px-3.5 md:py-1.5 md:text-xs">
         {label}
       </span>
 
@@ -153,30 +126,29 @@ function BrowserBar({ label, lit = false, children }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Gallery card — pointer-tracked tilt + spotlight                           */
-/* -------------------------------------------------------------------------- */
+/* --------------------------- GALLERY CARD ------------------------ */
 
 function GalleryCard({ item, interactive, reverse, onOpen }) {
   const cardRef = useRef(null);
   const frame = useRef(0);
 
   const handleMove = useCallback((event) => {
-    // Tilt is a mouse-only enhancement; touch and pen skip it.
     if (event.pointerType !== "mouse") return;
     const el = cardRef.current;
     if (!el) return;
 
     const { clientX, clientY } = event;
     cancelAnimationFrame(frame.current);
+
     frame.current = requestAnimationFrame(() => {
       const rect = el.getBoundingClientRect();
       const x = (clientX - rect.left) / rect.width;
       const y = (clientY - rect.top) / rect.height;
+
       el.style.setProperty("--mx", `${(x * 100).toFixed(1)}%`);
       el.style.setProperty("--my", `${(y * 100).toFixed(1)}%`);
-      el.style.setProperty("--ry", `${((x - 0.5) * 7).toFixed(2)}deg`);
-      el.style.setProperty("--rx", `${((0.5 - y) * 5).toFixed(2)}deg`);
+      el.style.setProperty("--ry", `${((x - 0.5) * 6).toFixed(2)}deg`);
+      el.style.setProperty("--rx", `${((0.5 - y) * 4).toFixed(2)}deg`);
     });
   }, []);
 
@@ -196,15 +168,15 @@ function GalleryCard({ item, interactive, reverse, onOpen }) {
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
       className={cx(
-        "group/card relative m-0 w-[var(--card)] shrink-0 rounded-[20px] hover:z-[1] md:rounded-[24px]",
+        "group/card relative m-0 w-[var(--card)] shrink-0 rounded-[18px] hover:z-[1]",
+        "sm:rounded-[20px] md:rounded-[22px] xl:rounded-[24px]",
         "[--rx:0deg] [--ry:0deg] [--mx:50%] [--my:50%]",
         "[transform:perspective(1100px)_rotateX(var(--rx))_rotateY(var(--ry))]",
         "[transition:transform_450ms_cubic-bezier(0.22,1,0.36,1)]",
-        "motion-reduce:transform-none motion-reduce:transition-none motion-reduce:snap-start",
-        // Staggered rhythm, mirrored on the second row
+        "motion-reduce:transform-none motion-reduce:transition-none motion-reduce:snap-center",
         reverse
-          ? "odd:mt-[clamp(14px,2vw,28px)]"
-          : "even:mt-[clamp(14px,2vw,28px)]"
+          ? "odd:mt-2 sm:odd:mt-3 lg:odd:mt-4"
+          : "even:mt-2 sm:even:mt-3 lg:even:mt-4"
       )}
     >
       <button
@@ -213,43 +185,49 @@ function GalleryCard({ item, interactive, reverse, onOpen }) {
         tabIndex={interactive ? 0 : -1}
         aria-label={`Enlarge ${item.alt}`}
         className={cx(
-          "relative block w-full cursor-zoom-in overflow-hidden rounded-[inherit] border-0 p-2.5 pb-3 text-left text-inherit md:p-3 md:pb-3.5",
-          "[-webkit-tap-highlight-color:transparent]",
+          "relative block w-full cursor-zoom-in overflow-hidden rounded-[inherit] border-0",
+          "p-2 pb-2.5 sm:p-2.5 sm:pb-3 md:p-[11px] md:pb-3",
+          "text-left text-inherit [-webkit-tap-highlight-color:transparent]",
           "[background:linear-gradient(160deg,rgba(255,255,255,0.18),rgba(255,255,255,0.04)_48%,rgba(255,255,255,0.09)),rgba(30,12,52,0.62)]",
-          "shadow-[inset_0_1px_0_rgba(255,255,255,0.24),inset_0_-1px_0_rgba(0,0,0,0.16),0_28px_50px_-26px_rgba(6,1,14,0.92)]",
+          "shadow-[inset_0_1px_0_rgba(255,255,255,0.24),inset_0_-1px_0_rgba(0,0,0,0.16),0_25px_45px_-25px_rgba(6,1,14,0.92)]",
           "[transition:box-shadow_400ms_ease,transform_450ms_cubic-bezier(0.22,1,0.36,1)]",
-          "group-hover/card:-translate-y-1.5",
-          "group-hover/card:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.16),0_36px_56px_-24px_rgba(6,1,14,0.95),0_0_50px_-12px_rgba(188,143,255,0.65)]",
+          "group-hover/card:-translate-y-1",
+          "group-hover/card:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(0,0,0,0.16),0_34px_54px_-24px_rgba(6,1,14,0.95),0_0_45px_-14px_rgba(188,143,255,0.62)]",
           "motion-reduce:transition-none motion-reduce:group-hover/card:translate-y-0",
-          // Gradient hairline border
-          "before:pointer-events-none before:absolute before:inset-0 before:z-[2] before:rounded-[inherit] before:p-px before:content-['']",
+          "before:pointer-events-none before:absolute before:inset-0 before:z-[2]",
+          "before:rounded-[inherit] before:p-px before:content-['']",
           "before:[background:linear-gradient(150deg,rgba(255,255,255,0.6),rgba(255,255,255,0.06)_42%,rgba(188,143,255,0.45))]",
           "before:[-webkit-mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)]",
           "before:[-webkit-mask-composite:xor]",
           "before:[mask:linear-gradient(#000_0_0)_content-box_exclude,linear-gradient(#000_0_0)]",
-          // Cursor-following spotlight
-          "after:pointer-events-none after:absolute after:inset-0 after:z-[3] after:rounded-[inherit] after:opacity-0 after:transition-opacity after:duration-300 after:content-['']",
+          "after:pointer-events-none after:absolute after:inset-0 after:z-[3]",
+          "after:rounded-[inherit] after:opacity-0 after:transition-opacity",
+          "after:duration-300 after:content-['']",
           "after:[background:radial-gradient(300px_circle_at_var(--mx)_var(--my),rgba(255,255,255,0.18),transparent_62%)]",
-          "group-hover/card:after:opacity-100 motion-reduce:after:transition-none",
+          "group-hover/card:after:opacity-100",
           FOCUS_RING
         )}
       >
         <BrowserBar label={item.alt}>
-          <span className="grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full text-white/60 transition-[color,transform,background-color] duration-[250ms] group-hover/card:rotate-[8deg] group-hover/card:scale-[1.12] group-hover/card:bg-[rgba(255,215,106,0.16)] group-hover/card:text-[#ffd76a] group-focus-within/card:text-[#ffd76a] motion-reduce:transition-none motion-reduce:group-hover/card:transform-none [&>svg]:h-3.5 [&>svg]:w-3.5">
+          <span className="grid h-[24px] w-[24px] shrink-0 place-items-center rounded-full text-white/60 transition-[color,transform,background-color] duration-[250ms] group-hover/card:rotate-[8deg] group-hover/card:scale-[1.1] group-hover/card:bg-[rgba(255,215,106,0.16)] group-hover/card:text-[#ffd76a] group-focus-within/card:text-[#ffd76a] sm:h-[26px] sm:w-[26px] [&>svg]:h-3.5 [&>svg]:w-3.5">
             <ExpandIcon />
           </span>
         </BrowserBar>
 
-        <span className="relative mt-1 block aspect-[16/10] overflow-hidden rounded-[11px] bg-[linear-gradient(160deg,rgba(19,6,36,0.6),rgba(19,6,36,0.3))] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.09)] md:rounded-[14px]">
+        {/* Full image, no crop, no blur, no empty space top/bottom */}
+        <span className="relative mt-1 block w-full overflow-hidden rounded-[10px] bg-[rgba(19,6,36,0.65)] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.09)] md:rounded-[13px]">
           <img
             src={item.src}
             alt={interactive ? item.alt : ""}
             loading="lazy"
             decoding="async"
             draggable={false}
-            width={720}
-            height={450}
-            className="block h-full w-full select-none object-contain object-center [transition:transform_800ms_cubic-bezier(0.22,1,0.36,1)] group-hover/card:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover/card:transform-none"
+            className={cx(
+              "block h-auto w-full select-none",
+              "[transition:transform_800ms_cubic-bezier(0.22,1,0.36,1)]",
+              "group-hover/card:scale-[1.015]",
+              "motion-reduce:transition-none motion-reduce:group-hover/card:transform-none"
+            )}
           />
         </span>
       </button>
@@ -257,54 +235,49 @@ function GalleryCard({ item, interactive, reverse, onOpen }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Marquee row                                                               */
-/* -------------------------------------------------------------------------- */
+/* --------------------------- CAROUSEL ROW ------------------------ */
 
-function CarouselRow({
-  images,
-  offset = 0,
-  reverse = false,
-  revealed,
-  paused,
-  onOpen,
-}) {
+function CarouselRow({ images, offset = 0, reverse = false, revealed, paused, onOpen }) {
+  const direction = reverse ? "Moves left to right." : "Moves right to left.";
+
   return (
     <div
       tabIndex={0}
       role="region"
-      aria-label={`Landing page gallery. ${reverse ? "Moves left to right." : "Moves right to left."
-        } Focus to pause.`}
+      aria-label={`Landing page gallery. ${direction} Focus to pause.`}
       className={cx(
-        "group/row w-full min-w-0 overflow-hidden py-5",
-        // Row-level sizing tokens, shared by the cards inside
-        "[--gap:14px] [--card:260px] min-[381px]:[--card:min(80vw,310px)]",
-        "md:[--gap:20px] md:[--card:clamp(280px,44vw,400px)]",
-        "lg:[--gap:26px] lg:[--card:clamp(280px,30vw,440px)]",
+        "group/row w-full min-w-0 overflow-hidden",
+        "py-3 sm:py-4 md:py-[18px] lg:py-5",
+        "[--gap:14px] [--card:70vw] min-[400px]:[--card:66vw]",
+        "sm:[--gap:18px] sm:[--card:46vw]",
+        "md:[--gap:20px] md:[--card:34vw]",
+        "lg:[--gap:24px] lg:[--card:26vw]",
+        "xl:[--gap:26px] xl:[--card:clamp(280px,21vw,340px)]",
+        "2xl:[--card:340px]",
         ROW_MASK,
-        // Rows glide in from opposite sides
         reverse
           ? "[transition:opacity_900ms_ease_680ms,transform_1200ms_cubic-bezier(0.22,1,0.36,1)_680ms]"
           : "[transition:opacity_900ms_ease_500ms,transform_1200ms_cubic-bezier(0.22,1,0.36,1)_500ms]",
         revealed
           ? "translate-x-0 opacity-100"
           : reverse
-            ? "-translate-x-[7vw] opacity-0"
-            : "translate-x-[7vw] opacity-0",
+          ? "-translate-x-[7vw] opacity-0"
+          : "translate-x-[7vw] opacity-0",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#ffd76a]",
-        // Reduced motion: static, swipeable row
-        "motion-reduce:translate-x-0 motion-reduce:overflow-x-auto motion-reduce:opacity-100 motion-reduce:transition-none motion-reduce:snap-x motion-reduce:snap-proximity"
+        "motion-reduce:translate-x-0 motion-reduce:overflow-x-auto motion-reduce:opacity-100",
+        "motion-reduce:transition-none motion-reduce:snap-x motion-reduce:snap-mandatory"
       )}
     >
       <div
         className={cx(
           "flex w-max will-change-transform",
           reverse
-            ? "animate-[cc-scroll_44s_linear_-18s_infinite_reverse] md:animate-[cc-scroll_58s_linear_-18s_infinite_reverse]"
-            : "animate-[cc-scroll_40s_linear_infinite] md:animate-[cc-scroll_52s_linear_infinite]",
-          // Pause: off-screen, hover, focus, press
+            ? "animate-[cc-scroll_48s_linear_-18s_infinite_reverse] md:animate-[cc-scroll_58s_linear_-18s_infinite_reverse]"
+            : "animate-[cc-scroll_44s_linear_infinite] md:animate-[cc-scroll_54s_linear_infinite]",
           paused && "[animation-play-state:paused]",
-          "group-hover/row:[animation-play-state:paused] group-focus-within/row:[animation-play-state:paused] group-active/row:[animation-play-state:paused]",
+          "group-hover/row:[animation-play-state:paused]",
+          "group-focus-within/row:[animation-play-state:paused]",
+          "group-active/row:[animation-play-state:paused]",
           "motion-reduce:transform-none motion-reduce:animate-none motion-reduce:will-change-auto"
         )}
       >
@@ -313,7 +286,8 @@ function CarouselRow({
             key={copy}
             aria-hidden={copy === 1 ? true : undefined}
             className={cx(
-              "flex shrink-0 items-start gap-[var(--gap)] pr-[var(--gap)] motion-reduce:pl-[var(--gap)]",
+              "flex shrink-0 items-start gap-[var(--gap)] pr-[var(--gap)]",
+              "motion-reduce:pl-[var(--gap)]",
               copy === 1 && "motion-reduce:hidden"
             )}
           >
@@ -333,9 +307,7 @@ function CarouselRow({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Lightbox — native <dialog> (focus trap + Esc for free)                    */
-/* -------------------------------------------------------------------------- */
+/* ----------------------------- LIGHTBOX -------------------------- */
 
 function Lightbox({ images, index, onClose, onStep, onSelect }) {
   const dialogRef = useRef(null);
@@ -349,7 +321,6 @@ function Lightbox({ images, index, onClose, onStep, onSelect }) {
     if (!isOpen && dialog.open) dialog.close();
   }, [isOpen]);
 
-  // Lock page scroll while the preview is open.
   useEffect(() => {
     if (!isOpen) return undefined;
     const root = document.documentElement;
@@ -377,11 +348,12 @@ function Lightbox({ images, index, onClose, onStep, onSelect }) {
       onClose={onClose}
       onKeyDown={handleKeyDown}
       onClick={(event) => {
-        // Clicks on the empty area around the stage dismiss the preview.
         if (event.target === event.currentTarget) onClose();
       }}
       className={cx(
-        "fixed inset-0 m-0 h-full max-h-none w-full max-w-none place-items-center border-0 bg-transparent p-[clamp(12px,3vw,40px)] text-white",
+        "fixed inset-0 m-0 h-full max-h-none w-full max-w-none",
+        "place-items-center border-0 bg-transparent",
+        "p-3 text-white sm:p-5 md:p-[clamp(12px,3vw,40px)]",
         "open:grid open:animate-[cc-fade_250ms_ease_both]",
         "backdrop:animate-[cc-fade_300ms_ease_both] backdrop:backdrop-blur-[14px]",
         "backdrop:[background:radial-gradient(ellipse_at_50%_20%,rgba(91,47,143,0.5),transparent_70%),rgba(10,2,20,0.9)]",
@@ -389,9 +361,9 @@ function Lightbox({ images, index, onClose, onStep, onSelect }) {
       )}
     >
       {item && (
-        <div className="grid w-[min(1080px,100%)] animate-[cc-pop_450ms_cubic-bezier(0.22,1,0.36,1)_both] gap-2.5 rounded-[22px] border border-white/20 bg-[linear-gradient(150deg,rgba(255,255,255,0.15),rgba(255,255,255,0.04))] p-[clamp(12px,1.8vw,20px)] shadow-[inset_0_1px_0_rgba(255,255,255,0.24),0_44px_90px_-30px_rgba(0,0,0,0.85),0_0_80px_-30px_rgba(188,143,255,0.5)] backdrop-blur-[26px] backdrop-saturate-150 motion-reduce:animate-none md:gap-3.5 md:rounded-[28px]">
+        <div className="grid max-h-[94dvh] w-[min(1080px,100%)] animate-[cc-pop_450ms_cubic-bezier(0.22,1,0.36,1)_both] gap-2.5 rounded-[20px] border border-white/20 bg-[linear-gradient(150deg,rgba(255,255,255,0.15),rgba(255,255,255,0.04))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.24),0_44px_90px_-30px_rgba(0,0,0,0.85),0_0_80px_-30px_rgba(188,143,255,0.5)] backdrop-blur-[26px] backdrop-saturate-150 motion-reduce:animate-none sm:p-4 md:gap-3.5 md:rounded-[28px] md:p-[clamp(12px,1.8vw,20px)]">
           <div className="flex items-center justify-between gap-4 px-1">
-            <span className="text-sm font-medium tracking-[0.02em] text-white/70">
+            <span className="text-xs font-medium tracking-[0.02em] text-white/70 sm:text-sm">
               {index + 1} of {images.length}
             </span>
             <button
@@ -404,26 +376,22 @@ function Lightbox({ images, index, onClose, onStep, onSelect }) {
             </button>
           </div>
 
-          <div className="overflow-hidden rounded-[18px] bg-[rgba(19,6,36,0.55)] px-2 pb-2.5 pt-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.09)]">
+          <div className="overflow-hidden rounded-[16px] bg-[rgba(19,6,36,0.55)] px-2 pb-2.5 pt-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.09)] md:rounded-[18px]">
             <BrowserBar label={item.alt} lit />
-            <div className="mt-1.5 grid place-items-center overflow-hidden rounded-xl bg-[rgba(19,6,36,0.6)]">
+
+            <div className="relative mt-1.5 grid place-items-center overflow-hidden rounded-xl bg-[rgba(19,6,36,0.6)]">
               <img
                 key={item.src}
                 src={item.src}
                 alt={item.alt}
                 decoding="async"
-                className="block aspect-[16/10] h-auto w-full animate-[cc-swap_450ms_cubic-bezier(0.22,1,0.36,1)_both] object-contain [max-height:calc(100dvh_-_300px)] motion-reduce:animate-none md:[max-height:calc(100dvh_-_290px)]"
+                className="relative block h-auto max-h-[62dvh] w-auto max-w-full animate-[cc-swap_450ms_cubic-bezier(0.22,1,0.36,1)_both] object-contain object-center motion-reduce:animate-none sm:max-h-[66dvh] md:[max-height:calc(100dvh_-_290px)]"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-3 px-1 md:grid-cols-[minmax(0,1fr)_auto_auto]">
-            <p
-              className={cx(
-                "m-0 min-w-0 font-bold leading-[1.15] tracking-[-0.025em]",
-                "[font-size:clamp(18px,2.2vw,28px)]"
-              )}
-            >
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 px-1 md:grid-cols-[minmax(0,1fr)_auto_auto] md:gap-x-6">
+            <p className="m-0 min-w-0 font-bold leading-[1.15] tracking-[-0.025em] [font-size:clamp(16px,2.2vw,28px)]">
               {item.alt}
             </p>
 
@@ -442,8 +410,9 @@ function Lightbox({ images, index, onClose, onStep, onSelect }) {
                   className={cx(
                     "relative h-7 w-5 cursor-pointer border-0 bg-transparent p-0",
                     FOCUS_RING,
-                    "before:absolute before:left-1/2 before:top-1/2 before:h-[7px] before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:content-['']",
-                    "before:transition-[width,background-color] before:duration-[400ms] before:ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:before:transition-none",
+                    "before:absolute before:left-1/2 before:top-1/2 before:h-[7px]",
+                    "before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:content-['']",
+                    "before:transition-[width,background-color] before:duration-[400ms]",
                     i === index
                       ? "before:w-5 before:bg-[#ffd76a]"
                       : "before:w-[7px] before:bg-white/35 hover:before:bg-white/75"
@@ -452,7 +421,7 @@ function Lightbox({ images, index, onClose, onStep, onSelect }) {
               ))}
             </div>
 
-            <div className="flex gap-2.5">
+            <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => onStep(-1)}
@@ -477,21 +446,22 @@ function Lightbox({ images, index, onClose, onStep, onSelect }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Section                                                                   */
-/* -------------------------------------------------------------------------- */
+/* ---------------------------- BACKGROUND ------------------------- */
 
-// Film grain as a data URI (a utility class can't hold this cleanly).
 const GRAIN_BG =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E\")";
+
+const GRID_LINES = "56px 56px";
+
+/* ------------------------------ MAIN ----------------------------- */
 
 export default function ImageCarousel() {
   const sectionRef = useRef(null);
   const bgRef = useRef(null);
   const glowFrame = useRef(0);
 
-  const [inView, setInView] = useState(false); // pauses motion off-screen
-  const [revealed, setRevealed] = useState(false); // one-time entrance
+  const [inView, setInView] = useState(false);
+  const [revealed, setRevealed] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
 
   useEffect(() => {
@@ -511,12 +481,11 @@ export default function ImageCarousel() {
       },
       { threshold: 0.12, rootMargin: "80px 0px" }
     );
+
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-  // The cursor "lights" the backdrop. Variables are written on the backdrop
-  // element only, so the cards and marquee never re-evaluate their styles.
   const handleSectionMove = useCallback((event) => {
     if (event.pointerType !== "mouse") return;
     const bg = bgRef.current;
@@ -524,6 +493,7 @@ export default function ImageCarousel() {
 
     const { clientX, clientY } = event;
     cancelAnimationFrame(glowFrame.current);
+
     glowFrame.current = requestAnimationFrame(() => {
       const rect = bg.getBoundingClientRect();
       bg.style.setProperty("--sx", `${(clientX - rect.left).toFixed(0)}px`);
@@ -534,15 +504,12 @@ export default function ImageCarousel() {
   useEffect(() => () => cancelAnimationFrame(glowFrame.current), []);
 
   const closePreview = useCallback(() => setActiveIndex(null), []);
-  const stepPreview = useCallback(
-    (direction) =>
-      setActiveIndex((current) =>
-        current === null
-          ? current
-          : (current + direction + allImages.length) % allImages.length
-      ),
-    []
-  );
+
+  const stepPreview = useCallback((direction) => {
+    setActiveIndex((current) =>
+      current === null ? current : (current + direction + allImages.length) % allImages.length
+    );
+  }, []);
 
   const stagger = (i) => ({ transitionDelay: `${i * 110}ms` });
   const bgPause = inView ? "" : "[animation-play-state:paused]";
@@ -555,26 +522,26 @@ export default function ImageCarousel() {
       className={cx(
         "group/sec relative isolate w-full min-w-0 overflow-hidden text-white",
         FONT_DISPLAY,
-        "pb-[46px] pt-[52px] md:pb-[clamp(56px,7vw,100px)] md:pt-[clamp(64px,8vw,118px)]",
+        "pb-12 pt-14 sm:pb-14 sm:pt-16 md:pb-16 md:pt-20 lg:pb-20 lg:pt-24 xl:pb-24 xl:pt-28",
         "[background:radial-gradient(ellipse_60%_50%_at_0%_0%,rgba(188,143,255,0.2),transparent_65%),linear-gradient(165deg,#130624_0%,#2b1245_42%,#4b266a_100%)]"
       )}
     >
-      {/* Decorative backdrop */}
+      {/* BACKGROUND */}
       <div
         ref={bgRef}
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden [--sx:50%] [--sy:30%]"
       >
-        {/* Rotating aurora */}
         <span
           className={cx(
-            "absolute inset-0 m-auto h-[max(130vw,1100px)] w-[max(130vw,1100px)] rounded-full opacity-[0.55] blur-[60px] will-change-transform md:blur-[90px]",
+            "absolute inset-0 m-auto h-[max(130vw,1100px)] w-[max(130vw,1100px)]",
+            "rounded-full opacity-[0.55] blur-[60px] will-change-transform md:blur-[90px]",
             "[background:conic-gradient(from_0deg,rgba(188,143,255,0)_0deg,rgba(188,143,255,0.42)_70deg,rgba(244,114,182,0.2)_140deg,rgba(255,215,106,0.14)_200deg,rgba(91,47,143,0.4)_270deg,rgba(188,143,255,0)_360deg)]",
             "animate-[cc-spin_70s_linear_infinite] motion-reduce:animate-none",
             bgPause
           )}
         />
-        {/* Gold orb */}
+
         <span
           className={cx(
             "absolute -bottom-[140px] right-[4%] h-[340px] w-[340px] rounded-full blur-[30px] will-change-transform",
@@ -583,32 +550,32 @@ export default function ImageCarousel() {
             bgPause
           )}
         />
-        {/* Faint grid */}
-        <span className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_bottom,#000,transparent_85%)] [background-image:linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:linear-gradient(to_bottom,#000,transparent_85%)]" />
-        {/* Same grid in gold, revealed only around the cursor */}
-        <span className="absolute inset-0 opacity-0 transition-opacity duration-[600ms] group-hover/sec:opacity-100 motion-reduce:transition-none [-webkit-mask-image:radial-gradient(260px_circle_at_var(--sx)_var(--sy),#000,transparent_70%)] [background-image:linear-gradient(rgba(255,215,106,0.55)_1px,transparent_1px),linear-gradient(90deg,rgba(255,215,106,0.55)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(260px_circle_at_var(--sx)_var(--sy),#000,transparent_70%)]" />
-        {/* Soft glow under the cursor */}
-        <span className="absolute inset-0 bg-[radial-gradient(460px_circle_at_var(--sx)_var(--sy),rgba(188,143,255,0.2),transparent_65%)] opacity-0 transition-opacity duration-[600ms] group-hover/sec:opacity-100 motion-reduce:transition-none" />
-        {/* Film grain */}
+
+        <span
+          className="absolute inset-0 [-webkit-mask-image:linear-gradient(to_bottom,#000,transparent_85%)] [background-image:linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:linear-gradient(to_bottom,#000,transparent_85%)]"
+          data-grid={GRID_LINES}
+        />
+
+        <span className="absolute inset-0 opacity-0 transition-opacity duration-[600ms] group-hover/sec:opacity-100 [-webkit-mask-image:radial-gradient(260px_circle_at_var(--sx)_var(--sy),#000,transparent_70%)] [background-image:linear-gradient(rgba(255,215,106,0.55)_1px,transparent_1px),linear-gradient(90deg,rgba(255,215,106,0.55)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(260px_circle_at_var(--sx)_var(--sy),#000,transparent_70%)]" />
+
+        <span className="absolute inset-0 bg-[radial-gradient(460px_circle_at_var(--sx)_var(--sy),rgba(188,143,255,0.2),transparent_65%)] opacity-0 transition-opacity duration-[600ms] group-hover/sec:opacity-100" />
+
         <span
           className="absolute inset-0 opacity-[0.07]"
           style={{ backgroundImage: GRAIN_BG }}
         />
       </div>
 
-      <header className="mx-auto mb-[clamp(32px,4.5vw,60px)] grid w-[min(1280px,100%)] grid-cols-1 items-end gap-[26px] px-[clamp(20px,4vw,52px)] text-left min-[901px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] min-[901px]:gap-x-[clamp(32px,6vw,104px)] min-[901px]:gap-y-7">
-        {/*
-          Headline: sized from the column width (cqw) so that
-          line 1 (white) and line 2 (gold) each stay on ONE line
-          at every screen size, desktop to small phone.
-        */}
+      {/* HEADER */}
+      <header className="mx-auto mb-8 grid w-full max-w-[1280px] grid-cols-1 items-end gap-6 px-5 sm:mb-10 sm:px-7 md:mb-12 md:px-9 lg:mb-14 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-x-14 lg:px-12 xl:gap-x-20">
         <div className="min-w-0 [container-type:inline-size]">
           <span
             style={stagger(0)}
             className={cx(
-              "mb-[18px] inline-flex items-center gap-3.5 text-sm font-medium leading-[1.4] tracking-[0.02em] text-[#eadfff] md:mb-[22px] md:text-[15px]",
-              "before:h-0.5 before:w-10 before:rounded-sm before:content-['']",
+              "mb-4 inline-flex items-center gap-3 text-[13px] font-medium leading-[1.4] tracking-[0.02em] text-[#eadfff]",
+              "before:h-0.5 before:w-9 before:rounded-sm before:content-['']",
               "before:[background:linear-gradient(90deg,#ffd76a,rgba(255,215,106,0))]",
+              "sm:text-sm md:mb-5 md:text-[15px]",
               reveal(revealed)
             )}
           >
@@ -619,25 +586,25 @@ export default function ImageCarousel() {
             id="cc-carousel-heading"
             style={stagger(1)}
             className={cx(
-              "m-0 font-bold leading-none tracking-[-0.04em] text-white",
-              "[font-size:clamp(22px,min(10.4cqw,76px),76px)] [font-variation-settings:'opsz'_96]",
+              "m-0 font-bold leading-[0.98] tracking-[-0.04em] text-white",
+              "[font-size:clamp(30px,min(10.4cqw,76px),76px)]",
+              "[font-variation-settings:'opsz'_96]",
               reveal(revealed)
             )}
           >
-            <span className="block max-w-full whitespace-nowrap">
-              Landing Pages That
-            </span>
+            <span className="block max-w-full whitespace-nowrap">Landing Pages That</span>
+
             <span
               className={cx(
-                "mt-[0.06em] block max-w-full whitespace-nowrap pb-[0.1em] font-normal italic leading-[1.04] tracking-[-0.01em]",
+                "mt-[0.08em] block max-w-full whitespace-nowrap pb-[0.1em]",
+                "font-normal italic leading-[1.04] tracking-[-0.01em]",
                 FONT_ACCENT,
                 "[font-size:min(7.6cqw,0.74em)]",
                 "bg-clip-text text-transparent",
                 "bg-[linear-gradient(100deg,#f2a93b_0%,#ffd76a_32%,#fff3c4_50%,#ffd76a_68%,#f2a93b_100%)]",
                 "[background-position:100%_0] [background-size:220%_100%]",
-                revealed &&
-                "animate-[cc-shimmer_2.8s_cubic-bezier(0.22,1,0.36,1)_0.6s_both]",
-                "motion-reduce:animate-none motion-reduce:[background-position:0_0]"
+                revealed && "animate-[cc-shimmer_2.8s_cubic-bezier(0.22,1,0.36,1)_0.6s_both]",
+                "motion-reduce:animate-none"
               )}
             >
               Turn Interest Into Enquiries.
@@ -647,29 +614,31 @@ export default function ImageCarousel() {
 
         <div
           className={cx(
-            "relative min-w-0 pb-1.5 pt-[22px] min-[901px]:pl-[clamp(22px,3vw,40px)] min-[901px]:pt-0",
-            // Divider: short rule on top (stacked), vertical line beside (two-column)
-            "before:absolute before:left-0 before:top-0 before:h-px before:w-[min(220px,60%)] before:content-['']",
+            "relative min-w-0 pb-1 pt-5",
+            "before:absolute before:left-0 before:top-0 before:h-px before:w-[55%] before:max-w-[220px] before:content-['']",
             "before:[background:linear-gradient(to_right,#ffd76a,rgba(255,215,106,0))]",
-            "min-[901px]:before:bottom-1.5 min-[901px]:before:top-1 min-[901px]:before:h-auto min-[901px]:before:w-px",
-            "min-[901px]:before:[background:linear-gradient(to_bottom,#ffd76a,rgba(255,215,106,0.05))]"
+            "lg:pl-8 lg:pt-0",
+            "lg:before:bottom-1 lg:before:top-1 lg:before:h-auto lg:before:w-px",
+            "lg:before:[background:linear-gradient(to_bottom,#ffd76a,rgba(255,215,106,0.05))]"
           )}
         >
           <p
             style={stagger(2)}
             className={cx(
               "m-0 max-w-[44ch] font-normal leading-[1.7] text-white/80",
-              "[font-size:clamp(15px,1.4vw,19px)] [text-wrap:pretty]",
+              "text-sm sm:text-[15px] md:text-base lg:text-[17px] xl:text-[18px]",
+              "[text-wrap:pretty]",
               reveal(revealed)
             )}
           >
-            Stop Wasting Ad Spend on Low Conversion Pages.
-            Invest in a High-Converting Automated Funnel.
+            Stop Wasting Ad Spend on Low Conversion Pages. Invest in a High-Converting
+            Automated Funnel.
           </p>
         </div>
       </header>
 
-      <div className="grid w-full min-w-0 gap-0.5">
+      {/* CAROUSEL */}
+      <div className="grid w-full min-w-0 gap-1 sm:gap-2 lg:gap-1">
         <CarouselRow
           images={topImages}
           offset={0}
@@ -687,6 +656,7 @@ export default function ImageCarousel() {
         />
       </div>
 
+      {/* LIGHTBOX */}
       <Lightbox
         images={allImages}
         index={activeIndex}
@@ -695,37 +665,17 @@ export default function ImageCarousel() {
         onSelect={setActiveIndex}
       />
 
-      {/* Only what utilities can't express: font import + keyframes */}
+      {/* FONTS + KEYFRAMES */}
       <style>{`
         @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700&family=Instrument+Serif:ital@1&display=swap");
 
-        @keyframes cc-scroll {
-          from { transform: translate3d(0, 0, 0); }
-          to   { transform: translate3d(-50%, 0, 0); }
-        }
-        @keyframes cc-spin {
-          to { transform: rotate(360deg); }
-        }
-        @keyframes cc-float {
-          from { transform: translate3d(0, 0, 0) scale(1); }
-          to   { transform: translate3d(-60px, -40px, 0) scale(1.15); }
-        }
-        @keyframes cc-shimmer {
-          from { background-position: 100% 0; }
-          to   { background-position: 0% 0; }
-        }
-        @keyframes cc-fade {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-        @keyframes cc-pop {
-          from { opacity: 0; transform: translateY(18px) scale(0.96); }
-          to   { opacity: 1; transform: none; }
-        }
-        @keyframes cc-swap {
-          from { opacity: 0; transform: scale(1.03); }
-          to   { opacity: 1; transform: none; }
-        }
+        @keyframes cc-scroll { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
+        @keyframes cc-spin { to { transform: rotate(360deg); } }
+        @keyframes cc-float { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(-60px,-40px,0) scale(1.15); } }
+        @keyframes cc-shimmer { from { background-position: 100% 0; } to { background-position: 0% 0; } }
+        @keyframes cc-fade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes cc-pop { from { opacity: 0; transform: translateY(18px) scale(0.96); } to { opacity: 1; transform: none; } }
+        @keyframes cc-swap { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: none; } }
       `}</style>
     </section>
   );
