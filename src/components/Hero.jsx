@@ -53,13 +53,14 @@ const FOCUS_RUN_GAP =
 const SERVICE_RUN_GAP =
   'gap-2 pr-2 min-[480px]:gap-2.5 min-[480px]:pr-2.5 md:gap-3.5 md:pr-3.5 lg:gap-4 lg:pr-4'
 
+// Yellow button + VIOLET glow shadow
 const HERO_BTN =
   'site-cta--revenue !relative !isolate !inline-flex !min-h-[52px] !w-full !min-w-0 !max-w-full !items-center !justify-center !gap-2 !overflow-hidden !whitespace-normal !rounded-[13px] !border !border-[#f3b01f] ' +
   '!bg-[linear-gradient(180deg,#ffee82,#ffe04e_48%,#ffca30)] !px-3.5 !py-3 !text-center !text-[15px] !font-extrabold !leading-[1.35] !text-[#2e0c4d] !no-underline ' +
-  '!shadow-[inset_0_1px_0_#fff8c4,inset_0_-2px_4px_#f5b2144d,0_4px_0_#d18f0a,0_14px_24px_-10px_#f5b323a0] ' +
+  '!shadow-[inset_0_1px_0_#fff8c4,inset_0_-2px_4px_#f5b2144d,0_4px_0_#d18f0a,0_12px_26px_-4px_rgba(124,58,237,.6),0_22px_44px_-14px_rgba(109,40,217,.55)] ' +
   'min-[480px]:!text-base md:!min-h-[54px] md:!rounded-[14px] md:!px-[clamp(14px,4vw,30px)] md:!text-[clamp(15px,1.4vw,17px)] ' +
   'transition-[transform,box-shadow,filter] duration-200 [-webkit-tap-highlight-color:transparent] touch-manipulation ' +
-  '[@media(hover:hover)]:hover:!-translate-y-[3px] [@media(hover:hover)]:hover:!brightness-105 [@media(hover:hover)]:hover:!shadow-[inset_0_1px_0_#fff8c4,0_7px_0_#d18f0a,0_22px_36px_-12px_#f5b323c0] ' +
+  '[@media(hover:hover)]:hover:!-translate-y-[3px] [@media(hover:hover)]:hover:!brightness-105 [@media(hover:hover)]:hover:!shadow-[inset_0_1px_0_#fff8c4,0_7px_0_#d18f0a,0_18px_34px_-4px_rgba(124,58,237,.75),0_30px_56px_-14px_rgba(109,40,217,.65)] ' +
   'active:!translate-y-[2px] ' +
   'focus-visible:!outline focus-visible:!outline-[3px] focus-visible:!outline-offset-[3px] focus-visible:!outline-[#a98af0] ' +
   'before:pointer-events-none before:absolute before:inset-x-0 before:bottom-1/2 before:top-0 before:-z-10 before:bg-[linear-gradient(180deg,#ffffff40,transparent)] ' +
@@ -438,35 +439,44 @@ export default function Hero() {
             className="relative mx-auto w-full max-w-full md:max-w-[640px] lg:ml-auto lg:mr-0 lg:max-w-[600px]"
           >
             {/* MOBILE ONLY: button ABOVE the image */}
-            <div className="mb-4 flex w-full justify-center md:hidden">
+            <div className="mb-5 flex w-full justify-center md:hidden">
               <Button className={HERO_BTN}>Yes! Let's Grow My Revenue</Button>
             </div>
 
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -bottom-[4%] -z-10 inset-x-[-4%] top-[10%] animate-[heroGlow_6s_ease-in-out_infinite_alternate] rounded-full bg-[radial-gradient(closest-side,#7c3aed4d,transparent_75%)] blur-[26px] motion-reduce:animate-none md:inset-x-[-6%] md:blur-[34px]"
-            />
-
+            {/* IMAGE: floating look (violet shadow + glow under it) */}
             <div
               ref={tilt.ref}
               onPointerMove={tilt.onPointerMove}
               onPointerLeave={tilt.onPointerLeave}
-              className="relative w-full min-w-0 overflow-hidden rounded-[18px] bg-[#1b1233] shadow-[0_20px_40px_-24px_rgba(91,33,182,.65)] transition-[transform,box-shadow] duration-[350ms] ease-out md:rounded-[clamp(18px,3vw,28px)] md:shadow-[0_2px_4px_#14111f14,0_30px_60px_-28px_#5b21b6a6,0_50px_90px_-50px_#14111fb3] lg:will-change-transform lg:[transform:perspective(1100px)_rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))_translateY(var(--lift,0px))] lg:hover:[--lift:-5px] lg:hover:shadow-[0_2px_4px_#14111f14,0_40px_70px_-28px_#5b21b6c4,0_50px_90px_-50px_#14111fb3] lg:motion-reduce:[transform:none]"
+              className="relative w-full min-w-0 pb-8 transition-transform duration-[350ms] ease-out min-[480px]:pb-10 md:pb-12 lg:will-change-transform lg:[transform:perspective(1100px)_rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))_translateY(var(--lift,0px))] lg:hover:[--lift:-5px] lg:motion-reduce:[transform:none]"
             >
-              <img
-                src="/images/Neeraj19.png"
-                alt="Creative Crew landing page preview"
-                className="block h-auto w-full"
-                loading="eager"
-                decoding="async"
+              {/* Soft violet glow on the ground */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-[6%] bottom-0 h-10 animate-[heroGroundGlow_5s_ease-in-out_infinite] rounded-[100%] bg-[radial-gradient(closest-side,rgba(167,139,250,.55),rgba(167,139,250,.18)_60%,transparent_100%)] blur-[18px] motion-reduce:animate-none md:h-14 md:blur-[24px]"
               />
 
-              {/* DESKTOP / TABLET ONLY: button BELOW the image (hidden on mobile) */}
-              <div className="relative z-[3] -mt-px bg-[radial-gradient(80%_90%_at_100%_100%,#7c3aed4d,transparent_70%),linear-gradient(180deg,#1b1233,#140d27)] px-2.5 pb-3 pt-2.5 max-md:hidden min-[480px]:px-3 md:px-[clamp(12px,2.4vw,18px)] md:pb-[clamp(14px,2.2vw,18px)] md:pt-[clamp(12px,2vw,16px)]">
-                <div className="flex w-full justify-center">
-                  <Button className={HERO_BTN}>Yes! Let's Grow My Revenue</Button>
-                </div>
+              {/* Ground shadow (shrinks when image goes up, grows when it comes down) */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-[14%] bottom-[10px] h-4 animate-[heroShadow_5s_ease-in-out_infinite] rounded-[100%] bg-[radial-gradient(closest-side,rgba(91,33,182,.75),rgba(109,40,217,.35)_55%,transparent_100%)] blur-[8px] motion-reduce:animate-none md:bottom-[14px] md:h-5 md:blur-[10px]"
+              />
+
+              {/* Floating image */}
+              <div className="relative animate-[heroFloat_5s_ease-in-out_infinite] motion-reduce:animate-none">
+                <img
+                  src="/images/Neeraj19.png"
+                  alt="Creative Crew landing page preview"
+                  className="block h-auto w-full [filter:drop-shadow(0_16px_20px_rgba(124,58,237,.35))_drop-shadow(0_28px_40px_rgba(91,33,182,.28))]"
+                  loading="eager"
+                  decoding="async"
+                />
               </div>
+            </div>
+
+            {/* DESKTOP / TABLET ONLY: button BELOW the image (hidden on mobile) */}
+            <div className="mt-2 flex w-full justify-center max-md:hidden">
+              <Button className={HERO_BTN}>Yes! Let's Grow My Revenue</Button>
             </div>
           </Reveal>
         </div>
@@ -574,5 +584,22 @@ const keyframes = `
 @keyframes heroRing {
   0% { opacity: .7; transform: scale(1); }
   100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* Image floats up and down */
+@keyframes heroFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -12px, 0); }
+}
+
+/* Ground shadow reacts to the float (smaller + lighter when image is up) */
+@keyframes heroShadow {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(.82); opacity: .6; }
+}
+
+@keyframes heroGroundGlow {
+  0%, 100% { transform: scale(1); opacity: .95; }
+  50% { transform: scale(.88); opacity: .6; }
 }
 `
