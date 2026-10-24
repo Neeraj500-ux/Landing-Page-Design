@@ -285,18 +285,7 @@ export default function WhatsAppReviews() {
         Swipe to see more · Tap to enlarge
       </p>
 
-      {/* TRUST LINE */}
-      <div className="mx-auto mt-10 flex flex-col items-center gap-4 px-5 sm:mt-12">
-        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-slate-700 sm:text-sm">
-          {["Real Conversations", "Real Clients", "Real Results"].map((t) => (
-            <span key={t} className="flex items-center gap-1.5">
-              <span className="text-purple-500">✓</span>
-              {t}
-            </span>
-          ))}
-        </div>
-        <div className="h-px w-24 bg-gradient-to-r from-transparent via-purple-300 to-transparent" />
-      </div>
+      
 
       <Lightbox index={activeIndex} onClose={close} onStep={step} />
 

@@ -53,14 +53,14 @@ const FOCUS_RUN_GAP =
 const SERVICE_RUN_GAP =
   'gap-2 pr-2 min-[480px]:gap-2.5 min-[480px]:pr-2.5 md:gap-3.5 md:pr-3.5 lg:gap-4 lg:pr-4'
 
-// Yellow button + VIOLET glow shadow
+// Yellow button (NO purple light / glow, only the yellow 3D edge)
 const HERO_BTN =
   'site-cta--revenue !relative !isolate !inline-flex !min-h-[52px] !w-full !min-w-0 !max-w-full !items-center !justify-center !gap-2 !overflow-hidden !whitespace-normal !rounded-[13px] !border !border-[#f3b01f] ' +
   '!bg-[linear-gradient(180deg,#ffee82,#ffe04e_48%,#ffca30)] !px-3.5 !py-3 !text-center !text-[15px] !font-extrabold !leading-[1.35] !text-[#2e0c4d] !no-underline ' +
-  '!shadow-[inset_0_1px_0_#fff8c4,inset_0_-2px_4px_#f5b2144d,0_4px_0_#d18f0a,0_12px_26px_-4px_rgba(124,58,237,.6),0_22px_44px_-14px_rgba(109,40,217,.55)] ' +
+  '!shadow-[inset_0_1px_0_#fff8c4,inset_0_-2px_4px_#f5b2144d,0_4px_0_#d18f0a] ' +
   'min-[480px]:!text-base md:!min-h-[54px] md:!rounded-[14px] md:!px-[clamp(14px,4vw,30px)] md:!text-[clamp(15px,1.4vw,17px)] ' +
   'transition-[transform,box-shadow,filter] duration-200 [-webkit-tap-highlight-color:transparent] touch-manipulation ' +
-  '[@media(hover:hover)]:hover:!-translate-y-[3px] [@media(hover:hover)]:hover:!brightness-105 [@media(hover:hover)]:hover:!shadow-[inset_0_1px_0_#fff8c4,0_7px_0_#d18f0a,0_18px_34px_-4px_rgba(124,58,237,.75),0_30px_56px_-14px_rgba(109,40,217,.65)] ' +
+  '[@media(hover:hover)]:hover:!-translate-y-[3px] [@media(hover:hover)]:hover:!brightness-105 [@media(hover:hover)]:hover:!shadow-[inset_0_1px_0_#fff8c4,0_7px_0_#d18f0a] ' +
   'active:!translate-y-[2px] ' +
   'focus-visible:!outline focus-visible:!outline-[3px] focus-visible:!outline-offset-[3px] focus-visible:!outline-[#a98af0] ' +
   'before:pointer-events-none before:absolute before:inset-x-0 before:bottom-1/2 before:top-0 before:-z-10 before:bg-[linear-gradient(180deg,#ffffff40,transparent)] ' +
