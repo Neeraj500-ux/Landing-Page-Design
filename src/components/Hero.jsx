@@ -443,39 +443,36 @@ export default function Hero() {
               <Button className={HERO_BTN}>Yes! Let's Grow My Revenue</Button>
             </div>
 
-            {/* IMAGE: floating look (violet shadow + glow under it) */}
+            {/* IMAGE: no floating. Attached at the bottom with violet colour fill + bottom line */}
             <div
               ref={tilt.ref}
               onPointerMove={tilt.onPointerMove}
               onPointerLeave={tilt.onPointerLeave}
-              className="relative w-full min-w-0 pb-8 transition-transform duration-[350ms] ease-out min-[480px]:pb-10 md:pb-12 lg:will-change-transform lg:[transform:perspective(1100px)_rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))_translateY(var(--lift,0px))] lg:hover:[--lift:-5px] lg:motion-reduce:[transform:none]"
+              className="relative w-full min-w-0 transition-transform duration-[350ms] ease-out lg:will-change-transform lg:[transform:perspective(1100px)_rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))_translateY(var(--lift,0px))] lg:hover:[--lift:-5px] lg:motion-reduce:[transform:none]"
             >
-              {/* Soft violet glow on the ground */}
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-[6%] bottom-0 h-10 animate-[heroGroundGlow_5s_ease-in-out_infinite] rounded-[100%] bg-[radial-gradient(closest-side,rgba(167,139,250,.55),rgba(167,139,250,.18)_60%,transparent_100%)] blur-[18px] motion-reduce:animate-none md:h-14 md:blur-[24px]"
+              <img
+                src="/images/Neeraj19.png"
+                alt="Creative Crew landing page preview"
+                className="relative block h-auto w-full"
+                loading="eager"
+                decoding="async"
               />
 
-              {/* Ground shadow (shrinks when image goes up, grows when it comes down) */}
+              {/* Colour fill from the bottom (fades upward) */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-[14%] bottom-[10px] h-4 animate-[heroShadow_5s_ease-in-out_infinite] rounded-[100%] bg-[radial-gradient(closest-side,rgba(91,33,182,.75),rgba(109,40,217,.35)_55%,transparent_100%)] blur-[8px] motion-reduce:animate-none md:bottom-[14px] md:h-5 md:blur-[10px]"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-[26%] bg-[linear-gradient(180deg,rgba(167,139,250,0)_0%,rgba(167,139,250,.28)_45%,rgba(124,58,237,.5)_100%)]"
               />
 
-              {/* Floating image */}
-              <div className="relative animate-[heroFloat_5s_ease-in-out_infinite] motion-reduce:animate-none">
-                <img
-                  src="/images/Neeraj19.png"
-                  alt="Creative Crew landing page preview"
-                  className="block h-auto w-full [filter:drop-shadow(0_16px_20px_rgba(124,58,237,.35))_drop-shadow(0_28px_40px_rgba(91,33,182,.28))]"
-                  loading="eager"
-                  decoding="async"
-                />
-              </div>
+              {/* Line at the very bottom */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-[4px] bg-[linear-gradient(90deg,#6d28d9,#a855f7,#6d28d9)] md:h-[5px]"
+              />
             </div>
 
             {/* DESKTOP / TABLET ONLY: button BELOW the image (hidden on mobile) */}
-            <div className="mt-2 flex w-full justify-center max-md:hidden">
+            <div className="mt-6 flex w-full justify-center max-md:hidden">
               <Button className={HERO_BTN}>Yes! Let's Grow My Revenue</Button>
             </div>
           </Reveal>
@@ -561,11 +558,6 @@ const keyframes = `
   to { transform: translate3d(3%, 5%, 0) scale(1.1); }
 }
 
-@keyframes heroGlow {
-  from { opacity: .65; }
-  to { opacity: 1; }
-}
-
 @keyframes heroSheen {
   from { background-position: 0% 50%; }
   to { background-position: 100% 50%; }
@@ -584,22 +576,5 @@ const keyframes = `
 @keyframes heroRing {
   0% { opacity: .7; transform: scale(1); }
   100% { opacity: 0; transform: scale(1.5); }
-}
-
-/* Image floats up and down */
-@keyframes heroFloat {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -12px, 0); }
-}
-
-/* Ground shadow reacts to the float (smaller + lighter when image is up) */
-@keyframes heroShadow {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(.82); opacity: .6; }
-}
-
-@keyframes heroGroundGlow {
-  0%, 100% { transform: scale(1); opacity: .95; }
-  50% { transform: scale(.88); opacity: .6; }
 }
 `
