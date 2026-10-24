@@ -7,8 +7,8 @@ import { Button } from './ui'
      live in the tiny <style> block at the bottom of this file.
    - Gradients use arbitrary values, so they work on
      Tailwind v3 AND v4.
-   - Mobile: the "Unclear offers..." heading now fills the whole
-     card width (no more empty space on the right side).
+   - Problem/solution cards are title-only (no descriptions).
+     On mobile the title font is fluid (13.5px to 17.5px).
    ========================================================== */
 
 /* ==================== Content ==================== */
@@ -21,55 +21,25 @@ const proofImageAlt =
   'Landing page ad turning into a new enquiry and a booked consultation'
 
 const items = [
-  {
-    problem: {
-      title: 'Generic Landing Page Design',
-      description: 'Using Common Templates That Fail To Make Your Brand Stand Out.',
-    },
-    solution: {
-      title: 'Custom, Conversion-Focused Design',
-      description: 'A Landing Page Designed Around Your Brand, Offer, And Target Audience.',
-    },
+   {
+    problem: { title: 'Generic Landing Page Design' },
+    solution: { title: 'Conversion-Focused Design' },
   },
   {
-    problem: {
-      title: 'No Proper Tracking Setup',
-      description: 'Missing Pixel Events And Conversion Tracking To Measure Campaign Performance.',
-    },
-    solution: {
-      title: 'Custom Pixel & Conversion Tracking',
-      description: 'Track Important Actions And Understand Where Your Leads Are Coming From.',
-    },
+    problem: { title: 'No Proper Tracking Setup' },
+    solution: { title: 'Pixel & Conversion Tracking' },
   },
   {
-    problem: {
-      title: 'No Automated Follow-Ups',
-      description: 'Leads Come In, But There’s No System To Follow Up With Them Automatically.',
-    },
-    solution: {
-      title: 'Automated Lead Follow-Ups',
-      description: 'Connect Your Funnel With CRM And Email Automation To Manage And Nurture Leads.',
-    },
+    problem: { title: 'No Automated Follow-Ups' },
+    solution: { title: 'Automated Lead Follow-Ups' },
   },
   {
-    problem: {
-      title: 'Unclear Messaging & Offer',
-      description: 'Visitors Don’t Understand Your Offer, Its Value, Or Why They Should Choose You.',
-    },
-    solution: {
-      title: 'Clear Messaging That Converts',
-      description: 'Present Your Offer, Benefits, And CTA In A Way Your Audience Understands Instantly.',
-    },
+    problem: { title: 'Unclear Messaging & Offer' },
+    solution: { title: 'Clear Messaging That Converts' },
   },
   {
-    problem: {
-      title: 'No Structured Funnel System',
-      description: 'No Proper Steps To Track Leads, Measure Conversions, And Optimize Ad Performance.',
-    },
-    solution: {
-      title: 'Complete Funnel Tracking System',
-      description: 'Track Leads, Monitor Performance, Identify Drop-Offs, And Make Data-Driven Improvements.',
-    },
+    problem: { title: 'No Structured Funnel System' },
+    solution: { title: 'Complete Funnel Tracking System' },
   },
 ]
 
@@ -261,7 +231,7 @@ function Icon({ type, className = 'h-6 w-6', strokeWidth = 2.2 }) {
 /* ---------- Liquid glass status icon ----------
    type="cross" -> red glass tile with a cut (X)
    type="check" -> green glass tile with a right (tick)
-   No outer shadow or glow, so the tile lines up exactly with the text.
+   Smaller on phones so the title gets more room.
    Every class is written out in full so Tailwind can see it. */
 
 const GLASS_TONES = {
@@ -285,17 +255,17 @@ function StatusIcon({ type }) {
   return (
     <span
       aria-hidden="true"
-      className={`relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[13px] border border-white/90 backdrop-blur-xl backdrop-saturate-200 transition-transform duration-300 ease-out group-hover:scale-110 motion-reduce:transition-none min-[360px]:h-11 min-[360px]:w-11 min-[360px]:rounded-[14px] sm:h-12 sm:w-12 sm:rounded-2xl lg:h-14 lg:w-14 lg:rounded-[18px] ${tone.glass}`}
+      className={`relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-white/90 backdrop-blur-xl backdrop-saturate-200 transition-transform duration-300 ease-out group-hover:scale-110 motion-reduce:transition-none min-[400px]:h-9 min-[400px]:w-9 min-[400px]:rounded-[11px] sm:h-11 sm:w-11 sm:rounded-[14px] lg:h-12 lg:w-12 lg:rounded-2xl ${tone.glass}`}
     >
       {/* Top gloss */}
-      <span className="pointer-events-none absolute left-1 right-1 top-[3px] h-1/2 rounded-b-[50%] rounded-t-[10px] bg-[linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,0))] lg:left-1.5 lg:right-1.5 lg:rounded-t-[14px]" />
+      <span className="pointer-events-none absolute left-1 right-1 top-[3px] h-1/2 rounded-b-[50%] rounded-t-[8px] bg-[linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,0))] lg:left-1.5 lg:right-1.5 lg:rounded-t-[12px]" />
       {/* Tiny specular highlight */}
-      <span className="pointer-events-none absolute left-1.5 top-1.5 h-1 w-2.5 -rotate-[30deg] rounded-full bg-white/90 lg:left-2 lg:top-2 lg:h-1.5 lg:w-3" />
+      <span className="pointer-events-none absolute left-1.5 top-1.5 h-1 w-2 -rotate-[30deg] rounded-full bg-white/90 lg:left-2 lg:top-2 lg:h-1.5 lg:w-2.5" />
 
       <Icon
         type={type}
         strokeWidth={3.2}
-        className="relative z-10 h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7"
+        className="relative z-10 h-4 w-4 min-[400px]:h-[18px] min-[400px]:w-[18px] sm:h-5 sm:w-5 lg:h-6 lg:w-6"
       />
     </span>
   )
@@ -433,47 +403,42 @@ const CARD_TONES = {
     card:
       'border-[#efd6de] bg-[linear-gradient(130deg,#fffffff0,#fff1f5)] hover:border-[#e6c3cd] max-md:[order:var(--op)]',
     title: 'text-[#b83e51]',
-    text: 'text-[#9a4757]',
     number: 'border-[#efd6de] text-[#b83e51]',
   },
   solution: {
     card:
       'border-[#cfe5da] bg-[linear-gradient(130deg,#fffffff0,#eef9f2)] hover:border-[#b7dbc8] max-md:[order:var(--os)]',
     title: 'text-[#20734e]',
-    text: 'text-[#3b6f56]',
     number: 'border-[#cfe5da] text-[#20734e]',
   },
 }
 
-function PairCard({ kind, number, title, description, delay, motionProps }) {
+function PairCard({ kind, number, title, delay, motionProps }) {
   const tone = CARD_TONES[kind]
 
   return (
     <article
-      className={`group relative min-w-0 rounded-[22px] border px-3.5 py-4 shadow-[0_1px_2px_#4422600a,0_12px_30px_#44226009,inset_0_1px_0_#fff] min-[360px]:px-4 min-[360px]:py-5 transition duration-[420ms] ease-[cubic-bezier(.22,1,.36,1)] hover:-translate-y-[3px] hover:shadow-[0_18px_36px_#44226014,inset_0_1px_0_#fff] active:scale-[.985] motion-reduce:transition-none motion-reduce:hover:translate-y-0 md:rounded-3xl md:px-[18px] md:py-5 md:active:scale-100 lg:px-[26px] lg:py-6 ${tone.card}`}
+      className={`group relative flex min-h-[58px] min-w-0 items-center rounded-[18px] border px-3 py-3 shadow-[0_1px_2px_#4422600a,0_12px_30px_#44226009,inset_0_1px_0_#fff] min-[400px]:min-h-[62px] min-[400px]:px-3.5 transition duration-[420ms] ease-[cubic-bezier(.22,1,.36,1)] hover:-translate-y-[3px] hover:shadow-[0_18px_36px_#44226014,inset_0_1px_0_#fff] active:scale-[.985] motion-reduce:transition-none motion-reduce:hover:translate-y-0 md:min-h-[76px] md:rounded-3xl md:px-[18px] md:py-3.5 md:active:scale-100 lg:min-h-[84px] lg:px-[24px] ${tone.card}`}
     >
+      {/* Number badge: vertically centred on the card, smaller on phones */}
       <span
-        className={`absolute right-3 top-3 grid h-7 min-w-[38px] place-items-center rounded-[9px] border bg-white/85 px-[7px] text-[12.5px] font-bold tabular-nums tracking-[0.02em] shadow-[0_3px_8px_#4422600a] md:right-4 md:top-4 ${tone.number}`}
+        className={`absolute right-2 top-1/2 grid h-6 min-w-[28px] -translate-y-1/2 place-items-center rounded-lg border bg-white/85 px-1 text-[10.5px] font-bold tabular-nums tracking-[0.02em] shadow-[0_3px_8px_#4422600a] md:right-4 md:h-7 md:min-w-[38px] md:rounded-[9px] md:px-[7px] md:text-[12.5px] lg:right-5 ${tone.number}`}
       >
         {number}
       </span>
 
-      <Reveal {...motionProps} delay={delay}>
-        {/* Icon on the left, text on the right, both centered on the same line */}
-        <div className="flex items-center gap-3 min-[360px]:gap-3.5 lg:gap-4">
+      <Reveal {...motionProps} delay={delay} className="w-full">
+        {/* Icon on the left, title on the right, both centred on the same line */}
+        <div className="flex items-center gap-2.5 min-[400px]:gap-3 lg:gap-4">
           <StatusIcon type={kind === 'problem' ? 'cross' : 'check'} />
 
-          <div className="min-w-0 flex-1 pr-10 lg:pr-11">
+          <div className="min-w-0 flex-1 pr-9 md:pr-12 lg:pr-14">
+            {/* Phone: fluid font 13.5px to 17.5px. md+: original sizing. */}
             <h3
-              className={`text-base font-bold leading-[1.3] tracking-[-0.028em] [text-wrap:balance] min-[360px]:text-[17.5px] md:text-[clamp(17px,1.9vw,21px)] ${tone.title}`}
+              className={`text-[clamp(13.5px,4vw,17.5px)] font-bold leading-[1.3] tracking-[-0.03em] [text-wrap:balance] md:text-[clamp(17px,1.9vw,21px)] md:tracking-[-0.028em] ${tone.title}`}
             >
               {title}
             </h3>
-            <p
-              className={`mt-1.5 text-sm leading-[1.55] [text-wrap:pretty] min-[360px]:text-[14.5px] md:mt-2 md:leading-[1.65] ${tone.text}`}
-            >
-              {description}
-            </p>
           </div>
         </div>
       </Reveal>
@@ -601,7 +566,7 @@ export default function Problems() {
 
         <div className="mt-8 md:mt-[clamp(36px,5vw,60px)]">
           {/* Mobile: one column, all problems first then all solutions (via order). */}
-          <div className="grid grid-cols-1 gap-y-3.5 md:grid-cols-[minmax(0,1fr)_46px_minmax(0,1fr)] md:gap-y-[18px] lg:grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] lg:gap-y-5">
+          <div className="grid grid-cols-1 gap-y-3 md:grid-cols-[minmax(0,1fr)_46px_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] lg:gap-y-[18px]">
             <Reveal
               {...motionProps}
               className="relative min-w-0 px-4 py-4 text-left md:mb-1 md:px-[18px] md:py-[22px] lg:px-[26px] lg:py-5"
@@ -636,7 +601,6 @@ export default function Problems() {
                     kind="problem"
                     number={number}
                     title={problem.title}
-                    description={problem.description}
                     delay={Math.min(index * 35, 140)}
                     motionProps={motionProps}
                   />
@@ -647,7 +611,6 @@ export default function Problems() {
                     kind="solution"
                     number={number}
                     title={solution.title}
-                    description={solution.description}
                     delay={Math.min(index * 35 + 60, 200)}
                     motionProps={motionProps}
                   />

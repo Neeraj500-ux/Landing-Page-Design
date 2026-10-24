@@ -24,6 +24,14 @@ const FONT_ACCENT = "[font-family:'Instrument_Serif','Iowan_Old_Style',Georgia,s
 const FOCUS_RING =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#a855f7]";
 
+/* Landscape image frame inside each card.
+   - IMG_FRAME: shape of the frame (16/10 = wide landscape). Try aspect-[16/9] or aspect-[4/3].
+   - IMG_FIT:   object-cover object-top  -> fills the frame, shows the top of the chat
+                object-cover object-center -> crops from the middle
+                object-contain -> shows the full image (no crop, may leave side space) */
+const IMG_FRAME = "aspect-[16/10]";
+const IMG_FIT = "object-cover object-top";
+
 const ICON_BUTTON = cx(
   "grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full md:h-11 md:w-11",
   "border border-white/25 text-white text-lg",
@@ -135,7 +143,7 @@ function ReviewCard({ review, index, revealed, onOpen }) {
     <article
       style={{ transitionDelay: `${index * 120}ms` }}
       className={cx(
-        "group/card relative flex w-[78vw] max-w-[340px] shrink-0 snap-center sm:w-[44vw] lg:w-auto lg:max-w-none",
+        "group/card relative flex w-[86vw] max-w-[520px] shrink-0 snap-center sm:w-[70vw] lg:w-auto lg:max-w-none",
         reveal(revealed)
       )}
     >
@@ -176,15 +184,24 @@ function ReviewCard({ review, index, revealed, onOpen }) {
           </span>
         </span>
 
-        {/* full image: full width, no crop, centered in the card */}
-        <span className="relative flex flex-1 items-center justify-center overflow-hidden rounded-[14px] p-1 shadow-[inset_0_0_0_1px_rgba(124,58,237,0.14)] sm:rounded-[16px] sm:p-1.5 [background:radial-gradient(circle_at_15%_10%,rgba(244,114,182,0.28),transparent_55%),radial-gradient(circle_at_90%_95%,rgba(168,85,247,0.3),transparent_55%),linear-gradient(135deg,#efe5ff,#f9ecff)]">
+        {/* LANDSCAPE image frame (wide ratio, same in every card) */}
+        <span
+          className={cx(
+            "relative block w-full overflow-hidden rounded-[14px] p-1 shadow-[inset_0_0_0_1px_rgba(124,58,237,0.14)] sm:rounded-[16px] sm:p-1.5",
+            IMG_FRAME,
+            "[background:radial-gradient(circle_at_15%_10%,rgba(244,114,182,0.28),transparent_55%),radial-gradient(circle_at_90%_95%,rgba(168,85,247,0.3),transparent_55%),linear-gradient(135deg,#efe5ff,#f9ecff)]"
+          )}
+        >
           <img
             src={review.image}
             alt={review.alt}
             loading="lazy"
             decoding="async"
             draggable={false}
-            className="relative mx-auto block h-auto w-full select-none rounded-[10px] shadow-[0_10px_30px_-10px_rgba(76,29,149,0.5)] [transition:transform_800ms_cubic-bezier(0.22,1,0.36,1)] group-hover/card:scale-[1.02] motion-reduce:transition-none"
+            className={cx(
+              "relative block h-full w-full select-none rounded-[10px] shadow-[0_10px_30px_-10px_rgba(76,29,149,0.5)] [transition:transform_800ms_cubic-bezier(0.22,1,0.36,1)] group-hover/card:scale-[1.02] motion-reduce:transition-none",
+              IMG_FIT
+            )}
           />
         </span>
 
@@ -328,7 +345,7 @@ export default function WhatsAppReviews() {
         </div>
       </div>
 
-      {/* CARDS: swipe on mobile/tablet, 4-column grid on desktop */}
+      {/* CARDS: swipe on mobile/tablet, 2-column landscape grid on desktop */}
       <div
         role="region"
         tabIndex={0}
@@ -337,7 +354,7 @@ export default function WhatsAppReviews() {
           "mx-auto flex w-full max-w-[1280px] snap-x snap-mandatory items-stretch gap-4 overflow-x-auto px-5 pb-6 pt-2",
           "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           "sm:gap-5 sm:px-7 md:px-9",
-          "lg:grid lg:grid-cols-4 lg:gap-5 lg:overflow-visible lg:px-12 lg:pb-2 xl:gap-6",
+          "lg:grid lg:grid-cols-2 lg:gap-6 lg:overflow-visible lg:px-12 lg:pb-2 xl:gap-8",
           FOCUS_RING
         )}
       >

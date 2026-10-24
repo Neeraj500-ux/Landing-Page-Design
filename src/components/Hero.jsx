@@ -261,9 +261,8 @@ function Reveal({ as: Tag = 'div', children, delay = 0, className = '' }) {
     <Tag
       ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
-      className={`min-w-0 max-w-full transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${
-        seen ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
-      } ${className}`}
+      className={`min-w-0 max-w-full transition-[opacity,transform] duration-[800ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${seen ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+        } ${className}`}
     >
       {children}
     </Tag>
@@ -541,9 +540,8 @@ export default function Hero() {
             <Reveal delay={90} className="w-full [container-type:inline-size]">
               <h1
                 id="premium-hero-title"
-                className="font-display m-0 mt-4 w-full text-center text-[clamp(17px,7.1cqw,41px)] font-extrabold capitalize leading-[1.1] tracking-[-0.04em] text-[#14111f] md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(30px,7.7cqw,64px)] md:leading-[1.08] md:tracking-[-0.035em] lg:text-left"
-              >
-                {/* Tablet + laptop + desktop */}
+                className="font-display m-0 mt-4 w-full min-w-0 max-w-full text-center text-[clamp(22px,8.8cqw,52px)] font-extrabold capitalize leading-[1.12] tracking-[-0.04em] text-[#14111f] [text-wrap:balance] md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(30px,7.7cqw,64px)] md:leading-[1.08] md:tracking-[-0.035em] lg:text-left"
+              >              {/* Tablet + laptop + desktop */}
                 <span className="block max-md:hidden">
                   <span className="block whitespace-nowrap">
                     Generate More <span className={VIOLET_FLOW}>Leads &amp;</span>
@@ -594,17 +592,15 @@ export default function Hero() {
                     {[0, 1].map((copy) => (
                       <ul
                         key={copy}
-                        className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center ${FOCUS_RUN_GAP} ${
-                          copy === 1 ? 'motion-reduce:hidden' : ''
-                        }`}
+                        className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center ${FOCUS_RUN_GAP} ${copy === 1 ? 'motion-reduce:hidden' : ''
+                          }`}
                         aria-hidden={copy === 1 ? true : undefined}
                       >
                         {focusLines.map((line, index) => (
                           <li
                             key={`${copy}-${index}`}
-                            className={`inline-flex flex-none items-center whitespace-nowrap text-[clamp(13px,3.7vw,15px)] font-bold leading-[1.45] text-[#2a2140] motion-reduce:whitespace-normal motion-reduce:text-center md:text-[clamp(14px,.6vw+10px,17px)] ${FOCUS_GAP} ${
-                              index > 0 ? 'motion-reduce:hidden' : ''
-                            }`}
+                            className={`inline-flex flex-none items-center whitespace-nowrap text-[clamp(13px,3.7vw,15px)] font-bold leading-[1.45] text-[#2a2140] motion-reduce:whitespace-normal motion-reduce:text-center md:text-[clamp(14px,.6vw+10px,17px)] ${FOCUS_GAP} ${index > 0 ? 'motion-reduce:hidden' : ''
+                              }`}
                             aria-hidden={copy === 0 && index > 0 ? true : undefined}
                           >
                             <span>{line}</span>
@@ -685,9 +681,8 @@ export default function Hero() {
             {[0, 1].map((copy) => (
               <ul
                 key={copy}
-                className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-3 motion-reduce:p-0 ${SERVICE_RUN_GAP} ${
-                  copy === 1 ? 'motion-reduce:hidden' : ''
-                }`}
+                className={`m-0 flex w-max flex-none list-none items-center p-0 motion-reduce:w-full motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-3 motion-reduce:p-0 ${SERVICE_RUN_GAP} ${copy === 1 ? 'motion-reduce:hidden' : ''
+                  }`}
                 aria-hidden={copy === 1 ? true : undefined}
               >
                 {services.map((service) => (
