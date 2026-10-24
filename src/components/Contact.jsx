@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
    Contact.jsx  (100% Tailwind utility classes)
    - Same content, same behavior, same yellow CTA button.
    - Richer purple / violet look + more popup animation.
+   - Mobile: first point full width, next two points side by side.
    - Only the font import and keyframes live in the small
      <style> block at the bottom (Tailwind can't declare them).
    - Arbitrary values only, so it works on Tailwind v3 and v4.
@@ -332,30 +333,45 @@ export default function Contact() {
                     </span>
                   </h2>
 
-                  <p
-                    id="ct-popup-description"
-                    className={`m-0 max-w-full text-sm leading-[1.6] text-white/80 min-[761px]:max-w-[370px] min-[761px]:text-[15px] min-[761px]:leading-[1.7] [@media(min-width:761px)_and_(max-height:700px)]:hidden ${RISE}`}
-                    style={rise(2)}
-                  >
-                    Tell us about your business. Let&rsquo;s build a smarter
-                    growth system that turns more leads into paying customers.
-                  </p>
+                  {/* Points: mobile = 1st full width, 2nd + 3rd side by side. Desktop = single column */}
+                  <ul className="m-0 mt-[18px] grid w-full max-w-full list-none grid-cols-2 gap-2 p-0 min-[761px]:mt-7 min-[761px]:max-w-[390px] min-[761px]:grid-cols-1 min-[761px]:gap-3 [@media(min-width:761px)_and_(max-height:820px)]:mt-5 [@media(min-width:761px)_and_(max-height:820px)]:gap-[9px]">
+                    {points.map((point, index) => {
+                      const isFirst = index === 0
 
-                  <ul className="m-0 mt-[18px] grid w-full max-w-full list-none gap-2 p-0 min-[761px]:mt-7 min-[761px]:max-w-[390px] min-[761px]:gap-3 [@media(min-width:761px)_and_(max-height:820px)]:mt-5 [@media(min-width:761px)_and_(max-height:820px)]:gap-[9px]">
-                    {points.map((point, index) => (
-                      <li
-                        key={point}
-                        className={RISE}
-                        style={rise(3 + index)}
-                      >
-                        <div className="flex items-center justify-start gap-3.5 rounded-[14px] border border-white/10 bg-white/5 px-3 py-[9px] text-left text-[13.5px] font-medium leading-[1.45] text-white transition-[background-color,border-color,transform] duration-300 ease-[cubic-bezier(.22,1,.36,1)] hover:translate-x-1 hover:border-[rgba(255,224,78,.4)] hover:bg-white/10 motion-reduce:transition-none min-[761px]:px-3.5 min-[761px]:py-[11px] min-[761px]:text-[14.5px]">
-                          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[rgba(255,224,78,.38)] bg-[rgba(255,224,78,.12)] text-[#ffe04e] min-[761px]:h-7 min-[761px]:w-7">
-                            <CheckIcon delay={600 + index * 200} />
-                          </span>
-                          <span>{point}</span>
-                        </div>
-                      </li>
-                    ))}
+                      return (
+                        <li
+                          key={point}
+                          className={`min-w-0 ${
+                            isFirst ? 'col-span-2' : 'col-span-1'
+                          } min-[761px]:col-span-1 ${RISE}`}
+                          style={rise(3 + index)}
+                        >
+                          <div
+                            className={`flex h-full items-center justify-start rounded-[14px] border border-white/10 bg-white/5 text-left font-medium text-white transition-[background-color,border-color,transform] duration-300 ease-[cubic-bezier(.22,1,.36,1)] hover:translate-x-1 hover:border-[rgba(255,224,78,.4)] hover:bg-white/10 motion-reduce:transition-none min-[761px]:gap-3.5 min-[761px]:px-3.5 min-[761px]:py-[11px] min-[761px]:text-[14.5px] min-[761px]:leading-[1.45] ${
+                              isFirst
+                                ? 'gap-3.5 px-3 py-[9px] text-[13.5px] leading-[1.45]'
+                                : 'gap-2 px-2.5 py-[9px] text-[12.5px] leading-[1.35]'
+                            }`}
+                          >
+                            <span
+                              className={`grid shrink-0 place-items-center rounded-full border border-[rgba(255,224,78,.38)] bg-[rgba(255,224,78,.12)] text-[#ffe04e] min-[761px]:h-7 min-[761px]:w-7 ${
+                                isFirst ? 'h-6 w-6' : 'h-[22px] w-[22px]'
+                              }`}
+                            >
+                              <CheckIcon
+                                delay={600 + index * 200}
+                                className={
+                                  isFirst
+                                    ? 'h-4 w-4'
+                                    : 'h-3.5 w-3.5 min-[761px]:h-4 min-[761px]:w-4'
+                                }
+                              />
+                            </span>
+                            <span className="min-w-0">{point}</span>
+                          </div>
+                        </li>
+                      )
+                    })}
                   </ul>
 
                   {/* Growth preview card */}
@@ -460,6 +476,7 @@ export default function Contact() {
                         </h3>
 
                         <p
+                          id="ct-popup-description"
                           className={`m-0 text-sm leading-[1.65] text-[#5b5870] min-[761px]:text-[14.5px] [@media(min-width:761px)_and_(max-height:700px)]:hidden ${RISE}`}
                           style={rise(2, 250, 60)}
                         >

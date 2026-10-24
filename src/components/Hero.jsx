@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { ScanEye } from 'lucide-react'
 import { Button } from './ui'
 
@@ -11,10 +11,6 @@ import { Button } from './ui'
      laptop : 1024-1279px (2 columns, side padding 40px)
      desktop: 1280px+   (2 columns, 1180px max width)
    ========================================================== */
-
-// Change this if your Vimeo video is not 16:9 (e.g. '4 / 5' or '1 / 1').
-// This is what removes the empty grey area above/below the video.
-const VIDEO_RATIO = '16 / 9'
 
 const focusLines = Array(4).fill(
   'Guaranteed Better Funnel Performance. More Value From Every Ad Spend.'
@@ -186,49 +182,6 @@ function Icon({ name, className = '' }) {
   )
 }
 
-function ControlIcon({ name }) {
-  const shapes = {
-    play: <path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor" />,
-    pause: (
-      <>
-        <rect x="6.5" y="5" width="4" height="14" rx="1" fill="currentColor" />
-        <rect x="13.5" y="5" width="4" height="14" rx="1" fill="currentColor" />
-      </>
-    ),
-    volume: (
-      <>
-        <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4Z" fill="currentColor" />
-        <path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12" />
-      </>
-    ),
-    muted: (
-      <>
-        <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4Z" fill="currentColor" />
-        <path d="m16 9.5 5 5m0-5-5 5" />
-      </>
-    ),
-    expand: <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />,
-  }
-
-  return (
-    <svg
-      className="block h-5 w-5 shrink-0"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.9"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      {shapes[name]}
-    </svg>
-  )
-}
-
 /* ==================== Reveal on scroll ==================== */
 
 function Reveal({ as: Tag = 'div', children, delay = 0, className = '' }) {
@@ -295,153 +248,6 @@ function useTilt() {
   }
 
   return { ref, onPointerMove, onPointerLeave }
-}
-
-/* ==================== Vimeo hero video ==================== */
-
-const VIMEO_SRC =
-  'https://player.vimeo.com/video/1234072596?autoplay=1&muted=1&loop=1&autopause=0&controls=0&playsinline=1&dnt=1&title=0&byline=0&portrait=0'
-
-// 44px touch target on phones/tablets, 40px on laptops
-const VIDEO_BTN =
-  'pointer-events-auto inline-grid h-11 w-11 cursor-pointer place-items-center rounded-full border border-white/25 bg-[rgba(20,17,31,.6)] p-0 text-white ' +
-  '[-webkit-backdrop-filter:blur(12px)] [backdrop-filter:blur(12px)] [-webkit-tap-highlight-color:transparent] touch-manipulation ' +
-  'transition-[transform,background-color] duration-200 [@media(hover:hover)]:hover:scale-105 [@media(hover:hover)]:hover:bg-[#7c3aed] active:scale-95 active:bg-[#7c3aed] ' +
-  'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0] lg:h-10 lg:w-10'
-
-function HeroVideo() {
-  const wrapRef = useRef(null)
-  const frameRef = useRef(null)
-  const [playing, setPlaying] = useState(true)
-  const [muted, setMuted] = useState(true)
-
-  const post = useCallback((method, value) => {
-    const win = frameRef.current?.contentWindow
-    if (!win) return
-    win.postMessage(
-      JSON.stringify(value === undefined ? { method } : { method, value }),
-      '*'
-    )
-  }, [])
-
-  useEffect(() => {
-    const onMessage = (event) => {
-      if (!String(event.origin).includes('vimeo.com')) return
-
-      let data = event.data
-      if (typeof data === 'string') {
-        try {
-          data = JSON.parse(data)
-        } catch {
-          return
-        }
-      }
-
-      if (data?.event === 'play') setPlaying(true)
-      if (data?.event === 'pause') setPlaying(false)
-    }
-
-    window.addEventListener('message', onMessage)
-    return () => window.removeEventListener('message', onMessage)
-  }, [])
-
-  const onLoad = () => {
-    post('addEventListener', 'play')
-    post('addEventListener', 'pause')
-  }
-
-  const togglePlay = () => {
-    post(playing ? 'pause' : 'play')
-    setPlaying(!playing)
-  }
-
-  const toggleMute = () => {
-    post('setVolume', muted ? 1 : 0)
-    setMuted(!muted)
-  }
-
-  const goFullscreen = () => {
-    const target = frameRef.current || wrapRef.current
-
-    try {
-      if (document.fullscreenElement || document.webkitFullscreenElement) {
-        if (document.exitFullscreen) document.exitFullscreen()
-        else document.webkitExitFullscreen?.()
-        return
-      }
-
-      if (target?.requestFullscreen) target.requestFullscreen()
-      else if (target?.webkitRequestFullscreen) target.webkitRequestFullscreen()
-      else post('requestFullscreen') // iOS Safari fallback
-    } catch {
-      /* Fullscreen is not available on this device */
-    }
-  }
-
-  return (
-    <figure
-      ref={wrapRef}
-      style={{ aspectRatio: VIDEO_RATIO }}
-      className="relative m-0 w-full min-w-0 overflow-hidden bg-[#1b1233]"
-    >
-      <iframe
-        ref={frameRef}
-        className="absolute inset-0 block h-full w-full max-w-full border-0 bg-[#1b1233]"
-        src={VIMEO_SRC}
-        title="Creative Crew Landing Page Preview"
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowFullScreen
-        loading="eager"
-        onLoad={onLoad}
-      />
-
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[38%] bg-[linear-gradient(180deg,transparent,#14111f8c)]"
-      />
-
-      {/* Tap the video itself to play or pause */}
-      <button
-        type="button"
-        onClick={togglePlay}
-        aria-label={playing ? 'Pause Video' : 'Play Video'}
-        className="absolute inset-0 z-[2] h-full w-full cursor-pointer touch-manipulation border-0 bg-transparent p-0 [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#a98af0]"
-      />
-
-      <div className="pointer-events-none absolute inset-x-1.5 bottom-1.5 z-[3] flex items-center justify-between gap-2 min-[480px]:inset-x-2 min-[480px]:bottom-2 md:inset-x-3 md:bottom-3">
-        <div className="flex items-center gap-1.5 min-[480px]:gap-2">
-          <button
-            type="button"
-            className={VIDEO_BTN}
-            onClick={togglePlay}
-            aria-label={playing ? 'Pause Video' : 'Play Video'}
-            aria-pressed={!playing}
-          >
-            <ControlIcon name={playing ? 'pause' : 'play'} />
-          </button>
-
-          <button
-            type="button"
-            className={VIDEO_BTN}
-            onClick={toggleMute}
-            aria-label={muted ? 'Unmute Video' : 'Mute Video'}
-            aria-pressed={!muted}
-          >
-            <ControlIcon name={muted ? 'muted' : 'volume'} />
-          </button>
-        </div>
-
-        <button
-          type="button"
-          className={VIDEO_BTN}
-          onClick={goFullscreen}
-          aria-label="Toggle Fullscreen"
-        >
-          <ControlIcon name="expand" />
-        </button>
-      </div>
-    </figure>
-  )
 }
 
 /* ==================== Feature card ==================== */
@@ -527,7 +333,7 @@ export default function Hero() {
         <div className="mx-auto grid max-w-[720px] grid-cols-1 items-center gap-5 min-[480px]:gap-[22px] md:gap-[clamp(24px,5vw,40px)] lg:max-w-none lg:grid-cols-[minmax(0,.94fr)_minmax(0,1.06fr)] lg:gap-[clamp(28px,3.5vw,60px)]">
           {/* ---------- Copy ---------- */}
           <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
-            {/* Top pill: container-type makes the font scale with the pill width on desktop */}
+            {/* Top pill */}
             <Reveal className="w-full [container-type:inline-size]">
               <p className="relative m-0 w-full overflow-hidden rounded-[22px] border border-[#e0d2ff] bg-[linear-gradient(180deg,#f6f1ff,#efe7ff)] px-3.5 py-2.5 text-center text-[clamp(13.5px,3.9vw,17px)] font-semibold leading-[1.5] text-[#2a2140] shadow-[inset_0_1px_0_#fff,0_10px_24px_-16px_rgba(124,58,237,.5)] [overflow-wrap:break-word] [text-wrap:balance] after:pointer-events-none after:absolute after:inset-y-0 after:-left-[40%] after:w-[36%] after:animate-[heroShine_6s_ease-in-out_1.2s_infinite] after:bg-[linear-gradient(100deg,transparent,#ffffffb3,transparent)] motion-reduce:after:hidden min-[480px]:rounded-[26px] min-[480px]:px-4 min-[480px]:py-3 min-[480px]:leading-[1.55] md:px-5 md:py-3.5 md:text-[clamp(16px,1.65vw,21px)] lg:px-6 lg:py-4 lg:text-left lg:whitespace-nowrap lg:text-[clamp(15px,4.2cqw,26px)]">
                 We Don’t Just Build Landing Pages.
@@ -536,21 +342,22 @@ export default function Hero() {
               </p>
             </Reveal>
 
-            {/* Title: container = column width, so the heading scales with it */}
+            {/* Title */}
             <Reveal delay={90} className="w-full [container-type:inline-size]">
               <h1
                 id="premium-hero-title"
                 className="font-display m-0 mt-4 w-full min-w-0 max-w-full text-center text-[clamp(22px,8.8cqw,52px)] font-extrabold capitalize leading-[1.12] tracking-[-0.04em] text-[#14111f] [text-wrap:balance] md:mt-[clamp(16px,2.4vw,26px)] md:text-[clamp(30px,7.7cqw,64px)] md:leading-[1.08] md:tracking-[-0.035em] lg:text-left"
-              >              {/* Tablet + laptop + desktop */}
+              >
+                {/* Tablet + laptop + desktop */}
                 <span className="block max-md:hidden">
                   <span className="block whitespace-nowrap">
                     Generate More <span className={VIOLET_FLOW}>Leads &amp;</span>
                   </span>
                   <span className="block whitespace-nowrap">
-                    <span className={VIOLET_FLOW}>Revenue</span> Without
+                    <span className={VIOLET_FLOW}>Revenue.</span> Without
                   </span>
                   <span className="block w-full whitespace-nowrap tracking-[-0.04em]">
-                    Spending More <span className={VIOLET_FLOW}>Ad Spend</span>
+                    Spending More on ads
                   </span>
                 </span>
 
@@ -560,10 +367,10 @@ export default function Hero() {
                     Generate More <span className={VIOLET_FLOW}>Leads</span>
                   </span>
                   <span className="block w-full whitespace-nowrap text-center leading-[1.1] tracking-[-0.045em]">
-                    <span className={VIOLET_FLOW}>&amp; Revenue</span> Without
+                    <span className={VIOLET_FLOW}>&amp; Revenue.</span> Without
                   </span>
                   <span className="block w-full whitespace-nowrap text-center leading-[1.1] tracking-[-0.045em]">
-                    Spending More <span className={VIOLET_FLOW}>Ad Spend</span>
+                    Spending More on ads
                   </span>
                 </span>
               </h1>
@@ -571,9 +378,16 @@ export default function Hero() {
 
             {/* Subtitle */}
             <Reveal delay={180} className="w-full">
-              <p className="m-0 mx-auto mt-3.5 w-full px-1 text-center text-[clamp(14.5px,4.1vw,17px)] font-bold leading-[1.45] text-[#2b2938] [overflow-wrap:break-word] [text-wrap:pretty] min-[480px]:max-w-[520px] min-[480px]:px-2 min-[480px]:text-[clamp(16px,.8vw+13.5px,20px)] min-[480px]:leading-[1.55] md:mt-[clamp(14px,2vw,20px)] md:max-w-[620px] md:leading-[1.6] lg:mx-0 lg:max-w-[540px] lg:px-0 lg:text-left lg:text-[clamp(16px,1.2vw,19px)]">
-                Stop Spending On Low-Converting Pages. Build A High-Converting Automated
-                Funnel That Helps You Reduce CPL And Increase ROI. From The Day 1
+              <p className="m-0 mx-auto mt-3.5 w-full px-1 text-center text-[clamp(14.5px,4.1vw,17px)] font-semibold leading-[1.45] text-[#25232D] [overflow-wrap:break-word] [text-wrap:pretty] min-[480px]:max-w-[520px] min-[480px]:px-2 min-[480px]:text-[clamp(16px,.8vw+13.5px,20px)] min-[480px]:leading-[1.55] md:mt-[clamp(14px,2vw,20px)] md:max-w-[620px] md:leading-[1.6] lg:mx-0 lg:max-w-[540px] lg:px-0 lg:text-left lg:text-[clamp(16px,1.2vw,19px)]">
+                Stop Spending On Low-Converting Pages. Build A{" "}
+                <span className="font-bold text-[#6841C8] underline decoration-[#F6D85B] decoration-[3px] underline-offset-[3px]">
+                  High-Converting Automated Funnel
+                </span>{" "}
+                That Helps You{" "}
+                <span className="font-bold text-[#6841C8] underline decoration-[#F6D85B] decoration-[3px] underline-offset-[3px]">
+                  Reduce CPL And Increase ROI.
+                </span>{" "}
+                From The Day 1
               </p>
             </Reveal>
 
@@ -618,11 +432,16 @@ export default function Hero() {
             </Reveal>
           </div>
 
-          {/* ---------- Video + CTA ---------- */}
+          {/* ---------- Image + CTA ---------- */}
           <Reveal
             delay={200}
             className="relative mx-auto w-full max-w-full md:max-w-[640px] lg:ml-auto lg:mr-0 lg:max-w-[600px]"
           >
+            {/* MOBILE ONLY: button ABOVE the image */}
+            <div className="mb-4 flex w-full justify-center md:hidden">
+              <Button className={HERO_BTN}>Yes! Let's Grow My Revenue</Button>
+            </div>
+
             <span
               aria-hidden="true"
               className="pointer-events-none absolute -bottom-[4%] -z-10 inset-x-[-4%] top-[10%] animate-[heroGlow_6s_ease-in-out_infinite_alternate] rounded-full bg-[radial-gradient(closest-side,#7c3aed4d,transparent_75%)] blur-[26px] motion-reduce:animate-none md:inset-x-[-6%] md:blur-[34px]"
@@ -634,11 +453,16 @@ export default function Hero() {
               onPointerLeave={tilt.onPointerLeave}
               className="relative w-full min-w-0 overflow-hidden rounded-[18px] bg-[#1b1233] shadow-[0_20px_40px_-24px_rgba(91,33,182,.65)] transition-[transform,box-shadow] duration-[350ms] ease-out md:rounded-[clamp(18px,3vw,28px)] md:shadow-[0_2px_4px_#14111f14,0_30px_60px_-28px_#5b21b6a6,0_50px_90px_-50px_#14111fb3] lg:will-change-transform lg:[transform:perspective(1100px)_rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))_translateY(var(--lift,0px))] lg:hover:[--lift:-5px] lg:hover:shadow-[0_2px_4px_#14111f14,0_40px_70px_-28px_#5b21b6c4,0_50px_90px_-50px_#14111fb3] lg:motion-reduce:[transform:none]"
             >
-              <div className="relative isolate w-full min-w-0 bg-[#1b1233]">
-                <HeroVideo />
-              </div>
+              <img
+                src="/images/Neeraj19.png"
+                alt="Creative Crew landing page preview"
+                className="block h-auto w-full"
+                loading="eager"
+                decoding="async"
+              />
 
-              <div className="relative z-[3] -mt-px bg-[radial-gradient(80%_90%_at_100%_100%,#7c3aed4d,transparent_70%),linear-gradient(180deg,#1b1233,#140d27)] px-2.5 pb-3 pt-2.5 min-[480px]:px-3 md:px-[clamp(12px,2.4vw,18px)] md:pb-[clamp(14px,2.2vw,18px)] md:pt-[clamp(12px,2vw,16px)]">
+              {/* DESKTOP / TABLET ONLY: button BELOW the image (hidden on mobile) */}
+              <div className="relative z-[3] -mt-px bg-[radial-gradient(80%_90%_at_100%_100%,#7c3aed4d,transparent_70%),linear-gradient(180deg,#1b1233,#140d27)] px-2.5 pb-3 pt-2.5 max-md:hidden min-[480px]:px-3 md:px-[clamp(12px,2.4vw,18px)] md:pb-[clamp(14px,2.2vw,18px)] md:pt-[clamp(12px,2vw,16px)]">
                 <div className="flex w-full justify-center">
                   <Button className={HERO_BTN}>Yes! Let's Grow My Revenue</Button>
                 </div>

@@ -8,12 +8,6 @@ const reviews = [1, 2, 3, 4].map((n) => ({
   alt: `WhatsApp Client Review ${n}`,
 }));
 
-const stats = [
-  { value: "100%", label: "Real chats" },
-  { value: "4.9/5", label: "Client rating" },
-  { value: "250+", label: "Happy founders" },
-];
-
 /* ---------------------------- SHARED ---------------------------- */
 
 const cx = (...p) => p.filter(Boolean).join(" ");
@@ -316,33 +310,8 @@ export default function WhatsAppReviews() {
             </span>
           </h2>
 
-          <p
-            style={stagger(2)}
-            className={cx(
-              "mx-auto mb-0 mt-5 max-w-[46ch] text-sm leading-[1.7] text-slate-600 [text-wrap:pretty] sm:text-[15px] md:text-base lg:text-[17px]",
-              reveal(revealed)
-            )}
-          >
-            Real conversations from clients who trusted us with their projects and saw the
-            results first-hand.
-          </p>
-        </header>
 
-        {/* STATS */}
-        <div
-          style={stagger(3)}
-          className={cx(
-            "mx-auto mb-10 grid max-w-2xl grid-cols-3 divide-x divide-purple-200 rounded-2xl border border-purple-200 bg-white/70 py-3 shadow-[0_12px_30px_-15px_rgba(124,58,237,0.35)] backdrop-blur-md sm:mb-12 sm:py-4",
-            reveal(revealed)
-          )}
-        >
-          {stats.map((s) => (
-            <div key={s.label} className="px-2 text-center">
-              <p className="m-0 text-lg font-bold text-purple-600 sm:text-2xl">{s.value}</p>
-              <p className="m-0 mt-0.5 text-[10px] text-slate-500 sm:text-xs">{s.label}</p>
-            </div>
-          ))}
-        </div>
+        </header>
       </div>
 
       {/* CARDS: swipe on mobile/tablet, 2-column landscape grid on desktop */}

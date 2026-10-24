@@ -215,11 +215,7 @@ export default function Video() {
               </span>
             </h2>
 
-            <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
-              Discover how high-converting landing pages and complete funnel
-              systems help businesses capture more leads, improve conversions,
-              and grow revenue.
-            </p>
+           
           </header>
         </Reveal>
 
