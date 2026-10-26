@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 /* ----------------------------- DATA ----------------------------- */
 
@@ -15,18 +15,6 @@ const cx = (...p) => p.filter(Boolean).join(" ");
 const FONT_DISPLAY =
   "[font-family:'Bricolage_Grotesque','Avenir_Next',system-ui,-apple-system,'Segoe_UI',sans-serif]";
 const FONT_ACCENT = "[font-family:'Instrument_Serif','Iowan_Old_Style',Georgia,serif]";
-const FOCUS_RING =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#a855f7]";
-
-const ICON_BUTTON = cx(
-  "grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full md:h-11 md:w-11",
-  "border border-white/25 text-white text-lg",
-  "bg-[linear-gradient(135deg,rgba(255,255,255,0.16),rgba(255,255,255,0.05))]",
-  "transition-[transform,background-color,color,border-color] duration-300",
-  "hover:border-[rgba(255,215,106,0.7)] hover:bg-[rgba(255,215,106,0.16)] hover:text-[#ffd76a]",
-  "active:scale-[0.92]",
-  FOCUS_RING
-);
 
 const reveal = (on) =>
   cx(
@@ -35,129 +23,25 @@ const reveal = (on) =>
     "motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none"
   );
 
-/* ---------------------------- LIGHTBOX --------------------------- */
-
-function Lightbox({ index, onClose, onStep }) {
-  const ref = useRef(null);
-  const isOpen = index !== null;
-  const item = isOpen ? reviews[index] : null;
-
-  useEffect(() => {
-    const d = ref.current;
-    if (!d) return;
-    if (isOpen && !d.open) d.showModal();
-    if (!isOpen && d.open) d.close();
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const root = document.documentElement;
-    const prev = root.style.overflow;
-    root.style.overflow = "hidden";
-    return () => {
-      root.style.overflow = prev;
-    };
-  }, [isOpen]);
-
-  const onKey = (e) => {
-    if (e.key === "ArrowRight") {
-      e.preventDefault();
-      onStep(1);
-    } else if (e.key === "ArrowLeft") {
-      e.preventDefault();
-      onStep(-1);
-    }
-  };
-
-  return (
-    <dialog
-      ref={ref}
-      aria-label="Review preview"
-      onClose={onClose}
-      onKeyDown={onKey}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-      className={cx(
-        "fixed inset-0 m-0 h-full max-h-none w-full max-w-none place-items-center border-0 bg-transparent p-3 text-white sm:p-6",
-        "open:grid open:animate-[wr-fade_250ms_ease_both]",
-        "backdrop:backdrop-blur-[14px]",
-        "backdrop:[background:radial-gradient(ellipse_at_50%_20%,rgba(91,47,143,0.5),transparent_70%),rgba(10,2,20,0.92)]",
-        "motion-reduce:open:animate-none"
-      )}
-    >
-      {item && (
-        <div className="grid max-h-[94dvh] w-[min(720px,100%)] animate-[wr-pop_450ms_cubic-bezier(0.22,1,0.36,1)_both] gap-3 rounded-[24px] border border-white/20 bg-[linear-gradient(150deg,rgba(255,255,255,0.15),rgba(255,255,255,0.04))] p-3 shadow-[0_44px_90px_-30px_rgba(0,0,0,0.85),0_0_80px_-30px_rgba(188,143,255,0.5)] backdrop-blur-[26px] motion-reduce:animate-none sm:p-4">
-          <div className="flex items-center justify-between px-1">
-            <span className="text-xs font-medium text-white/80 sm:text-sm">
-              {index + 1} of {reviews.length}
-            </span>
-            <button type="button" onClick={onClose} aria-label="Close preview" className={ICON_BUTTON}>
-              ✕
-            </button>
-          </div>
-
-          <div className="grid place-items-center overflow-hidden rounded-2xl p-2 shadow-[inset_0_0_0_1px_rgba(124,58,237,0.16)] sm:p-3 [background:radial-gradient(circle_at_15%_10%,rgba(244,114,182,0.25),transparent_55%),radial-gradient(circle_at_90%_95%,rgba(168,85,247,0.28),transparent_55%),linear-gradient(135deg,#f1e8ff,#faefff)]">
-            <img
-              key={item.image}
-              src={item.image}
-              alt={item.alt}
-              decoding="async"
-              className="mx-auto block h-auto max-h-[66dvh] w-auto max-w-full rounded-xl animate-[wr-swap_450ms_cubic-bezier(0.22,1,0.36,1)_both] object-contain motion-reduce:animate-none"
-            />
-          </div>
-
-          <div className="flex items-center justify-between gap-3 px-1">
-            <p className="m-0 text-sm font-bold sm:text-base">{item.alt}</p>
-            <div className="flex gap-2">
-              <button type="button" onClick={() => onStep(-1)} aria-label="Previous review" className={ICON_BUTTON}>
-                ‹
-              </button>
-              <button type="button" onClick={() => onStep(1)} aria-label="Next review" className={ICON_BUTTON}>
-                ›
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </dialog>
-  );
-}
-
 /* ----------------------------- CARD ------------------------------ */
-/* Image only. Full image, natural ratio, no cropping. */
+/* Image only. Full image, natural ratio, no cropping, no click. */
 
-function ReviewCard({ review, index, revealed, onOpen }) {
+function ReviewCard({ review, index, revealed }) {
   return (
     <article
       style={{ transitionDelay: `${index * 120}ms` }}
-      className={cx(
-        "group/card relative flex w-[86vw] max-w-[520px] shrink-0 snap-center self-start sm:w-[70vw] lg:w-auto lg:max-w-none",
-        reveal(revealed)
-      )}
+      className={cx("min-w-0 self-start", reveal(revealed))}
     >
-      <button
-        type="button"
-        onClick={onOpen}
-        aria-label={`Enlarge ${review.alt}`}
-        className={cx(
-          "relative block w-full cursor-zoom-in overflow-hidden rounded-[22px] border-0 bg-[#0b1014] p-0 sm:rounded-[26px]",
-          "[-webkit-tap-highlight-color:transparent]",
-          "shadow-[0_20px_45px_-22px_rgba(124,58,237,0.45)]",
-          "[transition:box-shadow_400ms_ease,transform_450ms_cubic-bezier(0.22,1,0.36,1)]",
-          "hover:-translate-y-2",
-          "hover:shadow-[0_34px_54px_-24px_rgba(124,58,237,0.55),0_0_45px_-14px_rgba(168,85,247,0.5)]",
-          "motion-reduce:transition-none motion-reduce:hover:translate-y-0",
-          FOCUS_RING
-        )}
-      >
+      <div className="overflow-hidden rounded-lg bg-[#0b1014] shadow-[0_12px_28px_-16px_rgba(124,58,237,0.45)] sm:rounded-2xl lg:rounded-[22px]">
         <img
           src={review.image}
           alt={review.alt}
           loading="lazy"
           decoding="async"
           draggable={false}
-          className="block h-auto w-full select-none [transition:transform_800ms_cubic-bezier(0.22,1,0.36,1)] group-hover/card:scale-[1.02] motion-reduce:transition-none"
+          className="block h-auto w-full select-none"
         />
-      </button>
+      </div>
     </article>
   );
 }
@@ -167,7 +51,6 @@ function ReviewCard({ review, index, revealed, onOpen }) {
 export default function WhatsAppReviews() {
   const sectionRef = useRef(null);
   const [revealed, setRevealed] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(null);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -187,11 +70,6 @@ export default function WhatsAppReviews() {
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, []);
-
-  const close = useCallback(() => setActiveIndex(null), []);
-  const step = useCallback((d) => {
-    setActiveIndex((c) => (c === null ? c : (c + d + reviews.length) % reviews.length));
   }, []);
 
   const stagger = (i) => ({ transitionDelay: `${i * 110}ms` });
@@ -257,44 +135,16 @@ export default function WhatsAppReviews() {
         </header>
       </div>
 
-      {/* CARDS: swipe on mobile/tablet, 2-column grid on desktop */}
-      <div
-        role="region"
-        tabIndex={0}
-        aria-label="Client review screenshots. Swipe to browse."
-        className={cx(
-          "mx-auto flex w-full max-w-[1280px] snap-x snap-mandatory items-start gap-4 overflow-x-auto px-5 pb-6 pt-2",
-          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-          "sm:gap-5 sm:px-7 md:px-9",
-          "lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:overflow-visible lg:px-12 lg:pb-2 xl:gap-8",
-          FOCUS_RING
-        )}
-      >
+      {/* IMAGES: always 4 in one row (mobile, tablet, desktop) */}
+      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-4 items-start gap-2 px-3 sm:gap-4 sm:px-7 md:gap-5 md:px-9 lg:gap-6 lg:px-12">
         {reviews.map((review, index) => (
-          <ReviewCard
-            key={review.id}
-            review={review}
-            index={index}
-            revealed={revealed}
-            onOpen={() => setActiveIndex(index)}
-          />
+          <ReviewCard key={review.id} review={review} index={index} revealed={revealed} />
         ))}
       </div>
-
-      <p className="mx-auto mb-0 mt-2 text-center text-xs text-slate-500 lg:hidden">
-        Swipe to see more · Tap to enlarge
-      </p>
-
-      
-
-      <Lightbox index={activeIndex} onClose={close} onStep={step} />
 
       <style>{`
         @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700&family=Instrument+Serif:ital@1&display=swap");
         @keyframes wr-shimmer { from { background-position: 100% 0; } to { background-position: 0% 0; } }
-        @keyframes wr-fade { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes wr-pop { from { opacity: 0; transform: translateY(18px) scale(0.96); } to { opacity: 1; transform: none; } }
-        @keyframes wr-swap { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: none; } }
       `}</style>
     </section>
   );
