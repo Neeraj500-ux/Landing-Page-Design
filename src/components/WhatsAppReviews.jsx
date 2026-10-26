@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 /* ----------------------------- DATA ----------------------------- */
 
@@ -24,19 +25,19 @@ const reveal = (on) =>
   );
 
 /* ----------------------------- CARD ------------------------------ */
-/* Image only. Full image, natural ratio, no cropping, no click. */
 
-function ReviewCard({ review, index, revealed }) {
+function ReviewCard({ review, index, revealed, onOpen }) {
   return (
     <article
       style={{ transitionDelay: `${index * 120}ms` }}
-      className={cx(
-        // mobile: centered, capped width so image doesn't look oversized
-        "mx-auto w-full min-w-0 max-w-[420px] self-start sm:max-w-none",
-        reveal(revealed)
-      )}
+      className={cx("mx-auto w-full min-w-0 max-w-[420px] self-start sm:max-w-none", reveal(revealed))}
     >
-      <div className="overflow-hidden rounded-2xl bg-[#0b1014] shadow-[0_12px_28px_-16px_rgba(124,58,237,0.45)] lg:rounded-[22px]">
+      <button
+        type="button"
+        onClick={() => onOpen(index)}
+        aria-label={`Open ${review.alt}`}
+        className="block w-full cursor-zoom-in overflow-hidden rounded-2xl bg-[#0b1014] shadow-[0_12px_28px_-16px_rgba(124,58,237,0.45)] transition-transform duration-300 hover:scale-[1.02] lg:rounded-[22px]"
+      >
         <img
           src={review.image}
           alt={review.alt}
@@ -45,8 +46,116 @@ function ReviewCard({ review, index, revealed }) {
           draggable={false}
           className="block h-auto w-full select-none"
         />
-      </div>
+      </button>
     </article>
+  );
+}
+
+/* ---------------------------- LIGHTBOX --------------------------- */
+/* Portal + left/right arrows + keyboard (← → Esc) + mobile swipe */
+
+const NAV_BTN =
+  "absolute top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-xl text-slate-900 shadow-lg transition hover:scale-105 hover:bg-white sm:h-12 sm:w-12";
+
+function Lightbox({ index, onClose, onChange }) {
+  const touchX = useRef(null);
+  const total = reviews.length;
+  const open = index !== null;
+
+  const goPrev = useCallback(() => onChange((index - 1 + total) % total), [index, total, onChange]);
+  const goNext = useCallback(() => onChange((index + 1) % total), [index, total, onChange]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft") goPrev();
+      else if (e.key === "ArrowRight") goNext();
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open, onClose, goPrev, goNext]);
+
+  if (!open || typeof document === "undefined") return null;
+
+  const review = reviews[index];
+
+  const onTouchStart = (e) => {
+    touchX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e) => {
+    if (touchX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) > 50) (dx > 0 ? goPrev : goNext)();
+  };
+
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      className="fixed left-0 top-0 z-[9999] flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-black/60 p-3 backdrop-blur-xl sm:p-6"
+    >
+      {/* CLOSE */}
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full bg-white/90 text-lg text-slate-900 shadow-lg transition hover:bg-white"
+      >
+        ✕
+      </button>
+
+      {/* PREV */}
+      <button
+        type="button"
+        aria-label="Previous image"
+        onClick={(e) => {
+          e.stopPropagation();
+          goPrev();
+        }}
+        className={cx(NAV_BTN, "left-3 sm:left-6")}
+      >
+        ❮
+      </button>
+
+      {/* IMAGE */}
+      <img
+        key={review.id}
+        src={review.image}
+        alt={review.alt}
+        draggable={false}
+        onClick={(e) => e.stopPropagation()}
+        className="h-auto max-h-[calc(100dvh-1.5rem)] w-auto max-w-full select-none rounded-2xl object-contain shadow-2xl sm:max-h-[calc(100dvh-3rem)]"
+      />
+
+      {/* NEXT */}
+      <button
+        type="button"
+        aria-label="Next image"
+        onClick={(e) => {
+          e.stopPropagation();
+          goNext();
+        }}
+        className={cx(NAV_BTN, "right-3 sm:right-6")}
+      >
+        ❯
+      </button>
+
+      {/* COUNTER */}
+      <span className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-sm font-medium text-white">
+        {index + 1} / {total}
+      </span>
+    </div>,
+    document.body
   );
 }
 
@@ -55,6 +164,9 @@ function ReviewCard({ review, index, revealed }) {
 export default function WhatsAppReviews() {
   const sectionRef = useRef(null);
   const [revealed, setRevealed] = useState(false);
+  const [active, setActive] = useState(null); // null ya image ka index
+
+  const closeLightbox = useCallback(() => setActive(null), []);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -89,7 +201,7 @@ export default function WhatsAppReviews() {
         "[background:radial-gradient(circle_at_0%_0%,rgba(216,190,255,0.5),transparent_45%),radial-gradient(circle_at_100%_0%,rgba(240,200,255,0.3),transparent_45%),radial-gradient(circle_at_0%_100%,rgba(205,185,255,0.4),transparent_45%),radial-gradient(circle_at_100%_100%,rgba(225,200,255,0.5),transparent_45%),linear-gradient(160deg,#ffffff_0%,#faf6ff_50%,#f3ebff_100%)]"
       )}
     >
-      {/* BACKGROUND: soft light-purple glows only (no grid lines) */}
+      {/* BACKGROUND: soft light-purple glows only */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <span className="absolute -left-24 -top-24 h-[320px] w-[320px] rounded-full bg-[#d9c2ff]/45 blur-[90px] sm:h-[440px] sm:w-[440px]" />
         <span className="absolute -right-24 -top-24 h-[300px] w-[300px] rounded-full bg-[#f0d4ff]/40 blur-[90px] sm:h-[400px] sm:w-[400px]" />
@@ -139,12 +251,20 @@ export default function WhatsAppReviews() {
         </header>
       </div>
 
-      {/* IMAGES: mobile = 1 column (ek ke niche ek), tablet = 2, desktop = 4 in a row */}
+      {/* IMAGES: mobile = 1 column, tablet = 2, desktop = 4 */}
       <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-start gap-5 px-5 sm:grid-cols-2 sm:gap-5 sm:px-7 md:gap-6 md:px-9 lg:grid-cols-4 lg:gap-6 lg:px-12">
         {reviews.map((review, index) => (
-          <ReviewCard key={review.id} review={review} index={index} revealed={revealed} />
+          <ReviewCard
+            key={review.id}
+            review={review}
+            index={index}
+            revealed={revealed}
+            onOpen={setActive}
+          />
         ))}
       </div>
+
+      <Lightbox index={active} onClose={closeLightbox} onChange={setActive} />
 
       <style>{`
         @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700&family=Instrument+Serif:ital@1&display=swap");

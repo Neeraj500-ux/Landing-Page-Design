@@ -3,8 +3,8 @@ import { Button, Container } from './ui'
 /* ----------------------------------------------------------------
    Data — swap these with your real values when ready
 ----------------------------------------------------------------- */
-const CONTACT_EMAIL = '[Your Business Email]'
-const CONTACT_PHONE = '[Your Business Number]'
+const CONTACT_EMAIL = ' crewcreative98@gmail.com'
+const CONTACT_PHONE = '+91 88601 03517'
 
 const QUICK_LINKS = [
   { label: 'How It Works', href: '#how' },
