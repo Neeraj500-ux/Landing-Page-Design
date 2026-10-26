@@ -30,9 +30,13 @@ function ReviewCard({ review, index, revealed }) {
   return (
     <article
       style={{ transitionDelay: `${index * 120}ms` }}
-      className={cx("min-w-0 self-start", reveal(revealed))}
+      className={cx(
+        // mobile: centered, capped width so image doesn't look oversized
+        "mx-auto w-full min-w-0 max-w-[420px] self-start sm:max-w-none",
+        reveal(revealed)
+      )}
     >
-      <div className="overflow-hidden rounded-lg bg-[#0b1014] shadow-[0_12px_28px_-16px_rgba(124,58,237,0.45)] sm:rounded-2xl lg:rounded-[22px]">
+      <div className="overflow-hidden rounded-2xl bg-[#0b1014] shadow-[0_12px_28px_-16px_rgba(124,58,237,0.45)] lg:rounded-[22px]">
         <img
           src={review.image}
           alt={review.alt}
@@ -66,7 +70,7 @@ export default function WhatsAppReviews() {
           obs.disconnect();
         }
       },
-      { threshold: 0.1, rootMargin: "60px 0px" }
+      { threshold: 0.05, rootMargin: "60px 0px" }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -135,8 +139,8 @@ export default function WhatsAppReviews() {
         </header>
       </div>
 
-      {/* IMAGES: always 4 in one row (mobile, tablet, desktop) */}
-      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-4 items-start gap-2 px-3 sm:gap-4 sm:px-7 md:gap-5 md:px-9 lg:gap-6 lg:px-12">
+      {/* IMAGES: mobile = 1 column (ek ke niche ek), tablet = 2, desktop = 4 in a row */}
+      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-start gap-5 px-5 sm:grid-cols-2 sm:gap-5 sm:px-7 md:gap-6 md:px-9 lg:grid-cols-4 lg:gap-6 lg:px-12">
         {reviews.map((review, index) => (
           <ReviewCard key={review.id} review={review} index={index} revealed={revealed} />
         ))}
