@@ -5,10 +5,10 @@ import { Button } from './ui'
    Problems.jsx  (100% Tailwind utility classes)
    - Only the Google font import, keyframes and .font-display
      live in the tiny <style> block at the bottom of this file.
-   - Gradients use arbitrary values, so they work on
-     Tailwind v3 AND v4.
-   - Problem/solution cards are title-only (no descriptions).
-     On mobile the title font is fluid (13.5px to 17.5px).
+   - Both section headings now have a same-colour underline
+     (red heading = red line, green heading = green line).
+   - Mobile titles are fluid and stay on ONE line
+     (e.g. "Complete Funnel Tracking System").
    ========================================================== */
 
 /* ==================== Content ==================== */
@@ -21,7 +21,7 @@ const proofImageAlt =
   'Landing page ad turning into a new enquiry and a booked consultation'
 
 const items = [
-   {
+  {
     problem: { title: 'Generic Landing Page Design' },
     solution: { title: 'Conversion-Focused Design' },
   },
@@ -292,6 +292,35 @@ function RevenueButton({ intro = false }) {
   )
 }
 
+/* ---------- Column heading with same-colour underline ---------- */
+
+const HEADING_TONES = {
+  problem: {
+    text: 'text-[#b83e51]',
+    line: 'bg-[linear-gradient(90deg,#b83e51,#f0546e_60%,#f7b6c2)]',
+  },
+  solution: {
+    text: 'text-[#20734e]',
+    line: 'bg-[linear-gradient(90deg,#20734e,#22c07a_60%,#a9e3c8)]',
+  },
+}
+
+function ColumnHeading({ kind, children }) {
+  const tone = HEADING_TONES[kind]
+
+  return (
+    <h3
+      className={`inline-block text-[23px] font-bold leading-[1.35] tracking-[-0.025em] md:text-[clamp(22px,2.1vw,27px)] ${tone.text}`}
+    >
+      {children}
+      <span
+        aria-hidden="true"
+        className={`mt-1.5 block h-[3px] w-full rounded-full ${tone.line}`}
+      />
+    </h3>
+  )
+}
+
 function ProofVisual({ playing }) {
   const play = playing
     ? '[animation-play-state:running]'
@@ -418,7 +447,7 @@ function PairCard({ kind, number, title, delay, motionProps }) {
 
   return (
     <article
-      className={`group relative flex min-h-[58px] min-w-0 items-center rounded-[18px] border px-3 py-3 shadow-[0_1px_2px_#4422600a,0_12px_30px_#44226009,inset_0_1px_0_#fff] min-[400px]:min-h-[62px] min-[400px]:px-3.5 transition duration-[420ms] ease-[cubic-bezier(.22,1,.36,1)] hover:-translate-y-[3px] hover:shadow-[0_18px_36px_#44226014,inset_0_1px_0_#fff] active:scale-[.985] motion-reduce:transition-none motion-reduce:hover:translate-y-0 md:min-h-[76px] md:rounded-3xl md:px-[18px] md:py-3.5 md:active:scale-100 lg:min-h-[84px] lg:px-[24px] ${tone.card}`}
+      className={`group relative flex min-h-[58px] min-w-0 items-center rounded-[18px] border px-2.5 py-3 shadow-[0_1px_2px_#4422600a,0_12px_30px_#44226009,inset_0_1px_0_#fff] min-[400px]:min-h-[62px] min-[400px]:px-3.5 transition duration-[420ms] ease-[cubic-bezier(.22,1,.36,1)] hover:-translate-y-[3px] hover:shadow-[0_18px_36px_#44226014,inset_0_1px_0_#fff] active:scale-[.985] motion-reduce:transition-none motion-reduce:hover:translate-y-0 md:min-h-[76px] md:rounded-3xl md:px-[18px] md:py-3.5 md:active:scale-100 lg:min-h-[84px] lg:px-[24px] ${tone.card}`}
     >
       {/* Number badge: vertically centred on the card, smaller on phones */}
       <span
@@ -429,13 +458,14 @@ function PairCard({ kind, number, title, delay, motionProps }) {
 
       <Reveal {...motionProps} delay={delay} className="w-full">
         {/* Icon on the left, title on the right, both centred on the same line */}
-        <div className="flex items-center gap-2.5 min-[400px]:gap-3 lg:gap-4">
+        <div className="flex items-center gap-2 min-[400px]:gap-2.5 lg:gap-4">
           <StatusIcon type={kind === 'problem' ? 'cross' : 'check'} />
 
-          <div className="min-w-0 flex-1 pr-9 md:pr-12 lg:pr-14">
-            {/* Phone: fluid font 13.5px to 17.5px. md+: original sizing. */}
+          <div className="min-w-0 flex-1 pr-8 md:pr-12 lg:pr-14">
+            {/* Phone: fluid font 12.5px to 16.5px, no balance wrap so it stays on one line.
+                md+: original sizing with balanced wrap. */}
             <h3
-              className={`text-[clamp(13.5px,4vw,17.5px)] font-bold leading-[1.3] tracking-[-0.03em] [text-wrap:balance] md:text-[clamp(17px,1.9vw,21px)] md:tracking-[-0.028em] ${tone.title}`}
+              className={`text-[clamp(12.5px,3.7vw,16.5px)] font-bold leading-[1.3] tracking-[-0.03em] md:text-[clamp(17px,1.9vw,21px)] md:tracking-[-0.028em] md:[text-wrap:balance] ${tone.title}`}
             >
               {title}
             </h3>
@@ -496,8 +526,6 @@ export default function Problems() {
           >
             {/* Card: slightly tighter side padding on phones so the heading gets more room */}
             <div className="relative rounded-3xl border border-[#e4d8f3] bg-[linear-gradient(150deg,#ffffffee,#f8f2fdd0)] px-4 py-5 shadow-[0_18px_48px_#5b21b611,inset_0_1px_0_#fff] backdrop-blur-[22px] transition duration-[450ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none min-[400px]:px-5 min-[400px]:py-6 md:rounded-[28px] md:p-[clamp(26px,3vw,40px)] md:hover:-translate-y-1 md:hover:border-[#ccb0e2] md:hover:shadow-[0_24px_52px_#5b21b619,inset_0_1px_0_#fff]">
-              {/* Phone: text fills the full card width (pretty wrap, fluid size).
-                  Tablet + desktop: original balanced look. */}
               <p className="w-full font-display text-[clamp(17px,5.3vw,22px)] font-bold leading-[1.4] tracking-[-0.02em] [text-wrap:pretty] md:text-[clamp(19px,1.9vw,23px)] md:leading-[1.4] md:[text-wrap:balance]">
                 Unclear Offers And Distracting Pages Stop Interested Visitors
                 From Taking The Next Step.
@@ -560,8 +588,6 @@ export default function Problems() {
             Getting Clicks, But{' '}
             <span className={GRADIENT_TEXT}>Not Enough Enquiries?</span>
           </h2>
-
-
         </Reveal>
 
         <div className="mt-8 md:mt-[clamp(36px,5vw,60px)]">
@@ -571,9 +597,7 @@ export default function Problems() {
               {...motionProps}
               className="relative min-w-0 px-4 py-4 text-left md:mb-1 md:px-[18px] md:py-[22px] lg:px-[26px] lg:py-5"
             >
-              <h3 className="text-[23px] font-bold leading-[1.35] tracking-[-0.025em] text-[#b83e51] md:text-[clamp(22px,2.1vw,27px)]">
-                What Holds Visitors Back
-              </h3>
+              <ColumnHeading kind="problem">What Holds Visitors Back</ColumnHeading>
             </Reveal>
 
             <div className="hidden md:block" aria-hidden="true" />
@@ -583,9 +607,7 @@ export default function Problems() {
               delay={60}
               className="relative min-w-0 px-4 py-4 text-left max-md:order-[500] max-md:mt-5 md:mb-1 md:px-[18px] md:py-[22px] lg:px-[26px] lg:py-5"
             >
-              <h3 className="text-[23px] font-bold leading-[1.35] tracking-[-0.025em] text-[#20734e] md:text-[clamp(22px,2.1vw,27px)]">
-                How We Fix It
-              </h3>
+              <ColumnHeading kind="solution">How We Fix It</ColumnHeading>
             </Reveal>
 
             {items.map(({ problem, solution }, index) => {
