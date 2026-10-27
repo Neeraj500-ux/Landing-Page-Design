@@ -25,26 +25,33 @@ const reveal = (on) =>
   );
 
 /* ----------------------------- CARD ------------------------------ */
+/* Full image, no crop. Desktop: width = image ratio, so all heights match. */
 
-function ReviewCard({ review, index, revealed, onOpen }) {
+function ReviewCard({ review, index, revealed, ratio, onRatio, onOpen }) {
   return (
     <article
-      style={{ transitionDelay: `${index * 120}ms` }}
-      className={cx("mx-auto w-full min-w-0 max-w-[420px] self-start sm:max-w-none", reveal(revealed))}
+      style={{ transitionDelay: `${index * 120}ms`, "--r": ratio }}
+      className={cx(
+        "mx-auto w-full min-w-0 max-w-[460px] self-start sm:max-w-none lg:[flex:var(--r)_1_0%]",
+        reveal(revealed)
+      )}
     >
       <button
         type="button"
         onClick={() => onOpen(index)}
         aria-label={`Open ${review.alt}`}
-        className="block w-full cursor-zoom-in overflow-hidden rounded-2xl bg-[#0b1014] shadow-[0_12px_28px_-16px_rgba(124,58,237,0.45)] transition-transform duration-300 hover:scale-[1.02] lg:rounded-[22px]"
+        className="block w-full cursor-zoom-in rounded-2xl bg-[#0b1014] shadow-[0_12px_28px_-16px_rgba(124,58,237,0.45)] transition-transform duration-300 hover:scale-[1.02] lg:rounded-[22px]"
       >
         <img
           src={review.image}
           alt={review.alt}
-          loading="lazy"
           decoding="async"
           draggable={false}
-          className="block h-auto w-full select-none"
+          onLoad={(e) => {
+            const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+            if (w && h) onRatio(index, w / h);
+          }}
+          className="block h-auto w-full select-none rounded-2xl object-contain lg:rounded-[22px]"
         />
       </button>
     </article>
@@ -104,7 +111,6 @@ function Lightbox({ index, onClose, onChange }) {
       onTouchEnd={onTouchEnd}
       className="fixed left-0 top-0 z-[9999] flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-black/60 p-3 backdrop-blur-xl sm:p-6"
     >
-      {/* CLOSE */}
       <button
         type="button"
         aria-label="Close"
@@ -114,7 +120,6 @@ function Lightbox({ index, onClose, onChange }) {
         ✕
       </button>
 
-      {/* PREV */}
       <button
         type="button"
         aria-label="Previous image"
@@ -127,7 +132,6 @@ function Lightbox({ index, onClose, onChange }) {
         ❮
       </button>
 
-      {/* IMAGE */}
       <img
         key={review.id}
         src={review.image}
@@ -137,7 +141,6 @@ function Lightbox({ index, onClose, onChange }) {
         className="h-auto max-h-[calc(100dvh-1.5rem)] w-auto max-w-full select-none rounded-2xl object-contain shadow-2xl sm:max-h-[calc(100dvh-3rem)]"
       />
 
-      {/* NEXT */}
       <button
         type="button"
         aria-label="Next image"
@@ -150,7 +153,6 @@ function Lightbox({ index, onClose, onChange }) {
         ❯
       </button>
 
-      {/* COUNTER */}
       <span className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-sm font-medium text-white">
         {index + 1} / {total}
       </span>
@@ -165,8 +167,14 @@ export default function WhatsAppReviews() {
   const sectionRef = useRef(null);
   const [revealed, setRevealed] = useState(false);
   const [active, setActive] = useState(null); // null ya image ka index
+  const [ratios, setRatios] = useState(() => reviews.map(() => 1));
 
   const closeLightbox = useCallback(() => setActive(null), []);
+  const setRatio = useCallback(
+    (i, r) =>
+      setRatios((prev) => (Math.abs(prev[i] - r) < 0.001 ? prev : prev.map((v, k) => (k === i ? r : v)))),
+    []
+  );
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -251,14 +259,16 @@ export default function WhatsAppReviews() {
         </header>
       </div>
 
-      {/* IMAGES: mobile = 1 column, tablet = 2, desktop = 4 */}
-      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-start gap-5 px-5 sm:grid-cols-2 sm:gap-5 sm:px-7 md:gap-6 md:px-9 lg:grid-cols-4 lg:gap-6 lg:px-12">
+      {/* IMAGES: mobile = 1 col, tablet = 2 cols, desktop = 1 row (width by image ratio) */}
+      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-start gap-5 px-5 sm:grid-cols-2 sm:px-7 md:gap-6 md:px-9 lg:flex lg:flex-row lg:gap-5 lg:px-12">
         {reviews.map((review, index) => (
           <ReviewCard
             key={review.id}
             review={review}
             index={index}
             revealed={revealed}
+            ratio={ratios[index]}
+            onRatio={setRatio}
             onOpen={setActive}
           />
         ))}
