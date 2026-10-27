@@ -465,7 +465,7 @@ function PairCard({ kind, number, title, delay, motionProps }) {
             {/* Phone: fluid font 12.5px to 16.5px, no balance wrap so it stays on one line.
                 md+: original sizing with balanced wrap. */}
             <h3
-              className={`text-[20px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[clamp(17px,1.9vw,21px)] md:tracking-[-0.028em] md:[text-wrap:balance] ${tone.title}`}
+              className={`text-[19px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[clamp(17px,1.9vw,21px)] md:tracking-[-0.028em] md:[text-wrap:balance] ${tone.title}`}
             >
               {title}
             </h3>
