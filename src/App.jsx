@@ -16,11 +16,12 @@ export default function App() {
       <main>
         <Hero />
         <Problems />
+         <Video />
         
          {/* WhatsApp Reviews */}
         <WhatsAppReviews />
 
-        <Video />
+        
          <ImageCarousel />
 
         
