@@ -19,6 +19,9 @@ const HOST_IMAGE = '/images/Neeraj20.png' // file lives in /public/images
 // Google Apps Script Web App URL (saves every enquiry to the Google Sheet)
 const FORM_ENDPOINT =
   'https://script.google.com/macros/s/AKfycbx4-zXZLsl3B4M4lgpDIWFUROF_GvseaDfzeaQHKUT6BDQAWSuO31MFjFle5e4MfZrQ/exec'
+const CRM_ENDPOINT = 'https://nuursmovhbhislrphakl.supabase.co/functions/v1/capture-lead'
+const CRM_CATEGORY = 'Landing Page'
+const CRM_SERVICE = '10X Landing Page Growth Call'
 const FORM_TITLE = 'Creative Crew — Growth Consultation Form'
 
 const introPoints = [
@@ -162,6 +165,10 @@ export default function Contact() {
   const closeTimer = useRef(null)
   const closeRef = useRef(() => {})
   const scrollRef = useRef(null)
+  // Keep one ID for this form submission so a CRM retry can be deduplicated server-side.
+  const submissionIdRef = useRef('')
+  const sheetSentRef = useRef(false)
+  const crmSavedRef = useRef(false)
 
   // Open from anywhere: window.dispatchEvent(new Event('open-contact-popup'))
   useEffect(() => {
@@ -210,6 +217,9 @@ export default function Contact() {
         setDetails(initialDetails)
         setAnswers({})
         setOtherText({})
+        submissionIdRef.current = ''
+        sheetSentRef.current = false
+        crmSavedRef.current = false
       }
     }, 200)
   }
@@ -230,50 +240,99 @@ export default function Contact() {
   }
 
   const submitAll = async () => {
+    if (isSubmitting) return
     setIsSubmitting(true)
     setSubmitError('')
 
-    const payload = {
+    if (!submissionIdRef.current) {
+      submissionIdRef.current =
+        typeof window !== 'undefined' && window.crypto?.randomUUID
+          ? window.crypto.randomUUID()
+          : `lead-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+    }
+
+    const answerRows = questions.map((q) => ({
+      question: q.title,
+      answer:
+        answers[q.id] === 'Other'
+          ? `Other: ${(otherText[q.id] || '').trim()}`
+          : (answers[q.id] || '').trim(),
+    }))
+    const sheetPayload = {
       form: FORM_TITLE,
       ...details,
-      answers: questions.map((q) => ({
-        question: q.title,
-        answer:
-          answers[q.id] === 'Other'
-            ? `Other: ${otherText[q.id] || ''}`
-            : answers[q.id],
-      })),
+      answers: answerRows,
+    }
+    const crmPayload = {
+      name: details.fullName.trim(),
+      email: details.email.trim(),
+      phone: details.phone.trim(),
+      company: details.businessName.trim(),
+      lead_source: CRM_CATEGORY,
+      service_name: CRM_SERVICE,
+      message: answerRows.map(({ question, answer }) => `${question}\n${answer}`).join('\n\n'),
+      landing_page_url: typeof window !== 'undefined' ? window.location.href : '',
+      external_lead_id: submissionIdRef.current,
     }
 
     try {
       if (!FORM_ENDPOINT) {
-        throw new Error(
-          'The contact form is not connected yet. Please add your form API URL (FORM_ENDPOINT) to receive enquiries.'
-        )
+        throw new Error('Google Sheet URL (FORM_ENDPOINT) is missing.')
+      }
+      if (!CRM_ENDPOINT) {
+        throw new Error('CRM endpoint (CRM_ENDPOINT) is missing.')
       }
 
-      // Google Apps Script: text/plain + no-cors avoids the CORS preflight error.
-      // Date & Time are added automatically in the Google Sheet by the script.
-      await fetch(FORM_ENDPOINT, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
-      })
+      // Google Apps Script: no-cors avoids browser preflight; its response is opaque.
+      // A resolved fetch means the browser sent the request, but cannot verify the Sheet write.
+      if (!sheetSentRef.current) {
+        await fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(sheetPayload),
+        })
+        sheetSentRef.current = true
+      }
 
-      // Meta Pixel: fire Lead event after successful submit
+      // CRM endpoint must allow this site's origin in Supabase CORS settings.
+      if (!crmSavedRef.current) {
+        const crmResponse = await fetch(CRM_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(crmPayload),
+        })
+        const responseText = await crmResponse.text()
+        let responseData = {}
+        try {
+          responseData = responseText ? JSON.parse(responseText) : {}
+        } catch {
+          responseData = { message: responseText }
+        }
+        if (!crmResponse.ok || responseData?.ok === false) {
+          throw new Error(
+            responseData?.error || responseData?.message || `CRM request failed (HTTP ${crmResponse.status}).`
+          )
+        }
+        crmSavedRef.current = true
+      }
+
+      // Fire the browser Pixel event only after CRM confirms the lead was saved.
       if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
-        window.fbq('track', 'Lead', { content_name: '10X Landing Page Growth Call' })
+        window.fbq('track', 'Lead', { content_name: CRM_SERVICE })
       }
 
       setStep(DONE_STEP)
     } catch (err) {
-      setSubmitError(err.message || 'Something went wrong. Please try again.')
+      setSubmitError(
+        err instanceof Error
+          ? `We couldn't confirm the CRM save: ${err.message} Please retry, or contact us on WhatsApp.`
+          : 'We could not submit your details. Please retry or contact us on WhatsApp.'
+      )
     } finally {
       setIsSubmitting(false)
     }
   }
-
   /* ---------- Progress bar ---------- */
 
   const progress = (n) => (
