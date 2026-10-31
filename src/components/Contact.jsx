@@ -1,21 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 /* ==========================================================
    Contact.jsx  (Tailwind utility classes only) - light + mobile-first
-   Flow:  Button click -> Intro screen (photo + points + Continue)
-          -> Your details form -> 5 questions (one per step, Next)
-          -> Thank you screen
+   Flow:  Button click -> Your details form (FIRST CLICK, logo on top)
+          -> 4 questions (one per step, Next)
+          -> Book Appointment (date + time slot) -> Thank you screen
    Layout: header/close fixed, content scrolls, buttons ALWAYS
            pinned at the bottom (works on small phones too).
-   Data:   saved to Google Sheet via Apps Script (Date + Time added there)
+   Data:   Name + Number go to the Google Sheet FIRST (as soon as the
+           details step is completed), then the full lead + appointment
+           is saved to Sheet + CRM (Supabase) at the end.
    Open it with:  window.dispatchEvent(new Event('open-contact-popup'))
-   Meta Pixel: Lead event fires after successful form submit
+   Meta Pixel: Lead + Schedule events fire after successful submit
    ========================================================== */
 
 // ---------- EDIT THESE ----------
-const HOST_NAME = 'Sohil'
-const HOST_IMAGE = '/images/Neeraj20.png' // file lives in /public/images
+const LOGO_IMAGE = '/images/Neeraj12.png' // file lives in /public/images
 // Google Apps Script Web App URL (saves every enquiry to the Google Sheet)
 const FORM_ENDPOINT =
   'https://script.google.com/macros/s/AKfycbx4-zXZLsl3B4M4lgpDIWFUROF_GvseaDfzeaQHKUT6BDQAWSuO31MFjFle5e4MfZrQ/exec'
@@ -24,13 +25,28 @@ const CRM_CATEGORY = 'Landing Page'
 const CRM_SERVICE = '10X Landing Page Growth Call'
 const FORM_TITLE = 'Creative Crew — Growth Consultation Form'
 
-const introPoints = [
-  'Discover what’s preventing your landing page from converting visitors into leads and identify opportunities to improve conversion rates by up to 10X.',
-  'Learn how to get the most out of your advertising budget and attract more qualified leads for your business.',
-  'Gain valuable insights from proven funnel strategies, backed by experience in landing page optimization and conversion-focused marketing.',
-  'Identify key improvements in your landing page and sales funnel that can help turn more leads into paying customers and increase your return on ad spend (ROAS) by up to 5X.',
+// ---------- PHONE VALIDATION ----------
+const PHONE_MIN_DIGITS = 10
+const PHONE_MAX_DIGITS = 15
+
+// ---------- APPOINTMENT SETTINGS ----------
+const APPOINTMENT_DAYS_AHEAD = 14 // kitne din aage tak booking dikhani hai
+const SKIP_SUNDAYS = true // Sunday band rakhna hai to true
+const MIN_LEAD_HOURS = 1 // aaj ke slots ke liye kam se kam itne ghante baad ka slot
+const TIME_ZONE_LABEL = 'IST (India Standard Time)'
+// Lunch time (1 PM - 3 PM) ke slots hata diye gaye hain.
+// h = 24-hour format hour, m = minute
+const TIME_SLOTS = [
+  { label: '10:00 AM', h: 10, m: 0 },
+  { label: '11:00 AM', h: 11, m: 0 },
+  { label: '12:00 PM', h: 12, m: 0 },
+  { label: '03:00 PM', h: 15, m: 0 },
+  { label: '04:00 PM', h: 16, m: 0 },
+  { label: '05:00 PM', h: 17, m: 0 },
+  { label: '06:00 PM', h: 18, m: 0 },
 ]
 
+// Question 2 (link) removed
 const questions = [
   {
     id: 'goal',
@@ -44,12 +60,6 @@ const questions = [
       'Build a complete lead generation funnel',
       'Other',
     ],
-  },
-  {
-    id: 'link',
-    type: 'text',
-    title: 'Please share your Instagram, LinkedIn, website, or landing page link.',
-    placeholder: 'Paste your profile or website URL here.',
   },
   {
     id: 'source',
@@ -93,13 +103,73 @@ const questions = [
   },
 ]
 
-// Steps: 0 intro | 1 details | 2..(1+questions.length) questions | last = thank you
-const DETAILS_STEP = 1
-const FIRST_Q = 2
-const DONE_STEP = FIRST_Q + questions.length
-const TOTAL_FORM_STEPS = 1 + questions.length // details + questions
+// Steps: 0 details (first click) | 1..questions.length questions | appointment | thank you
+const DETAILS_STEP = 0
+const FIRST_Q = 1
+const APPOINTMENT_STEP = FIRST_Q + questions.length
+const DONE_STEP = APPOINTMENT_STEP + 1
+const TOTAL_FORM_STEPS = 1 + questions.length + 1 // details + questions + appointment
 
 const initialDetails = { fullName: '', businessName: '', email: '', phone: '' }
+const initialAppointment = { date: '', time: '' }
+
+/* ==================== Helpers ==================== */
+
+const pad = (n) => String(n).padStart(2, '0')
+const toDateKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+
+const countDigits = (v) => (v.match(/\d/g) || []).length
+const isValidPhone = (v) => {
+  const n = countDigits(v)
+  return n >= PHONE_MIN_DIGITS && n <= PHONE_MAX_DIGITS
+}
+
+// Slots available for a given day (today ke liye past slots hata deta hai)
+function getSlotsForDate(date) {
+  const now = new Date()
+  const isToday = toDateKey(date) === toDateKey(now)
+  if (!isToday) return TIME_SLOTS
+  const cutoff = new Date(now.getTime() + MIN_LEAD_HOURS * 60 * 60 * 1000)
+  return TIME_SLOTS.filter((s) => {
+    const slotDate = new Date(date)
+    slotDate.setHours(s.h, s.m, 0, 0)
+    return slotDate >= cutoff
+  })
+}
+
+function buildUpcomingDays(booked = []) {
+  const bookedSet = new Set(booked)
+  const out = []
+  const base = new Date()
+  base.setHours(0, 0, 0, 0)
+  for (let i = 0; i <= APPOINTMENT_DAYS_AHEAD; i++) {
+    const d = new Date(base)
+    d.setDate(base.getDate() + i)
+    if (SKIP_SUNDAYS && d.getDay() === 0) continue
+    const slots = getSlotsForDate(d)
+    if (slots.length === 0) continue // aaj ke saare slot nikal chuke
+    const key = toDateKey(d)
+    // har slot par mark: kya wo pehle se book hai?
+    const marked = slots.map((sl) => ({ ...sl, booked: bookedSet.has(`${key}|${sl.label}`) }))
+    out.push({
+      key,
+      date: d,
+      weekday: d.toLocaleDateString('en-IN', { weekday: 'short' }),
+      day: d.getDate(),
+      month: d.toLocaleDateString('en-IN', { month: 'short' }),
+      full: d.toLocaleDateString('en-IN', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }),
+      isToday: i === 0,
+      slots: marked,
+      soldOut: marked.every((sl) => sl.booked),
+    })
+  }
+  return out
+}
 
 /* ==================== Shared classes ==================== */
 
@@ -150,15 +220,37 @@ function CloseIcon() {
   )
 }
 
+function CalendarIcon({ className = 'h-4 w-4' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3.5" y="5" width="17" height="15.5" rx="3" stroke="currentColor" strokeWidth="2" />
+      <path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function ClockIcon({ className = 'h-4 w-4' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="2" />
+      <path d="M12 7.5V12l3 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 /* ==================== Main component ==================== */
 
 export default function Contact() {
   const [isOpen, setIsOpen] = useState(false)
   const [closing, setClosing] = useState(false)
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(DETAILS_STEP)
   const [details, setDetails] = useState(initialDetails)
+  const [phoneError, setPhoneError] = useState('')
   const [answers, setAnswers] = useState({})
   const [otherText, setOtherText] = useState({})
+  const [appointment, setAppointment] = useState(initialAppointment)
+  const [bookedSlots, setBookedSlots] = useState([]) // e.g. ['2026-11-03|10:00 AM']
+  const [slotsLoading, setSlotsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
@@ -167,16 +259,59 @@ export default function Contact() {
   const scrollRef = useRef(null)
   // Keep one ID for this form submission so a CRM retry can be deduplicated server-side.
   const submissionIdRef = useRef('')
+  const partialSentRef = useRef(false) // Name + Number already sent to the sheet?
   const sheetSentRef = useRef(false)
   const crmSavedRef = useRef(false)
 
+  const getSubmissionId = () => {
+    if (!submissionIdRef.current) {
+      submissionIdRef.current =
+        typeof window !== 'undefined' && window.crypto?.randomUUID
+          ? window.crypto.randomUUID()
+          : `lead-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+    }
+    return submissionIdRef.current
+  }
+
+  // Available dates are rebuilt every time the popup opens (so "today" is always fresh)
+  const availableDays = useMemo(
+    () => (isOpen ? buildUpcomingDays(bookedSlots) : []),
+    [isOpen, bookedSlots]
+  )
+
+  // Google Sheet (Apps Script) se already booked slots laao
+  const loadBookedSlots = async () => {
+    setSlotsLoading(true)
+    try {
+      const res = await fetch(`${FORM_ENDPOINT}?action=booked&t=${Date.now()}`)
+      const data = await res.json()
+      if (Array.isArray(data?.booked)) {
+        setBookedSlots(data.booked)
+        // agar user ka chuna hua slot ab book ho chuka hai to hata do
+        setAppointment((p) => (data.booked.includes(`${p.date}|${p.time}`) ? { ...p, time: '' } : p))
+      }
+    } catch {
+      // Fail-open: list na mile to bhi booking chalu rehti hai (server dobara check karta hai)
+    } finally {
+      setSlotsLoading(false)
+    }
+  }
+
+  // Appointment step khulte hi latest booked slots refresh karo
+  useEffect(() => {
+    if (isOpen && step === APPOINTMENT_STEP) loadBookedSlots()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, step])
+
   // Open from anywhere: window.dispatchEvent(new Event('open-contact-popup'))
+  // First click opens the details form directly.
   useEffect(() => {
     const openPopup = () => {
       clearTimeout(closeTimer.current)
       setClosing(false)
-      setStep(0)
+      setStep(DETAILS_STEP)
       setSubmitError('')
+      setPhoneError('')
       setIsOpen(true)
     }
     window.addEventListener('open-contact-popup', openPopup)
@@ -213,11 +348,13 @@ export default function Contact() {
       setIsOpen(false)
       setClosing(false)
       if (step === DONE_STEP) {
-        setStep(0)
+        setStep(DETAILS_STEP)
         setDetails(initialDetails)
         setAnswers({})
         setOtherText({})
+        setAppointment(initialAppointment)
         submissionIdRef.current = ''
+        partialSentRef.current = false
         sheetSentRef.current = false
         crmSavedRef.current = false
       }
@@ -231,25 +368,63 @@ export default function Contact() {
   }
   const goBack = () => {
     setSubmitError('')
-    setStep((s) => Math.max(0, s - 1))
+    setStep((s) => Math.max(DETAILS_STEP, s - 1))
   }
 
   const updateDetail = (e) => {
     const { name, value } = e.target
+    if (name === 'phone') {
+      // allow only digits, +, space and dash
+      const cleaned = value.replace(/[^\d+\s-]/g, '')
+      setDetails((p) => ({ ...p, phone: cleaned }))
+      if (phoneError) setPhoneError('')
+      return
+    }
     setDetails((p) => ({ ...p, [name]: value }))
   }
 
+  // NAME + NUMBER go to the Google Sheet FIRST (before the questions).
+  // Fire-and-forget: it never blocks the user. Apps Script gets stage: 'details'.
+  const sendDetailsToSheet = () => {
+    if (partialSentRef.current || !FORM_ENDPOINT) return
+    partialSentRef.current = true
+    fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        form: FORM_TITLE,
+        stage: 'details',
+        submissionId: getSubmissionId(),
+        fullName: details.fullName.trim(),
+        businessName: details.businessName.trim(),
+        email: details.email.trim(),
+        phone: details.phone.trim(),
+      }),
+    }).catch(() => {
+      partialSentRef.current = false // retry on the next attempt
+    })
+  }
+
+  const handleDetailsSubmit = (e) => {
+    e.preventDefault()
+    if (!isValidPhone(details.phone)) {
+      setPhoneError(`Please enter a valid number (${PHONE_MIN_DIGITS}-${PHONE_MAX_DIGITS} digits).`)
+      return
+    }
+    sendDetailsToSheet()
+    goNext()
+  }
+
+  const selectedDay = availableDays.find((d) => d.key === appointment.date)
+  const appointmentDateLabel = selectedDay ? selectedDay.full : ''
+
   const submitAll = async () => {
     if (isSubmitting) return
+    if (!appointment.date || !appointment.time) return
     setIsSubmitting(true)
     setSubmitError('')
 
-    if (!submissionIdRef.current) {
-      submissionIdRef.current =
-        typeof window !== 'undefined' && window.crypto?.randomUUID
-          ? window.crypto.randomUUID()
-          : `lead-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
-    }
+    const submissionId = getSubmissionId()
 
     const answerRows = questions.map((q) => ({
       question: q.title,
@@ -258,10 +433,19 @@ export default function Contact() {
           ? `Other: ${(otherText[q.id] || '').trim()}`
           : (answers[q.id] || '').trim(),
     }))
+
+    const appointmentText = `${appointmentDateLabel} at ${appointment.time} (${TIME_ZONE_LABEL})`
+
     const sheetPayload = {
       form: FORM_TITLE,
+      stage: 'complete',
+      submissionId,
       ...details,
       answers: answerRows,
+      appointmentDate: appointmentDateLabel,
+      appointmentDateISO: appointment.date,
+      appointmentTime: appointment.time,
+      appointment: appointmentText,
     }
     const crmPayload = {
       name: details.fullName.trim(),
@@ -270,9 +454,14 @@ export default function Contact() {
       company: details.businessName.trim(),
       lead_source: CRM_CATEGORY,
       service_name: CRM_SERVICE,
-      message: answerRows.map(({ question, answer }) => `${question}\n${answer}`).join('\n\n'),
+      message:
+        answerRows.map(({ question, answer }) => `${question}\n${answer}`).join('\n\n') +
+        `\n\nAppointment Booked\n${appointmentText}`,
       landing_page_url: typeof window !== 'undefined' ? window.location.href : '',
-      external_lead_id: submissionIdRef.current,
+      external_lead_id: submissionId,
+      appointment_date: appointment.date,
+      appointment_time: appointment.time,
+      appointment_label: appointmentText,
     }
 
     try {
@@ -283,15 +472,29 @@ export default function Contact() {
         throw new Error('CRM endpoint (CRM_ENDPOINT) is missing.')
       }
 
-      // Google Apps Script: no-cors avoids browser preflight; its response is opaque.
-      // A resolved fetch means the browser sent the request, but cannot verify the Sheet write.
+      // Google Apps Script: saves lead + checks that the slot is still free (server-side lock).
       if (!sheetSentRef.current) {
-        await fetch(FORM_ENDPOINT, {
+        const sheetRes = await fetch(FORM_ENDPOINT, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // simple request: no preflight
           body: JSON.stringify(sheetPayload),
         })
+        let sheetData = null
+        try {
+          sheetData = await sheetRes.json()
+        } catch {
+          sheetData = null
+        }
+        // Kisi aur ne ye slot abhi book kar liya
+        if (sheetData?.error === 'slot_taken') {
+          await loadBookedSlots()
+          setAppointment((p) => ({ ...p, time: '' }))
+          setSubmitError('Sorry, this slot was just booked by someone else. Please choose another time.')
+          return
+        }
+        if (!sheetData || sheetData.ok !== true) {
+          throw new Error(sheetData?.error || 'Booking could not be saved.')
+        }
         sheetSentRef.current = true
       }
 
@@ -317,22 +520,26 @@ export default function Contact() {
         crmSavedRef.current = true
       }
 
-      // Fire the browser Pixel event only after CRM confirms the lead was saved.
+      // Fire the browser Pixel events only after CRM confirms the lead was saved.
       if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
         window.fbq('track', 'Lead', { content_name: CRM_SERVICE })
+        window.fbq('track', 'Schedule', { content_name: CRM_SERVICE })
       }
 
+      // Is slot ko turant locally bhi booked mark kar do
+      setBookedSlots((prev) => [...prev, `${appointment.date}|${appointment.time}`])
       setStep(DONE_STEP)
     } catch (err) {
       setSubmitError(
         err instanceof Error
-          ? `We couldn't confirm the CRM save: ${err.message} Please retry, or contact us on WhatsApp.`
+          ? `We couldn't complete your booking: ${err.message} Please retry, or contact us on WhatsApp.`
           : 'We could not submit your details. Please retry or contact us on WhatsApp.'
       )
     } finally {
       setIsSubmitting(false)
     }
   }
+
   /* ---------- Progress bar ---------- */
 
   const progress = (n) => (
@@ -354,67 +561,22 @@ export default function Contact() {
 
   /* ---------- Step renderers: each returns { body, footer } ---------- */
 
-  const renderIntro = () => ({
-    body: (
-      <div className="flex flex-col items-center text-center">
-        {/* Plain round photo - no ring / glow effect */}
-        <img
-          src={HOST_IMAGE}
-          alt={HOST_NAME}
-          className="h-16 w-16 rounded-full bg-[#efe7ff] object-cover object-top min-[561px]:h-[84px] min-[561px]:w-[84px]"
-        />
-
-        <h3
-          id="ct-popup-title"
-          className="ct-display m-0 mt-2.5 text-[21px] font-extrabold leading-[1.15] tracking-[-0.03em] text-[#14111f] min-[561px]:text-[26px]"
-        >
-          {HOST_NAME}&rsquo;s <span className={GRADIENT_TEXT}>10X Landing Page</span> Growth Call
-        </h3>
-
-        <p
-          id="ct-popup-description"
-          className="m-0 mt-2 text-[12.5px] font-bold leading-[1.4] text-[#d4161d] min-[561px]:text-[14px]"
-        >
-          Exclusively for serious coaches, consultants, and business owners who are ready to invest
-          in their growth.
-        </p>
-
-        <ol className="m-0 mt-3.5 grid w-full list-none gap-2 p-0 text-left">
-          {introPoints.map((point, i) => (
-            <li
-              key={i}
-              className="flex items-start gap-2.5 rounded-xl border border-[#ece6fb] bg-[#faf8ff] px-2.5 py-2 text-[12.5px] leading-[1.45] text-[#4b475f] min-[561px]:px-3 min-[561px]:py-2.5 min-[561px]:text-[13px]"
-            >
-              <span className="mt-px grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#7c3aed] text-[11px] font-extrabold text-white">
-                {i + 1}
-              </span>
-              <span className="min-w-0">{point}</span>
-            </li>
-          ))}
-        </ol>
-
-        <p className="m-0 mt-3 text-center text-[11.5px] font-medium text-[#8a869a]">
-          Creative Crew &mdash; growth, built around your business.
-        </p>
-      </div>
-    ),
-    footer: (
-      <button type="button" onClick={goNext} className={YELLOW_BTN}>
-        Continue
-        <span
-          className="text-[18px] leading-none transition-transform duration-200 group-hover:translate-x-[3px]"
-          aria-hidden="true"
-        >
-          &rarr;
-        </span>
-      </button>
-    ),
-  })
-
   const renderDetails = () => ({
     body: (
       <div>
+        {/* Logo (replaces the old host photo). Dark chip so the white part of the logo stays visible. */}
+        <div className="mb-3 flex justify-center">
+          <span className="grid h-16 w-16 place-items-center overflow-hidden rounded-2xl bg-[#14111f] min-[561px]:h-[76px] min-[561px]:w-[76px]">
+            <img
+              src={LOGO_IMAGE}
+              alt="Creative Crew logo"
+              className="h-full w-full object-contain p-1.5"
+            />
+          </span>
+        </div>
+
         {progress(1)}
+
         <small className="mb-1.5 inline-flex items-center gap-2 rounded-full bg-[#f1eaff] px-3 py-1 text-[12px] font-bold text-[#7c3aed]">
           <span className="h-1.5 w-1.5 rounded-full bg-[#7c3aed]" />
           {FORM_TITLE}
@@ -423,7 +585,7 @@ export default function Contact() {
           id="ct-popup-title"
           className="ct-display m-0 mb-1 text-[22px] font-extrabold leading-[1.15] tracking-[-0.03em] text-[#14111f]"
         >
-          Let&rsquo;s talk <span className={GRADIENT_TEXT}>growth.</span>
+          <span className={GRADIENT_TEXT}>10X Landing Page</span> Growth Call
         </h3>
         <p id="ct-popup-description" className="m-0 mb-3.5 text-[13px] leading-[1.5] text-[#5b5870]">
           Share your details so we can reach you.
@@ -432,10 +594,8 @@ export default function Contact() {
         <form
           id="ct-details-form"
           className="grid grid-cols-1 gap-x-3 gap-y-3 min-[561px]:grid-cols-2"
-          onSubmit={(e) => {
-            e.preventDefault()
-            goNext()
-          }}
+          onSubmit={handleDetailsSubmit}
+          noValidate={false}
         >
           {[
             ['fullName', 'Full Name *', 'text', 'Your full name', 'name', 'ct-full-name'],
@@ -455,44 +615,45 @@ export default function Contact() {
                 onChange={updateDetail}
                 placeholder={ph}
                 autoComplete={ac}
+                inputMode={name === 'phone' ? 'tel' : undefined}
+                aria-invalid={name === 'phone' && phoneError ? 'true' : undefined}
                 required
                 className={FIELD}
               />
+              {name === 'phone' && phoneError && (
+                <span className="text-[12px] font-semibold leading-[1.3] text-[#d4161d]" role="alert">
+                  {phoneError}
+                </span>
+              )}
             </div>
           ))}
         </form>
       </div>
     ),
     footer: (
-      <div className="flex gap-3">
-        <button type="button" onClick={goBack} className={BACK_BTN}>
-          Back
-        </button>
-        {/* submit button lives in the pinned footer but still submits the form above */}
-        <button type="submit" form="ct-details-form" className={YELLOW_BTN}>
-          Next
-          <span className="text-[18px] leading-none" aria-hidden="true">
-            &rarr;
-          </span>
-        </button>
-      </div>
+      // First step: no Back button (form opens directly on first click)
+      <button type="submit" form="ct-details-form" className={YELLOW_BTN}>
+        Next
+        <span className="text-[18px] leading-none" aria-hidden="true">
+          &rarr;
+        </span>
+      </button>
     ),
   })
 
   const renderQuestion = (index) => {
     const q = questions[index]
     const value = answers[q.id] || ''
-    const isLast = index === questions.length - 1
     const needsOther = value === 'Other'
     const valid =
       q.type === 'text'
         ? value.trim().length > 0
         : value && (!needsOther || (otherText[q.id] || '').trim().length > 0)
 
+    // Last question goes to the appointment step (submit happens there)
     const handleNext = () => {
-      if (!valid || isSubmitting) return
-      if (isLast) submitAll()
-      else goNext()
+      if (!valid) return
+      goNext()
     }
 
     return {
@@ -567,6 +728,162 @@ export default function Contact() {
               )}
             </div>
           )}
+        </div>
+      ),
+      footer: (
+        <div className="flex gap-3">
+          <button type="button" onClick={goBack} className={BACK_BTN}>
+            Back
+          </button>
+          <button type="button" onClick={handleNext} disabled={!valid} className={YELLOW_BTN}>
+            Next
+            <span className="text-[18px] leading-none" aria-hidden="true">
+              &rarr;
+            </span>
+          </button>
+        </div>
+      ),
+    }
+  }
+
+  /* ---------- Appointment booking step ---------- */
+
+  const renderAppointment = () => {
+    const slots = selectedDay ? selectedDay.slots : []
+    const valid = Boolean(appointment.date && appointment.time)
+
+    const pickDate = (day) => {
+      setAppointment((p) => {
+        // keep the chosen time only if that slot exists on the new day
+        const stillValid = day.slots.some((s) => s.label === p.time)
+        return { date: day.key, time: stillValid ? p.time : '' }
+      })
+    }
+
+    return {
+      body: (
+        <div>
+          {progress(TOTAL_FORM_STEPS)}
+
+          <p className="m-0 mb-1 inline-flex items-center gap-1.5 text-[12px] font-bold text-[#7c3aed]">
+            <CalendarIcon className="h-3.5 w-3.5" />
+            Last step
+          </p>
+          <h3
+            id="ct-popup-title"
+            className="ct-display m-0 mb-1 text-[20px] font-extrabold leading-[1.25] tracking-[-0.02em] text-[#14111f] min-[561px]:text-[23px]"
+          >
+            Book your <span className={GRADIENT_TEXT}>appointment</span>
+          </h3>
+          <p id="ct-popup-description" className="m-0 mb-3.5 text-[13px] leading-[1.5] text-[#5b5870]">
+            Pick a date and time that works best for your free Growth Call.
+          </p>
+
+          {availableDays.length === 0 ? (
+            <p className="m-0 rounded-xl border border-[#ece6fb] bg-[#faf8ff] px-3.5 py-3 text-[13px] leading-[1.5] text-[#5b5870]">
+              No slots are open right now. Please check back soon or contact us on WhatsApp.
+            </p>
+          ) : (
+            <>
+              {/* Date picker */}
+              <p className={`${LABEL} m-0 mb-2`}>Select date *</p>
+              <div
+                role="radiogroup"
+                aria-label="Select appointment date"
+                className="grid grid-cols-4 gap-2 min-[561px]:grid-cols-5"
+              >
+                {availableDays.map((day) => {
+                  const selected = appointment.date === day.key
+                  return (
+                    <button
+                      key={day.key}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      aria-label={day.full}
+                      disabled={day.soldOut}
+                      onClick={() => pickDate(day)}
+                      className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border px-1 py-2 text-center leading-tight disabled:cursor-not-allowed disabled:border-[#eee9f7] disabled:bg-[#f3f1f8] disabled:text-[#aaa5b8] disabled:shadow-none transition-[border-color,background-color,box-shadow] duration-200 [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#a98af0] ${
+                        selected
+                          ? 'border-[#7c3aed] bg-[#7c3aed] text-white shadow-[0_0_0_3px_rgba(124,58,237,.14)]'
+                          : 'border-[#e2dcf2] bg-[#fbfaff] text-[#2a2140] hover:border-[#cdbff3]'
+                      }`}
+                    >
+                      <span className={`text-[10.5px] font-bold uppercase tracking-wide ${selected ? 'text-[#e9ddff]' : 'text-[#7c3aed]'}`}>
+                        {day.isToday ? 'Today' : day.weekday}
+                      </span>
+                      <span className="text-[18px] font-extrabold">{day.day}</span>
+                      <span className={`text-[10.5px] font-semibold ${selected ? 'text-[#e9ddff]' : 'text-[#8a869a]'}`}>
+                        {day.month}
+                      </span>
+                      {day.soldOut && (
+                        <span className="text-[10px] font-extrabold uppercase text-[#d4161d]">Full</span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Time slots */}
+              <p className={`${LABEL} m-0 mb-2 mt-4`}>
+                Select time *
+                {slotsLoading && (
+                  <span className="ml-2 text-[11.5px] font-medium text-[#8a869a]">Checking availability...</span>
+                )}
+              </p>
+              {!selectedDay ? (
+                <p className="m-0 rounded-xl border border-dashed border-[#e2dcf2] bg-[#fbfaff] px-3.5 py-3 text-[12.5px] text-[#8a869a]">
+                  Choose a date first to see available time slots.
+                </p>
+              ) : (
+                <div
+                  role="radiogroup"
+                  aria-label="Select appointment time"
+                  className="grid grid-cols-2 gap-2 min-[561px]:grid-cols-3"
+                >
+                  {slots.map((slot) => {
+                    const selected = appointment.time === slot.label
+                    return (
+                      <button
+                        key={slot.label}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        disabled={slot.booked}
+                        onClick={() => setAppointment((p) => ({ ...p, time: slot.label }))}
+                        className={`inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-2 py-2.5 text-[13.5px] font-bold disabled:cursor-not-allowed disabled:border-[#eee9f7] disabled:bg-[#f3f1f8] disabled:text-[#aaa5b8] disabled:shadow-none transition-[border-color,background-color,box-shadow] duration-200 [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#a98af0] ${
+                          selected
+                            ? 'border-[#7c3aed] bg-[#f4efff] text-[#2e0c4d] shadow-[0_0_0_3px_rgba(124,58,237,.14)]'
+                            : 'border-[#e2dcf2] bg-[#fbfaff] text-[#2a2140] hover:border-[#cdbff3]'
+                        }`}
+                      >
+                        <ClockIcon className={`h-3.5 w-3.5 ${slot.booked ? 'text-[#c4bfd2]' : 'text-[#7c3aed]'}`} />
+                        <span className={slot.booked ? 'line-through' : ''}>{slot.label}</span>
+                        {slot.booked && (
+                          <span className="text-[10px] font-extrabold uppercase text-[#d4161d]">Booked</span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              <p className="m-0 mt-2 text-[11.5px] font-medium text-[#8a869a]">
+                All times are in {TIME_ZONE_LABEL}.
+              </p>
+
+              {/* Selected summary */}
+              {valid && (
+                <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-[#d9ccf7] bg-[#f4efff] px-3 py-2.5 text-[13px] leading-[1.45] text-[#2e0c4d]">
+                  <CalendarIcon className="mt-0.5 h-4 w-4 shrink-0 text-[#7c3aed]" />
+                  <span className="min-w-0">
+                    <strong className="font-extrabold">Your slot:</strong> {appointmentDateLabel} at{' '}
+                    {appointment.time}
+                  </span>
+                </div>
+              )}
+            </>
+          )}
 
           {submitError && (
             <p
@@ -585,11 +902,11 @@ export default function Contact() {
           </button>
           <button
             type="button"
-            onClick={handleNext}
+            onClick={submitAll}
             disabled={!valid || isSubmitting}
             className={YELLOW_BTN}
           >
-            {isSubmitting ? 'Please wait...' : isLast ? "Yes! Let's Grow My Revenue" : 'Next'}
+            {isSubmitting ? 'Please wait...' : 'Confirm Appointment'}
             {!isSubmitting && (
               <span className="text-[18px] leading-none" aria-hidden="true">
                 &rarr;
@@ -611,11 +928,28 @@ export default function Contact() {
           id="ct-popup-title"
           className="ct-display m-0 mb-2 text-[28px] font-extrabold tracking-[-0.03em] text-[#14111f]"
         >
-          Thank you!
+          You&rsquo;re booked!
         </h3>
         <p id="ct-popup-description" className="m-0 text-[14.5px] leading-[1.65] text-[#5b5870]">
-          Your enquiry has been submitted successfully. Our team will get back to you soon.
+          Your appointment request has been submitted successfully. Our team will contact you to
+          confirm the details.
         </p>
+
+        {appointment.date && appointment.time && (
+          <div className="mt-4 w-full rounded-xl border border-[#d9ccf7] bg-[#f4efff] px-3.5 py-3 text-[13.5px] text-[#2e0c4d]">
+            <p className="m-0 mb-1.5 text-[11.5px] font-bold uppercase tracking-wide text-[#7c3aed]">
+              Your appointment
+            </p>
+            <p className="m-0 flex items-center gap-2 font-bold">
+              <CalendarIcon className="h-4 w-4 shrink-0 text-[#7c3aed]" />
+              {appointmentDateLabel}
+            </p>
+            <p className="m-0 mt-1 flex items-center gap-2 font-bold">
+              <ClockIcon className="h-4 w-4 shrink-0 text-[#7c3aed]" />
+              {appointment.time} &middot; {TIME_ZONE_LABEL}
+            </p>
+          </div>
+        )}
       </div>
     ),
     footer: (
@@ -626,8 +960,8 @@ export default function Contact() {
   })
 
   let view
-  if (step === 0) view = renderIntro()
-  else if (step === DETAILS_STEP) view = renderDetails()
+  if (step === DETAILS_STEP) view = renderDetails()
+  else if (step === APPOINTMENT_STEP) view = renderAppointment()
   else if (step === DONE_STEP) view = renderDone()
   else view = renderQuestion(step - FIRST_Q)
 
@@ -683,7 +1017,7 @@ export default function Contact() {
                 <div
                   key={step}
                   className={
-                    step === 0 || step === DONE_STEP
+                    step === DETAILS_STEP || step === DONE_STEP
                       ? ''
                       : 'animate-[ctSlide_.3s_cubic-bezier(.22,1,.36,1)_both] motion-reduce:animate-none'
                   }
