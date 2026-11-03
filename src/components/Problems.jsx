@@ -322,8 +322,8 @@ function VsBadge() {
       aria-hidden="true"
     >
       <div className="rv rv-zoom relative" style={{ '--i': 5 }}>
-        <span className="spin-slow absolute -inset-2.5 rounded-full border-2 border-dashed border-[#1457e6]/50" />
-        <div className="ripple grid h-16 w-16 place-items-center rounded-full bg-gradient-to-b from-[#3a78ff] to-[#0b2a85] text-[24px] font-black text-white ring-[5px] ring-white sm:h-20 sm:w-20 sm:text-[30px] lg:h-[88px] lg:w-[88px] lg:text-[34px]">
+        <span className="spin-slow absolute -inset-2.5 rounded-full border-2 border-dashed border-[#9a5ad4]/60" />
+        <div className="ripple grid h-16 w-16 place-items-center rounded-full bg-gradient-to-b from-[#a066d6] to-[#5a2a85] text-[24px] font-black text-white ring-[5px] ring-white sm:h-20 sm:w-20 sm:text-[30px] lg:h-[88px] lg:w-[88px] lg:text-[34px]">
           VS
         </div>
       </div>
@@ -708,7 +708,7 @@ const styles = `
 @keyframes sa-right{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
 @keyframes sa-pop{0%{opacity:0;transform:scale(0)}70%{opacity:1;transform:scale(1.2)}100%{opacity:1;transform:scale(1)}}
 @keyframes sa-zoom{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
-@keyframes sa-ripple{0%{box-shadow:0 0 0 0 rgba(20,87,230,.55)}100%{box-shadow:0 0 0 26px rgba(20,87,230,0)}}
+@keyframes sa-ripple{0%{box-shadow:0 0 0 0 rgba(117,66,164,.5)}100%{box-shadow:0 0 0 26px rgba(117,66,164,0)}}
 @keyframes sa-blob{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,-30px) scale(1.15)}}
 @keyframes sa-spin{to{transform:rotate(360deg)}}
 @keyframes sa-scan{

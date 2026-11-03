@@ -1,8 +1,6 @@
-
 import { useEffect, useRef, useState } from "react";
 import Player from "@vimeo/player";
 import { Volume2, VolumeX, Play, Pause } from "lucide-react";
-import { Button } from "./ui";
 
 const videos = [
   {
@@ -203,19 +201,12 @@ export default function Video() {
       <div className="relative mx-auto max-w-7xl">
         <Reveal className="mx-auto mb-10 max-w-3xl text-center sm:mb-14 lg:mb-16">
           <header>
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-violet-100 bg-violet-50 px-4 py-2 text-[10px] font-bold tracking-[0.16em] text-violet-700 sm:text-xs">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-violet-500" />
-              BUILT FOR GROWTH
-            </div>
-
             <h2 className="text-3xl font-bold leading-tight tracking-tight text-slate-950 sm:text-4xl md:text-5xl lg:text-6xl">
               Real Stories.
               <span className="mt-1 block bg-gradient-to-r from-violet-600 via-fuchsia-500 to-blue-600 bg-clip-text text-transparent">
                 Real Growth. Real Results.
               </span>
             </h2>
-
-           
           </header>
         </Reveal>
 
@@ -230,34 +221,6 @@ export default function Video() {
             </Reveal>
           ))}
         </div>
-
-        <Reveal delay={200}>
-          <div className="mt-12 rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-violet-50/70 p-5 sm:mt-16 sm:p-9 lg:p-10">
-            <div className="flex min-w-0 flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0 max-w-2xl">
-                <span className="text-xs font-bold tracking-[0.16em] text-violet-600">
-                  YOUR NEXT GROWTH CHAPTER
-                </span>
-
-                <h3 className="mt-3 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
-                  Ready to turn your traffic into revenue?
-                </h3>
-
-                <p className="mt-3 text-sm leading-7 text-slate-600 sm:text-base">
-                  Let&apos;s build a funnel that works harder for your business.
-                </p>
-              </div>
-
-              <Reveal delay={290} className="video-cta-actions-slot">
-                <div className="video-cta-actions">
-                  <Button className="site-cta--revenue premium-hero__button">
-                    Yes! Let&apos;s Grow My Revenue
-                  </Button>
-                </div>
-              </Reveal>
-            </div>
-          </div>
-        </Reveal>
       </div>
 
       <style>{`
@@ -294,32 +257,10 @@ export default function Video() {
           }
         }
 
-        .video-cta-actions-slot {
-          width: 100%;
-          max-width: 620px;
-          margin-top: 0;
-        }
-
-        .video-cta-actions {
-          display: flex;
-          justify-content: center;
-          width: 100%;
-        }
-
         @media (max-width: 767px) {
           .video-stories-section {
             padding-left: 16px;
             padding-right: 16px;
-          }
-
-          .video-cta-actions-slot,
-          .video-cta-actions {
-            width: 100%;
-            max-width: 100%;
-          }
-
-          .video-stories-section .premium-hero__button.premium-hero__button {
-            width: 100%;
           }
         }
 

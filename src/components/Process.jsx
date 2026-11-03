@@ -158,18 +158,6 @@ const css = `
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
 }
 
-/* Detail panel */
-.pr-note{
-  position:relative;overflow:hidden;
-  border:1px solid rgba(109,53,201,.1);
-  background:linear-gradient(145deg,rgba(243,236,252,.9),rgba(255,255,255,.6));
-  box-shadow:inset 0 1px 0 #fff;
-}
-.pr-note::before{
-  content:'';position:absolute;left:0;top:.75rem;bottom:.75rem;width:3px;border-radius:0 3px 3px 0;
-  background:linear-gradient(to bottom,#6D35C9,#FF8A3D);
-}
-
 /* Card hover */
 .pr-card{transition:transform .45s cubic-bezier(.2,.7,.2,1),box-shadow .45s ease}
 @media (hover:hover) and (pointer:fine){
@@ -272,7 +260,8 @@ export default function Process() {
             <span className="pr-line-fill" />
           </span>
 
-          {steps.map(([title, desc, detail, label, icon], i) => {
+          {/* steps = [title, desc, detail, label, icon]; detail + label (the note) are no longer shown */}
+          {steps.map(([title, desc, , , icon], i) => {
             const right = i % 2 === 1
             const iconName = icon || fallbackOrder[i % fallbackOrder.length]
             return (
@@ -305,11 +294,6 @@ export default function Process() {
                       {title}
                     </h3>
                     <p className="relative mt-2 text-[0.95rem] leading-relaxed text-ink/65 sm:text-base">{desc}</p>
-
-                    <p className="pr-note relative mt-4 rounded-2xl py-3.5 pl-5 pr-4 text-left text-sm leading-relaxed text-ink/75 sm:mt-5">
-                      <b className="font-semibold text-cobalt">{label}: </b>
-                      {detail}
-                    </p>
                   </div>
                 </div>
               </li>
@@ -323,4 +307,4 @@ export default function Process() {
       </Container>
     </section>
   )
-}   
+}
