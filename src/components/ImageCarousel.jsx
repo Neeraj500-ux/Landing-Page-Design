@@ -8,10 +8,15 @@ const makeImages = (from, to, names) =>
     alt: `Landing Page Design ${name}`,
   }));
 
-const NAMES = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve"];
+const NAMES = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen"];
+
+/* New image (public/images/Neeraj21.jpeg). Add more here the same way. */
+const extraImages = [
+  { src: "/images/Neeraj21.jpeg", alt: `Landing Page Design ${NAMES[12]}` },
+];
 
 const topImages = makeImages(1, 6, NAMES);
-const bottomImages = makeImages(7, 12, NAMES);
+const bottomImages = [...makeImages(7, 12, NAMES), ...extraImages];
 const allImages = [...topImages, ...bottomImages];
 
 /* ---------------------------- SHARED ---------------------------- */

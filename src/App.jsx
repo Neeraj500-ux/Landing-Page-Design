@@ -15,8 +15,9 @@ export default function App() {
     <>
       <main>
         <Hero />
-        <Problems />
          <Video />
+        <Problems />
+         
         
          {/* WhatsApp Reviews */}
         <WhatsAppReviews />

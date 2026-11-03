@@ -1,21 +1,21 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { Check, X } from 'lucide-react'
 import { Button } from './ui'
 
 /* ==========================================================
-   Problems.jsx  (100% Tailwind utility classes)
-   - Only the Google font import, keyframes and .font-display
-     live in the tiny <style> block at the bottom of this file.
-   - Both section headings now have a same-colour underline
-     (red heading = red line, green heading = green line).
-   - Mobile titles are fluid and stay on ONE line
-     (e.g. "Complete Funnel Tracking System").
+   Problems.jsx  (Tailwind utility classes)
+   - Problem / solution block is now an EXACT copy of the
+     "StructuredApproach" cards (Traditional vs AnalyzerView):
+     MOBILE : red card on top, VS badge, green card below
+     DESKTOP: red + green side by side, VS in the middle
+   - Content of this page is unchanged (same headings + same 5 points).
+   - Keyframes + font live in the <style> block at the bottom.
    ========================================================== */
 
 /* ==================== Content ==================== */
 
 const ctaNote = ''
 
-// Optional: replace the illustration with your own image.
 const proofImage = ''
 const proofImageAlt =
   'Landing page ad turning into a new enquiry and a booked consultation'
@@ -45,13 +45,23 @@ const items = [
 
 const numberFormatter = new Intl.NumberFormat('en-US')
 
+/* left %, size px, duration s, delay s */
+const PARTICLES = [
+  [6, 6, 9, 0],
+  [18, 4, 11, 2.5],
+  [32, 7, 10, 1],
+  [47, 5, 12, 3.5],
+  [60, 6, 9.5, 0.5],
+  [74, 4, 11, 2],
+  [86, 7, 10.5, 4],
+  [95, 5, 12, 1.5],
+]
+
 /* ==================== Shared Tailwind class strings ==================== */
 
-// Purple gradient text
 const GRADIENT_TEXT =
   'bg-[linear-gradient(110deg,#6a359b,#9a5ad4_55%,#6a359b)] bg-clip-text text-transparent'
 
-// Pill label (same look for both sections, same gap under it)
 const PILL =
   'mb-3.5 flex w-fit max-w-full items-center justify-center gap-2.5 rounded-full border border-[#ddcdf0] ' +
   'bg-[linear-gradient(180deg,#ffffffe6,#f6effbc0)] px-[13px] py-[9px] text-[11px] font-[650] leading-[1.6] ' +
@@ -64,7 +74,6 @@ const PILL_DOT =
 /* ==================== Motion hooks ==================== */
 
 function useReducedMotion() {
-  // Null prevents animations from starting before the preference is known.
   const [reducedMotion, setReducedMotion] = useState(null)
 
   useEffect(() => {
@@ -141,7 +150,6 @@ function useCounter(start, reducedMotion, target = 2000, duration = 2200) {
       const progress = Math.min((timestamp - startedAt) / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
 
-      // Reserve the exact final value for the completion frame.
       const next =
         progress === 1
           ? target
@@ -228,59 +236,6 @@ function Icon({ type, className = 'h-6 w-6', strokeWidth = 2.2 }) {
   )
 }
 
-/* ---------- Liquid glass status icon ----------
-   type="cross" -> red glass tile with a cut (X)
-   type="check" -> green glass tile with a right (tick)
-   Smaller on phones so the title gets more room.
-   Every class is written out in full so Tailwind can see it. */
-
-const GLASS_TONES = {
-  cross: {
-    glass:
-      'bg-[linear-gradient(145deg,rgba(255,255,255,.9),rgba(255,255,255,.3)_45%,rgba(240,84,110,.5))] ' +
-      'text-[#d12f4a] ' +
-      'shadow-[inset_0_2px_0_rgba(255,255,255,1),inset_0_-8px_12px_-6px_rgba(240,84,110,.55),inset_0_0_0_1px_rgba(255,255,255,.45)]',
-  },
-  check: {
-    glass:
-      'bg-[linear-gradient(145deg,rgba(255,255,255,.9),rgba(255,255,255,.3)_45%,rgba(34,192,122,.5))] ' +
-      'text-[#13804f] ' +
-      'shadow-[inset_0_2px_0_rgba(255,255,255,1),inset_0_-8px_12px_-6px_rgba(34,192,122,.55),inset_0_0_0_1px_rgba(255,255,255,.45)]',
-  },
-}
-
-function StatusIcon({ type }) {
-  const tone = GLASS_TONES[type]
-
-  return (
-    <span
-      aria-hidden="true"
-      className={`relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-white/90 backdrop-blur-xl backdrop-saturate-200 transition-transform duration-300 ease-out group-hover:scale-110 motion-reduce:transition-none min-[400px]:h-9 min-[400px]:w-9 min-[400px]:rounded-[11px] sm:h-11 sm:w-11 sm:rounded-[14px] lg:h-12 lg:w-12 lg:rounded-2xl ${tone.glass}`}
-    >
-      {/* Top gloss */}
-      <span className="pointer-events-none absolute left-1 right-1 top-[3px] h-1/2 rounded-b-[50%] rounded-t-[8px] bg-[linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,0))] lg:left-1.5 lg:right-1.5 lg:rounded-t-[12px]" />
-      {/* Tiny specular highlight */}
-      <span className="pointer-events-none absolute left-1.5 top-1.5 h-1 w-2 -rotate-[30deg] rounded-full bg-white/90 lg:left-2 lg:top-2 lg:h-1.5 lg:w-2.5" />
-
-      <Icon
-        type={type}
-        strokeWidth={3.2}
-        className="relative z-10 h-4 w-4 min-[400px]:h-[18px] min-[400px]:w-[18px] sm:h-5 sm:w-5 lg:h-6 lg:w-6"
-      />
-    </span>
-  )
-}
-
-function Connector() {
-  return (
-    <div className="hidden place-items-center md:grid" aria-hidden="true">
-      <span className="grid h-[34px] w-[34px] animate-[linkNudge_2.8s_ease-in-out_infinite] place-items-center rounded-full border border-[#ddcdf0] bg-white/85 text-[#7542a4] shadow-[0_5px_14px_#7542a410] motion-reduce:animate-none">
-        <Icon type="arrow" className="h-4 w-4" />
-      </span>
-    </div>
-  )
-}
-
 function RevenueButton({ intro = false }) {
   return (
     <Button
@@ -292,34 +247,91 @@ function RevenueButton({ intro = false }) {
   )
 }
 
-/* ---------- Column heading with same-colour underline ---------- */
+/* ==================== Comparison cards (exact StructuredApproach style) ==================== */
 
-const HEADING_TONES = {
-  problem: {
-    text: 'text-[#b83e51]',
-    line: 'bg-[linear-gradient(90deg,#b83e51,#f0546e_60%,#f7b6c2)]',
-  },
-  solution: {
-    text: 'text-[#20734e]',
-    line: 'bg-[linear-gradient(90deg,#20734e,#22c07a_60%,#a9e3c8)]',
-  },
-}
-
-function ColumnHeading({ kind, children }) {
-  const tone = HEADING_TONES[kind]
-
+/* floating dots: green rises, red falls */
+function Particles({ up, color }) {
   return (
-    <h3
-      className={`inline-block text-[23px] font-bold leading-[1.35] tracking-[-0.025em] md:text-[clamp(22px,2.1vw,27px)] ${tone.text}`}
-    >
-      {children}
-      <span
-        aria-hidden="true"
-        className={`mt-1.5 block h-[3px] w-full rounded-full ${tone.line}`}
-      />
-    </h3>
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+      {PARTICLES.map(([left, size, t, dl], i) => (
+        <span
+          key={i}
+          className={`ptl ${up ? 'ptl-up' : 'ptl-down'}`}
+          style={{ left: `${left}%`, width: size, height: size, background: color, '--t': `${t}s`, '--dl': `${dl}s` }}
+        />
+      ))}
+    </div>
   )
 }
+
+function CompareCard({ good, title, rows, order }) {
+  return (
+    <article
+      className={`rv rv-up sheen relative grid overflow-hidden rounded-[28px] border-[3px] border-white transition-shadow duration-300 sm:rounded-[32px] ${
+        good
+          ? 'bg-gradient-to-br from-[#cdf2de] via-[#e4f8ed] to-[#f4fdf8] shadow-[0_18px_40px_-12px_rgba(22,163,74,.28)] hover:shadow-[0_24px_50px_-12px_rgba(22,163,74,.4)]'
+          : 'bg-gradient-to-br from-[#fbd3da] via-[#fde5e9] to-[#fff5f6] shadow-[0_18px_40px_-12px_rgba(229,52,45,.25)] hover:shadow-[0_24px_50px_-12px_rgba(229,52,45,.38)] max-lg:pb-8'
+      }`}
+      style={{ '--i': order }}
+    >
+      <Particles up={good} color={good ? '#4fd18c' : '#f4909b'} />
+
+      {/* header pill */}
+      <header className={`relative z-10 col-span-full flex justify-center px-3 pt-5 sm:px-4 sm:pt-7 ${good ? 'max-lg:pt-11' : ''}`}>
+        <div className="rv rv-zoom flex w-fit max-w-full items-center gap-2.5 rounded-full bg-white py-2 pl-2.5 pr-5 shadow-[0_8px_22px_rgba(0,0,0,.10)] sm:gap-3 sm:py-2.5 sm:pl-3 sm:pr-7">
+          <span
+            className={`${good ? 'glow-g bg-gradient-to-b from-[#2fd16b] to-[#12963f]' : 'glow-r bg-gradient-to-b from-[#ff5a52] to-[#d62a23]'} grid h-9 w-9 shrink-0 place-items-center rounded-full text-white sm:h-10 sm:w-10`}
+          >
+            {good ? <Check size={22} strokeWidth={4} /> : <X size={22} strokeWidth={3.6} className="wig" />}
+          </span>
+          <h3 className="text-[clamp(16px,4.4vw,26px)] font-extrabold leading-tight text-[#0a1f5c]">{title}</h3>
+        </div>
+      </header>
+
+      {/* list */}
+      <ul className="relative z-10 order-1 m-0 list-none space-y-2.5 px-4 py-5 sm:px-8 lg:py-8 lg:pl-8 lg:pr-8">
+        {rows.map((t, i) => (
+          <li key={t} className={`rv ${good ? 'rv-left' : 'rv-right'}`} style={{ '--i': i }}>
+            <div className="row flex items-center gap-3 rounded-2xl border border-white/90 bg-white/65 px-3 py-2.5 text-[15.5px] font-medium leading-snug text-[#0a1f5c] backdrop-blur-sm transition-transform duration-200 hover:scale-[1.02] lg:text-[clamp(15px,1.3vw,17px)]">
+              <span className="rv rv-pop shrink-0">
+                <span
+                  className={`${good ? 'glow-g bg-gradient-to-b from-[#2fd16b] to-[#12963f]' : 'glow-r bg-gradient-to-b from-[#ff6a62] to-[#df3029]'} grid h-7 w-7 place-items-center rounded-full text-white`}
+                  style={{ animationDelay: `${i * 0.45}s` }}
+                >
+                  {good ? (
+                    <Check size={16} strokeWidth={4.5} />
+                  ) : (
+                    <X size={15} strokeWidth={4.5} className="wig" style={{ animationDelay: `${i * 0.8}s` }} />
+                  )}
+                </span>
+              </span>
+              <span>{t}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </article>
+  )
+}
+
+/* VS badge (outer = position, inner = animation) */
+function VsBadge() {
+  return (
+    <div
+      className="pointer-events-none z-30 mx-auto -my-[34px] lg:absolute lg:left-1/2 lg:top-1/2 lg:my-0 lg:-translate-x-1/2 lg:-translate-y-1/2"
+      aria-hidden="true"
+    >
+      <div className="rv rv-zoom relative" style={{ '--i': 5 }}>
+        <span className="spin-slow absolute -inset-2.5 rounded-full border-2 border-dashed border-[#1457e6]/50" />
+        <div className="ripple grid h-16 w-16 place-items-center rounded-full bg-gradient-to-b from-[#3a78ff] to-[#0b2a85] text-[24px] font-black text-white ring-[5px] ring-white sm:h-20 sm:w-20 sm:text-[30px] lg:h-[88px] lg:w-[88px] lg:text-[34px]">
+          VS
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ==================== Proof visual ==================== */
 
 function ProofVisual({ playing }) {
   const play = playing
@@ -378,7 +390,6 @@ function ProofVisual({ playing }) {
           <span className="block h-1.5 w-[64%] rounded-full bg-[#e8dff0]" />
         </div>
 
-        {/* Same Button as the other CTAs, so it opens the same form popup */}
         <Button className="site-cta--revenue !relative !m-0 !flex !min-h-0 !w-full !min-w-0 !items-center !justify-center !gap-2 !rounded-[9px] !border !border-[#f3b01f] !bg-[linear-gradient(180deg,#ffee82,#ffe04e_48%,#ffca30)] !p-2.5 !text-[10px] !font-extrabold !leading-[1.4] !text-[#2e0c4d] !shadow-[inset_0_1px_0_#fff8c4,0_3px_0_0_#d18f0a,0_8px_12px_-6px_#f5b323a0] active:!translate-y-0.5">
           <span>Learn More</span>
         </Button>
@@ -425,57 +436,6 @@ function ProofVisual({ playing }) {
   )
 }
 
-/* ==================== Problem / solution cards ==================== */
-
-const CARD_TONES = {
-  problem: {
-    card:
-      'border-[#efd6de] bg-[linear-gradient(130deg,#fffffff0,#fff1f5)] hover:border-[#e6c3cd] max-md:[order:var(--op)]',
-    title: 'text-[#b83e51]',
-    number: 'border-[#efd6de] text-[#b83e51]',
-  },
-  solution: {
-    card:
-      'border-[#cfe5da] bg-[linear-gradient(130deg,#fffffff0,#eef9f2)] hover:border-[#b7dbc8] max-md:[order:var(--os)]',
-    title: 'text-[#20734e]',
-    number: 'border-[#cfe5da] text-[#20734e]',
-  },
-}
-
-function PairCard({ kind, number, title, delay, motionProps }) {
-  const tone = CARD_TONES[kind]
-
-  return (
-    <article
-      className={`group relative flex min-h-[58px] min-w-0 items-center rounded-[18px] border px-2.5 py-3 shadow-[0_1px_2px_#4422600a,0_12px_30px_#44226009,inset_0_1px_0_#fff] min-[400px]:min-h-[62px] min-[400px]:px-3.5 transition duration-[420ms] ease-[cubic-bezier(.22,1,.36,1)] hover:-translate-y-[3px] hover:shadow-[0_18px_36px_#44226014,inset_0_1px_0_#fff] active:scale-[.985] motion-reduce:transition-none motion-reduce:hover:translate-y-0 md:min-h-[76px] md:rounded-3xl md:px-[18px] md:py-3.5 md:active:scale-100 lg:min-h-[84px] lg:px-[24px] ${tone.card}`}
-    >
-      {/* Number badge: vertically centred on the card, smaller on phones */}
-      <span
-        className={`absolute right-2 top-1/2 grid h-6 min-w-[28px] -translate-y-1/2 place-items-center rounded-lg border bg-white/85 px-1 text-[10.5px] font-bold tabular-nums tracking-[0.02em] shadow-[0_3px_8px_#4422600a] md:right-4 md:h-7 md:min-w-[38px] md:rounded-[9px] md:px-[7px] md:text-[12.5px] lg:right-5 ${tone.number}`}
-      >
-        {number}
-      </span>
-
-      <Reveal {...motionProps} delay={delay} className="w-full">
-        {/* Icon on the left, title on the right, both centred on the same line */}
-        <div className="flex items-center gap-2 min-[400px]:gap-2.5 lg:gap-4">
-          <StatusIcon type={kind === 'problem' ? 'cross' : 'check'} />
-
-          <div className="min-w-0 flex-1 pr-8 md:pr-12 lg:pr-14">
-            {/* Phone: fluid font 12.5px to 16.5px, no balance wrap so it stays on one line.
-                md+: original sizing with balanced wrap. */}
-            <h3
-              className={`text-[19px] font-bold leading-[1.3] tracking-[-0.03em] md:text-[clamp(17px,1.9vw,21px)] md:tracking-[-0.028em] md:[text-wrap:balance] ${tone.title}`}
-            >
-              {title}
-            </h3>
-          </div>
-        </div>
-      </Reveal>
-    </article>
-  )
-}
-
 /* ==================== Complete component ==================== */
 
 export default function Problems() {
@@ -483,6 +443,8 @@ export default function Problems() {
   const reducedMotion = useReducedMotion()
   const proofRef = useRef(null)
   const proofVisible = useInViewOnce(proofRef, reducedMotion)
+  const cmpRef = useRef(null)
+  const cmpVisible = useInViewOnce(cmpRef, reducedMotion)
 
   const { value, complete } = useCounter(proofVisible, reducedMotion)
 
@@ -524,7 +486,6 @@ export default function Problems() {
             delay={80}
             className="mx-auto w-full max-w-[720px] lg:mx-0 lg:max-w-none"
           >
-            {/* Card: slightly tighter side padding on phones so the heading gets more room */}
             <div className="relative rounded-3xl border border-[#e4d8f3] bg-[linear-gradient(150deg,#ffffffee,#f8f2fdd0)] px-4 py-5 shadow-[0_18px_48px_#5b21b611,inset_0_1px_0_#fff] backdrop-blur-[22px] transition duration-[450ms] ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none min-[400px]:px-5 min-[400px]:py-6 md:rounded-[28px] md:p-[clamp(26px,3vw,40px)] md:hover:-translate-y-1 md:hover:border-[#ccb0e2] md:hover:shadow-[0_24px_52px_#5b21b619,inset_0_1px_0_#fff]">
               <p className="w-full font-display text-[clamp(17px,5.3vw,22px)] font-bold leading-[1.4] tracking-[-0.02em] [text-wrap:pretty] md:text-[clamp(19px,1.9vw,23px)] md:leading-[1.4] md:[text-wrap:balance]">
                 Unclear Offers And Distracting Pages Stop Interested Visitors
@@ -590,55 +551,30 @@ export default function Problems() {
           </h2>
         </Reveal>
 
-        <div className="mt-8 md:mt-[clamp(36px,5vw,60px)]">
-          {/* Mobile: one column, all problems first then all solutions (via order). */}
-          <div className="grid grid-cols-1 gap-y-3 md:grid-cols-[minmax(0,1fr)_46px_minmax(0,1fr)] md:gap-y-4 lg:grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] lg:gap-y-[18px]">
-            <Reveal
-              {...motionProps}
-              className="relative min-w-0 px-4 py-4 text-left md:mb-1 md:px-[18px] md:py-[22px] lg:px-[26px] lg:py-5"
-            >
-              <ColumnHeading kind="problem">What Holds Visitors Back</ColumnHeading>
-            </Reveal>
+        {/* Mobile: red card, VS, green card. Desktop: side by side with VS in the middle. */}
+        <div className="sa relative mt-8 md:mt-[clamp(36px,5vw,60px)]">
+          {/* drifting background glows */}
+          <div className="blob pointer-events-none absolute -left-24 top-0 -z-10 h-72 w-72 rounded-full bg-[#ffb3bf]/40 blur-3xl" />
+          <div className="blob pointer-events-none absolute -right-24 top-16 -z-10 h-80 w-80 rounded-full bg-[#7ee8b0]/40 blur-3xl" style={{ animationDelay: '-6s' }} />
+          <div className="blob pointer-events-none absolute -top-16 left-1/3 -z-10 h-64 w-64 rounded-full bg-[#9db8ff]/40 blur-3xl" style={{ animationDelay: '-3s' }} />
 
-            <div className="hidden md:block" aria-hidden="true" />
+          <div ref={cmpRef} className={cmpVisible ? 'is-in' : ''}>
+            <div className="relative grid gap-y-4 lg:grid-cols-2 lg:gap-x-10 lg:gap-y-0">
+              <CompareCard
+                title="What Holds Visitors Back"
+                rows={items.map((item) => item.problem.title)}
+                order={3}
+              />
 
-            <Reveal
-              {...motionProps}
-              delay={60}
-              className="relative min-w-0 px-4 py-4 text-left max-md:order-[500] max-md:mt-5 md:mb-1 md:px-[18px] md:py-[22px] lg:px-[26px] lg:py-5"
-            >
-              <ColumnHeading kind="solution">How We Fix It</ColumnHeading>
-            </Reveal>
+              <VsBadge />
 
-            {items.map(({ problem, solution }, index) => {
-              const number = String(index + 1).padStart(2, '0')
-
-              return (
-                <div
-                  className="contents"
-                  key={problem.title}
-                  style={{ '--op': index + 1, '--os': index + 501 }}
-                >
-                  <PairCard
-                    kind="problem"
-                    number={number}
-                    title={problem.title}
-                    delay={Math.min(index * 35, 140)}
-                    motionProps={motionProps}
-                  />
-
-                  <Connector />
-
-                  <PairCard
-                    kind="solution"
-                    number={number}
-                    title={solution.title}
-                    delay={Math.min(index * 35 + 60, 200)}
-                    motionProps={motionProps}
-                  />
-                </div>
-              )
-            })}
+              <CompareCard
+                good
+                title="How We Fix It"
+                rows={items.map((item) => item.solution.title)}
+                order={4}
+              />
+            </div>
           </div>
         </div>
 
@@ -661,7 +597,7 @@ export default function Problems() {
           </div>
         </Reveal>
 
-        {/* ============ Proof (counter starts when this enters the viewport) ============ */}
+        {/* ============ Proof ============ */}
         <div
           ref={proofRef}
           className="mt-[54px] grid items-center gap-[34px] md:mt-[clamp(60px,8vw,100px)] md:gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.03fr)] lg:gap-[clamp(32px,5vw,68px)]"
@@ -686,7 +622,6 @@ export default function Problems() {
                 role="img"
                 aria-label="More Than 2,000"
               >
-                {/* Invisible final value fixes the width so the counter never jitters. */}
                 <span
                   className="pointer-events-none invisible [grid-area:1/1]"
                   aria-hidden="true"
@@ -726,9 +661,7 @@ export default function Problems() {
 }
 
 /* ==================== The only non-utility CSS ====================
-   Tailwind can't import fonts or declare keyframes by itself, so those
-   live here. If your tailwind config already has these animations
-   you can delete the keyframes. */
+   Font import + keyframes (Tailwind can't declare these by itself). */
 
 const styles = `
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Inter:wght@400;500;600;700;800&display=swap');
@@ -741,19 +674,67 @@ const styles = `
   0%, 100% { transform: translate3d(0, 0, 0); }
   50% { transform: translate3d(0, -5px, 0); }
 }
-
 @keyframes noteFloat {
   0%, 100% { transform: translate3d(0, 0, 0); }
   50% { transform: translate3d(0, -3px, 0); }
 }
-
 @keyframes iconBob {
   0%, 100% { transform: translate3d(0, 0, 0); }
   50% { transform: translate3d(0, -3px, 0); }
 }
 
-@keyframes linkNudge {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, 3px, 0); }
+/* ---- comparison cards (copied from StructuredApproach) ---- */
+.sa .rv{opacity:0}
+.sa .is-in .rv-up{animation:sa-up .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*110ms)}
+.sa .is-in .rv-left{animation:sa-left .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*120ms + 250ms)}
+.sa .is-in .rv-right{animation:sa-right .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*120ms + 250ms)}
+.sa .is-in .rv-pop{animation:sa-pop .55s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i,0)*120ms + 450ms)}
+.sa .is-in .rv-zoom{animation:sa-zoom .9s cubic-bezier(.2,.8,.2,1) both;animation-delay:.15s}
+
+.sa .ripple{animation:sa-ripple 2.4s ease-out infinite}
+.sa .blob{animation:sa-blob 14s ease-in-out infinite alternate}
+.sa .spin-slow{animation:sa-spin 14s linear infinite}
+.sa .row{animation:sa-scan 6s ease-in-out infinite;animation-delay:calc(var(--i,0)*1s + 1.8s)}
+.sa .glow-g{animation:sa-glow-g 2.6s ease-out infinite}
+.sa .glow-r{animation:sa-glow-r 2.6s ease-out infinite}
+.sa .wig{transform-origin:50% 50%;animation:sa-wig 4.5s ease-in-out infinite}
+.sa .ptl{position:absolute;border-radius:9999px;opacity:0;pointer-events:none;animation-duration:var(--t);animation-delay:var(--dl);animation-iteration-count:infinite;animation-timing-function:linear}
+.sa .ptl-up{bottom:-14px;animation-name:sa-pup}
+.sa .ptl-down{top:-14px;animation-name:sa-pdown}
+.sa .sheen::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);transform:translateX(-130%);animation:sa-shine 7s ease-in-out infinite 2s}
+
+@keyframes sa-up{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes sa-left{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes sa-right{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes sa-pop{0%{opacity:0;transform:scale(0)}70%{opacity:1;transform:scale(1.2)}100%{opacity:1;transform:scale(1)}}
+@keyframes sa-zoom{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes sa-ripple{0%{box-shadow:0 0 0 0 rgba(20,87,230,.55)}100%{box-shadow:0 0 0 26px rgba(20,87,230,0)}}
+@keyframes sa-blob{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,-30px) scale(1.15)}}
+@keyframes sa-spin{to{transform:rotate(360deg)}}
+@keyframes sa-scan{
+  0%,24%,100%{background-color:rgba(255,255,255,.65);box-shadow:0 4px 14px -6px rgba(10,31,92,.18)}
+  4%,15%{background-color:rgba(255,255,255,1);box-shadow:0 12px 26px -8px rgba(10,31,92,.32)}
+}
+@keyframes sa-glow-g{
+  0%{box-shadow:0 3px 8px rgba(22,163,74,.45),0 0 0 0 rgba(34,197,94,.55)}
+  70%,100%{box-shadow:0 3px 8px rgba(22,163,74,.45),0 0 0 10px rgba(34,197,94,0)}
+}
+@keyframes sa-glow-r{
+  0%{box-shadow:0 3px 8px rgba(229,52,45,.4),0 0 0 0 rgba(239,68,82,.5)}
+  70%,100%{box-shadow:0 3px 8px rgba(229,52,45,.4),0 0 0 10px rgba(239,68,82,0)}
+}
+@keyframes sa-wig{
+  0%,86%,100%{transform:rotate(0)}
+  89%{transform:rotate(-14deg)}
+  92%{transform:rotate(14deg)}
+  95%{transform:rotate(-7deg)}
+}
+@keyframes sa-pup{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:.75}100%{transform:translateY(-440px) scale(1.15);opacity:0}}
+@keyframes sa-pdown{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:.7}100%{transform:translateY(440px) scale(1.15);opacity:0}}
+@keyframes sa-shine{0%,60%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+
+@media (prefers-reduced-motion:reduce){
+  .sa *,.sa *::before,.sa *::after{animation:none!important}
+  .sa .rv{opacity:1!important;transform:none!important}
 }
 `

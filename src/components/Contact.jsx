@@ -11,6 +11,7 @@ import { createPortal } from 'react-dom'
    Data:   Name + Number go to the Google Sheet FIRST (as soon as the
            details step is completed), then the full lead + appointment
            is saved to Sheet + CRM (Supabase) at the end.
+   Phone:  fixed +91 prefix, exactly 10 digits.
    Open it with:  window.dispatchEvent(new Event('open-contact-popup'))
    Meta Pixel: Lead + Schedule events fire after successful submit
    ========================================================== */
@@ -24,10 +25,13 @@ const CRM_ENDPOINT = 'https://nuursmovhbhislrphakl.supabase.co/functions/v1/capt
 const CRM_CATEGORY = 'Landing Page'
 const CRM_SERVICE = '10X Landing Page Growth Call'
 const FORM_TITLE = 'Creative Crew — Growth Consultation Form'
+// WhatsApp confirmation (Supabase edge function: send-whatsapp-confirmation)
+const WHATSAPP_ENDPOINT =
+  'https://nuursmovhbhislrphakl.supabase.co/functions/v1/send-whatsapp-confirmation'
 
-// ---------- PHONE VALIDATION ----------
-const PHONE_MIN_DIGITS = 10
-const PHONE_MAX_DIGITS = 15
+// ---------- PHONE SETTINGS ----------
+const COUNTRY_CODE = '+91'
+const PHONE_DIGITS = 10 // exactly 10 digits after +91
 
 // ---------- APPOINTMENT SETTINGS ----------
 const APPOINTMENT_DAYS_AHEAD = 14 // kitne din aage tak booking dikhani hai
@@ -118,11 +122,15 @@ const initialAppointment = { date: '', time: '' }
 const pad = (n) => String(n).padStart(2, '0')
 const toDateKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 
-const countDigits = (v) => (v.match(/\d/g) || []).length
-const isValidPhone = (v) => {
-  const n = countDigits(v)
-  return n >= PHONE_MIN_DIGITS && n <= PHONE_MAX_DIGITS
+// Keep only the 10 local digits (handles pasted "+91 98765 43210", "91987...", "0987...")
+function cleanPhoneInput(value) {
+  let d = String(value).replace(/\D/g, '')
+  if (d.length > PHONE_DIGITS && d.startsWith('91')) d = d.slice(2)
+  else if (d.length > PHONE_DIGITS && d.startsWith('0')) d = d.slice(1)
+  return d.slice(0, PHONE_DIGITS)
 }
+const isValidPhone = (digits) => digits.length === PHONE_DIGITS
+const toFullPhone = (digits) => `${COUNTRY_CODE}${digits}`
 
 // Slots available for a given day (today ke liye past slots hata deta hai)
 function getSlotsForDate(date) {
@@ -177,6 +185,12 @@ const LABEL = 'text-[12.5px] font-bold leading-[1.3] text-[#2a2140]'
 
 const FIELD =
   'block m-0 h-[44px] w-full min-w-0 rounded-xl border border-[#e2dcf2] bg-[#fbfaff] px-3.5 py-2.5 font-[inherit] text-base leading-normal text-[#14111f] outline-none ' +
+  'transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-[#a7a2b8] ' +
+  'hover:border-[#cdbff3] focus:border-[#7c3aed] focus:bg-white focus:shadow-[0_0_0_3px_rgba(124,58,237,.14)]'
+
+// Input with a left icon (details form)
+const FIELD_ICON =
+  'block m-0 h-[48px] w-full min-w-0 rounded-xl border bg-[#fbfaff] pl-11 pr-3.5 font-[inherit] text-base leading-normal text-[#14111f] outline-none ' +
   'transition-[border-color,box-shadow,background-color] duration-200 placeholder:text-[#a7a2b8] ' +
   'hover:border-[#cdbff3] focus:border-[#7c3aed] focus:bg-white focus:shadow-[0_0_0_3px_rgba(124,58,237,.14)]'
 
@@ -238,6 +252,55 @@ function ClockIcon({ className = 'h-4 w-4' }) {
   )
 }
 
+function UserIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" />
+      <path d="M4.5 20c.9-3.6 3.9-5.5 7.5-5.5s6.6 1.9 7.5 5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function BuildingIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="4.5" y="3.5" width="11" height="17" rx="2" stroke="currentColor" strokeWidth="2" />
+      <path d="M15.5 9.5h3a1 1 0 0 1 1 1v10h-4M8 8h4M8 12h4M8 16h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function MailIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" strokeWidth="2" />
+      <path d="m4 8 8 6 8-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function PhoneIcon({ className = 'h-[18px] w-[18px]' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M6.6 3.5h2.3l1.4 4-1.8 1.3a11 11 0 0 0 5.7 5.7l1.3-1.8 4 1.4v2.3a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+function LockIcon({ className = 'h-3.5 w-3.5' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="5" y="10.5" width="14" height="9.5" rx="2.5" stroke="currentColor" strokeWidth="2" />
+      <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 /* ==================== Main component ==================== */
 
 export default function Contact() {
@@ -259,7 +322,8 @@ export default function Contact() {
   const scrollRef = useRef(null)
   // Keep one ID for this form submission so a CRM retry can be deduplicated server-side.
   const submissionIdRef = useRef('')
-  const partialSentRef = useRef(false) // Name + Number already sent to the sheet?
+  const partialSentRef = useRef(false) // First-step request sent to the Sheet
+  const partialCrmSavedRef = useRef(false) // First-step record confirmed by CRM
   const sheetSentRef = useRef(false)
   const crmSavedRef = useRef(false)
 
@@ -355,6 +419,7 @@ export default function Contact() {
         setAppointment(initialAppointment)
         submissionIdRef.current = ''
         partialSentRef.current = false
+        partialCrmSavedRef.current = false
         sheetSentRef.current = false
         crmSavedRef.current = false
       }
@@ -374,47 +439,97 @@ export default function Contact() {
   const updateDetail = (e) => {
     const { name, value } = e.target
     if (name === 'phone') {
-      // allow only digits, +, space and dash
-      const cleaned = value.replace(/[^\d+\s-]/g, '')
-      setDetails((p) => ({ ...p, phone: cleaned }))
+      setDetails((p) => ({ ...p, phone: cleanPhoneInput(value) }))
       if (phoneError) setPhoneError('')
       return
     }
     setDetails((p) => ({ ...p, [name]: value }))
   }
 
-  // NAME + NUMBER go to the Google Sheet FIRST (before the questions).
-  // Fire-and-forget: it never blocks the user. Apps Script gets stage: 'details'.
-  const sendDetailsToSheet = () => {
+  // Save the first-step contact details to both destinations before advancing.
+  const sendDetailsToSheet = async (signal) => {
     if (partialSentRef.current || !FORM_ENDPOINT) return
-    partialSentRef.current = true
-    fetch(FORM_ENDPOINT, {
+    const payload = {
+      form: FORM_TITLE,
+      stage: 'details',
+      submissionId: getSubmissionId(),
+      fullName: details.fullName.trim(),
+      businessName: details.businessName.trim(),
+      email: details.email.trim(),
+      phone: toFullPhone(details.phone),
+    }
+    await fetch(FORM_ENDPOINT, {
       method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        form: FORM_TITLE,
-        stage: 'details',
-        submissionId: getSubmissionId(),
-        fullName: details.fullName.trim(),
-        businessName: details.businessName.trim(),
-        email: details.email.trim(),
-        phone: details.phone.trim(),
-      }),
-    }).catch(() => {
-      partialSentRef.current = false // retry on the next attempt
+      body: JSON.stringify(payload),
+      signal,
     })
+    // A no-cors response is opaque: this confirms request dispatch, not the Sheet write.
+    partialSentRef.current = true
   }
 
-  const handleDetailsSubmit = (e) => {
+  const sendDetailsToCrm = async (signal) => {
+    if (partialCrmSavedRef.current || !CRM_ENDPOINT) return
+    const response = await fetch(CRM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal,
+      body: JSON.stringify({
+        external_lead_id: getSubmissionId(),
+        form_stage: 'step1',
+        name: details.fullName.trim(),
+        email: details.email.trim(),
+        phone: toFullPhone(details.phone),
+        company: details.businessName.trim(),
+        lead_source: CRM_CATEGORY,
+        // Keep this empty for step 1; the final request fills it and updates this same lead.
+        service_name: '',
+        message: 'Initial enquiry details received.',
+        landing_page_url: window.location.href,
+        marketing_consent: false,
+      }),
+    })
+    const result = await response.json().catch(() => ({}))
+    if (!response.ok || result?.ok !== true) {
+      throw new Error(result?.error || `CRM request failed (HTTP ${response.status}).`)
+    }
+    partialCrmSavedRef.current = true
+  }
+
+  const handleDetailsSubmit = async (e) => {
     e.preventDefault()
+    if (isSubmitting) return
     if (!isValidPhone(details.phone)) {
-      setPhoneError(`Please enter a valid number (${PHONE_MIN_DIGITS}-${PHONE_MAX_DIGITS} digits).`)
+      setPhoneError(`Please enter a valid ${PHONE_DIGITS}-digit mobile number.`)
       return
     }
-    sendDetailsToSheet()
-    goNext()
-  }
+    if (!FORM_ENDPOINT && !CRM_ENDPOINT) {
+      setSubmitError('The enquiry form is not connected. Please contact us on WhatsApp.')
+      return
+    }
 
+    setIsSubmitting(true)
+    setSubmitError('')
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => controller.abort(), 20000)
+    try {
+      const saves = []
+      if (FORM_ENDPOINT) saves.push(sendDetailsToSheet(controller.signal))
+      if (CRM_ENDPOINT) saves.push(sendDetailsToCrm(controller.signal))
+      await Promise.all(saves)
+      goNext()
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? `We couldn't save your contact details: ${error.message} Please try again.`
+          : 'We could not save your contact details. Please try again.'
+      )
+    } finally {
+      window.clearTimeout(timeout)
+      setIsSubmitting(false)
+    }
+  }
   const selectedDay = availableDays.find((d) => d.key === appointment.date)
   const appointmentDateLabel = selectedDay ? selectedDay.full : ''
 
@@ -425,6 +540,7 @@ export default function Contact() {
     setSubmitError('')
 
     const submissionId = getSubmissionId()
+    const fullPhone = toFullPhone(details.phone)
 
     const answerRows = questions.map((q) => ({
       question: q.title,
@@ -435,12 +551,18 @@ export default function Contact() {
     }))
 
     const appointmentText = `${appointmentDateLabel} at ${appointment.time} (${TIME_ZONE_LABEL})`
+    // e.g. 2026-11-12T12:00:00+05:30 (IST) - easy for a CRM date/time column
+    const slotDef = TIME_SLOTS.find((s) => s.label === appointment.time)
+    const appointmentISO = slotDef
+      ? `${appointment.date}T${pad(slotDef.h)}:${pad(slotDef.m)}:00+05:30`
+      : ''
 
     const sheetPayload = {
       form: FORM_TITLE,
       stage: 'complete',
       submissionId,
       ...details,
+      phone: fullPhone,
       answers: answerRows,
       appointmentDate: appointmentDateLabel,
       appointmentDateISO: appointment.date,
@@ -450,19 +572,24 @@ export default function Contact() {
     const crmPayload = {
       name: details.fullName.trim(),
       email: details.email.trim(),
-      phone: details.phone.trim(),
+      phone: fullPhone,
       company: details.businessName.trim(),
       lead_source: CRM_CATEGORY,
       service_name: CRM_SERVICE,
+      // Appointment request is included in the CRM note
+      // even if the CRM has no separate appointment columns.
       message:
-        answerRows.map(({ question, answer }) => `${question}\n${answer}`).join('\n\n') +
-        `\n\nAppointment Booked\n${appointmentText}`,
+        `Appointment Requested: ${appointmentText}\n\n` +
+        answerRows.map(({ question, answer }) => `${question}\n${answer}`).join('\n\n'),
       landing_page_url: typeof window !== 'undefined' ? window.location.href : '',
       external_lead_id: submissionId,
       appointment_date: appointment.date,
       appointment_time: appointment.time,
       appointment_label: appointmentText,
+      appointment_datetime: appointmentISO,
     }
+
+    let failedAt = '' // which request was running when an error happened
 
     try {
       if (!FORM_ENDPOINT) {
@@ -472,34 +599,39 @@ export default function Contact() {
         throw new Error('CRM endpoint (CRM_ENDPOINT) is missing.')
       }
 
-      // Google Apps Script: saves lead + checks that the slot is still free (server-side lock).
+      // Always attempt CRM even if the Sheet response is unreadable; retain any Sheet error for the user.
+      let sheetError = null
       if (!sheetSentRef.current) {
-        const sheetRes = await fetch(FORM_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // simple request: no preflight
-          body: JSON.stringify(sheetPayload),
-        })
-        let sheetData = null
+        failedAt = 'Google Sheet'
         try {
-          sheetData = await sheetRes.json()
-        } catch {
-          sheetData = null
+          const sheetRes = await fetch(FORM_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(sheetPayload),
+          })
+          let sheetData = null
+          try {
+            sheetData = await sheetRes.json()
+          } catch {
+            sheetData = null
+          }
+          if (sheetData?.error === 'slot_taken') {
+            await loadBookedSlots()
+            setAppointment((p) => ({ ...p, time: '' }))
+            setSubmitError('Sorry, this slot was just booked by someone else. Please choose another time.')
+            return
+          }
+          if (!sheetData || sheetData.ok !== true) {
+            throw new Error(sheetData?.error || 'Booking could not be confirmed by Google Sheets.')
+          }
+          sheetSentRef.current = true
+        } catch (error) {
+          sheetError = error
         }
-        // Kisi aur ne ye slot abhi book kar liya
-        if (sheetData?.error === 'slot_taken') {
-          await loadBookedSlots()
-          setAppointment((p) => ({ ...p, time: '' }))
-          setSubmitError('Sorry, this slot was just booked by someone else. Please choose another time.')
-          return
-        }
-        if (!sheetData || sheetData.ok !== true) {
-          throw new Error(sheetData?.error || 'Booking could not be saved.')
-        }
-        sheetSentRef.current = true
       }
 
-      // CRM endpoint must allow this site's origin in Supabase CORS settings.
       if (!crmSavedRef.current) {
+        failedAt = 'CRM'
         const crmResponse = await fetch(CRM_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -512,7 +644,7 @@ export default function Contact() {
         } catch {
           responseData = { message: responseText }
         }
-        if (!crmResponse.ok || responseData?.ok === false) {
+        if (!crmResponse.ok || responseData?.ok !== true) {
           throw new Error(
             responseData?.error || responseData?.message || `CRM request failed (HTTP ${crmResponse.status}).`
           )
@@ -520,19 +652,50 @@ export default function Contact() {
         crmSavedRef.current = true
       }
 
+      if (sheetError) {
+        failedAt = 'Google Sheet'
+        throw new Error(
+          `CRM saved the lead, but the Sheet did not confirm its save: ${sheetError instanceof Error ? sheetError.message : 'unknown Sheet error'}`
+        )
+      }
       // Fire the browser Pixel events only after CRM confirms the lead was saved.
       if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
         window.fbq('track', 'Lead', { content_name: CRM_SERVICE })
         window.fbq('track', 'Schedule', { content_name: CRM_SERVICE })
       }
 
+      // WhatsApp confirmation (fire-and-forget: never blocks or breaks the booking)
+      try {
+        fetch(WHATSAPP_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          keepalive: true,
+          body: JSON.stringify({
+            submissionId,
+            phone: fullPhone,
+            appointmentDate: appointmentDateLabel,
+            appointmentTime: appointment.time,
+            timeZone: TIME_ZONE_LABEL,
+          }),
+        }).catch(() => {})
+      } catch {
+        /* ignore */
+      }
+
       // Is slot ko turant locally bhi booked mark kar do
       setBookedSlots((prev) => [...prev, `${appointment.date}|${appointment.time}`])
       setStep(DONE_STEP)
     } catch (err) {
+      console.error(`[Contact] ${failedAt || 'Submit'} request failed:`, err)
+      const isNetwork = err instanceof TypeError || err?.message === 'Failed to fetch'
+      const detail = isNetwork
+        ? `${failedAt || 'Server'} request was blocked (network or CORS error).`
+        : err instanceof Error
+          ? `${failedAt ? `${failedAt}: ` : ''}${err.message}`
+          : ''
       setSubmitError(
-        err instanceof Error
-          ? `We couldn't complete your booking: ${err.message} Please retry, or contact us on WhatsApp.`
+        detail
+          ? `We couldn't complete your booking: ${detail} Please retry, or contact us on WhatsApp.`
           : 'We could not submit your details. Please retry or contact us on WhatsApp.'
       )
     } finally {
@@ -561,85 +724,177 @@ export default function Contact() {
 
   /* ---------- Step renderers: each returns { body, footer } ---------- */
 
-  const renderDetails = () => ({
-    body: (
-      <div>
-        {/* Logo (replaces the old host photo). Dark chip so the white part of the logo stays visible. */}
-        <div className="mb-3 flex justify-center">
-          <span className="grid h-16 w-16 place-items-center overflow-hidden rounded-2xl bg-[#14111f] min-[561px]:h-[76px] min-[561px]:w-[76px]">
-            <img
-              src={LOGO_IMAGE}
-              alt="Creative Crew logo"
-              className="h-full w-full object-contain p-1.5"
-            />
-          </span>
-        </div>
+  const renderDetails = () => {
+    const iconWrap =
+      'pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9b8fc4] transition-colors duration-200 group-focus-within:text-[#7c3aed]'
 
-        {progress(1)}
+    // [name, label, type, placeholder, autocomplete, id, Icon]
+    const fields = [
+      ['fullName', 'Full Name', 'text', 'Enter your full name', 'name', 'ct-full-name', UserIcon],
+      ['businessName', 'Business / Brand', 'text', 'Enter your business name', 'organization', 'ct-business', BuildingIcon],
+      ['email', 'Email Address', 'email', 'you@example.com', 'email', 'ct-email', MailIcon],
+    ]
 
-        <small className="mb-1.5 inline-flex items-center gap-2 rounded-full bg-[#f1eaff] px-3 py-1 text-[12px] font-bold text-[#7c3aed]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#7c3aed]" />
-          {FORM_TITLE}
-        </small>
-        <h3
-          id="ct-popup-title"
-          className="ct-display m-0 mb-1 text-[22px] font-extrabold leading-[1.15] tracking-[-0.03em] text-[#14111f]"
-        >
-          <span className={GRADIENT_TEXT}>10X Landing Page</span> Growth Call
-        </h3>
-        <p id="ct-popup-description" className="m-0 mb-3.5 text-[13px] leading-[1.5] text-[#5b5870]">
-          Share your details so we can reach you.
-        </p>
+    const phoneInvalid = Boolean(phoneError)
 
-        <form
-          id="ct-details-form"
-          className="grid grid-cols-1 gap-x-3 gap-y-3 min-[561px]:grid-cols-2"
-          onSubmit={handleDetailsSubmit}
-          noValidate={false}
-        >
-          {[
-            ['fullName', 'Full Name *', 'text', 'Your full name', 'name', 'ct-full-name'],
-            ['businessName', 'Business / Brand *', 'text', 'Your business name', 'organization', 'ct-business'],
-            ['email', 'Email Address *', 'email', 'you@example.com', 'email', 'ct-email'],
-            ['phone', 'Phone / WhatsApp *', 'tel', 'Your contact number', 'tel', 'ct-phone'],
-          ].map(([name, label, type, ph, ac, id]) => (
-            <div key={name} className="flex min-w-0 flex-col gap-1.5">
-              <label className={LABEL} htmlFor={id}>
-                {label}
-              </label>
-              <input
-                id={id}
-                name={name}
-                type={type}
-                value={details[name]}
-                onChange={updateDetail}
-                placeholder={ph}
-                autoComplete={ac}
-                inputMode={name === 'phone' ? 'tel' : undefined}
-                aria-invalid={name === 'phone' && phoneError ? 'true' : undefined}
-                required
-                className={FIELD}
+    return {
+      body: (
+        <div>
+          {progress(1)}
+
+          {/* Header: logo + title */}
+          <div className="flex flex-col items-center text-center">
+            {/* Dark chip so the white part of the logo stays visible */}
+            <span className="grid h-[68px] w-[68px] place-items-center overflow-hidden rounded-[20px] bg-[#14111f] shadow-[0_10px_24px_-10px_rgba(91,33,182,.6)] ring-1 ring-[#e6dffa] min-[561px]:h-[78px] min-[561px]:w-[78px]">
+              <img
+                src={LOGO_IMAGE}
+                alt="Creative Crew logo"
+                className="h-full w-full object-contain p-2"
               />
-              {name === 'phone' && phoneError && (
-                <span className="text-[12px] font-semibold leading-[1.3] text-[#d4161d]" role="alert">
-                  {phoneError}
+            </span>
+
+            <small className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#f1eaff] px-3 py-1 text-[11.5px] font-bold text-[#7c3aed]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#7c3aed]" />
+              {FORM_TITLE}
+            </small>
+
+            <h3
+              id="ct-popup-title"
+              className="ct-display m-0 mt-2.5 text-[23px] font-extrabold leading-[1.15] tracking-[-0.03em] text-[#14111f] min-[561px]:text-[27px]"
+            >
+              <span className={GRADIENT_TEXT}>10X Landing Page</span> Growth Call
+            </h3>
+            <p
+              id="ct-popup-description"
+              className="m-0 mt-1.5 max-w-[360px] text-[13px] leading-[1.5] text-[#5b5870]"
+            >
+              Tell us a little about you so we can reach out and plan your free growth call.
+            </p>
+          </div>
+
+          {submitError && (
+            <p className="mb-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+              {submitError}
+            </p>
+          )}
+
+          <form
+            id="ct-details-form"
+            className="mt-5 grid grid-cols-1 gap-3.5"
+            onSubmit={handleDetailsSubmit}
+          >
+            {fields.map(([name, label, type, ph, ac, id, Icon]) => (
+              <div key={name} className="flex min-w-0 flex-col gap-1.5">
+                <label className={LABEL} htmlFor={id}>
+                  {label} <span className="text-[#7c3aed]">*</span>
+                </label>
+                <div className="group relative">
+                  <span className={iconWrap}>
+                    <Icon />
+                  </span>
+                  <input
+                    id={id}
+                    name={name}
+                    type={type}
+                    value={details[name]}
+                    onChange={updateDetail}
+                    placeholder={ph}
+                    autoComplete={ac}
+                    required
+                    className={`${FIELD_ICON} border-[#e2dcf2]`}
+                  />
+                </div>
+              </div>
+            ))}
+
+            {/* Phone: fixed +91 prefix, exactly 10 digits */}
+            <div className="flex min-w-0 flex-col gap-1.5">
+              <label className={LABEL} htmlFor="ct-phone">
+                Phone / WhatsApp <span className="text-[#7c3aed]">*</span>
+              </label>
+              <div
+                className={`group flex h-[48px] w-full min-w-0 items-stretch overflow-hidden rounded-xl border bg-[#fbfaff] transition-[border-color,box-shadow,background-color] duration-200 hover:border-[#cdbff3] focus-within:border-[#7c3aed] focus-within:bg-white focus-within:shadow-[0_0_0_3px_rgba(124,58,237,.14)] ${
+                  phoneInvalid ? 'border-[#e5484d]' : 'border-[#e2dcf2]'
+                }`}
+              >
+                <span className="flex shrink-0 select-none items-center gap-1.5 border-r border-[#e2dcf2] bg-[#f4efff] px-3 text-[14.5px] font-bold text-[#2e0c4d]">
+                  <PhoneIcon className="h-4 w-4 text-[#7c3aed]" />
+                  {COUNTRY_CODE}
                 </span>
-              )}
+                <input
+                  id="ct-phone"
+                  name="phone"
+                  type="tel"
+                  inputMode="numeric"
+                  pattern={`[0-9]{${PHONE_DIGITS}}`}
+                  maxLength={PHONE_DIGITS}
+                  value={details.phone}
+                  onChange={updateDetail}
+                  placeholder="10-digit mobile number"
+                  autoComplete="tel-national"
+                  aria-invalid={phoneInvalid ? 'true' : undefined}
+                  aria-describedby="ct-phone-hint"
+                  required
+                  // Inline style on purpose: it beats any global input:focus border/outline/shadow
+                  // in your CSS, so only the outer wrapper shows the border (no inner lines).
+                  style={{
+                    border: 'none',
+                    outline: 'none',
+                    boxShadow: 'none',
+                    background: 'transparent',
+                    borderRadius: 0,
+                  }}
+                  className="m-0 h-full w-full min-w-0 appearance-none px-3.5 font-[inherit] text-[16px] font-semibold tracking-[0.04em] text-[#14111f] placeholder:font-normal placeholder:tracking-normal placeholder:text-[#a7a2b8]"
+                />
+                <span
+                  className="flex shrink-0 items-center pl-1 pr-3"
+                  aria-hidden="true"
+                >
+                  {details.phone.length === PHONE_DIGITS ? (
+                    <span className="grid h-6 w-6 place-items-center rounded-full bg-[#16a34a] text-white">
+                      <CheckIcon className="h-3.5 w-3.5" />
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-[#f1eaff] px-2 py-0.5 text-[11.5px] font-bold tabular-nums text-[#7c3aed]">
+                      {details.phone.length}/{PHONE_DIGITS}
+                    </span>
+                  )}
+                </span>
+              </div>
+              <span
+                id="ct-phone-hint"
+                role={phoneInvalid ? 'alert' : undefined}
+                className={`text-[12px] leading-[1.3] ${
+                  phoneInvalid ? 'font-semibold text-[#d4161d]' : 'font-medium text-[#8a869a]'
+                }`}
+              >
+                {phoneInvalid
+                  ? phoneError
+                  : 'Enter your 10-digit number without +91 or 0.'}
+              </span>
             </div>
-          ))}
-        </form>
-      </div>
-    ),
-    footer: (
-      // First step: no Back button (form opens directly on first click)
-      <button type="submit" form="ct-details-form" className={YELLOW_BTN}>
-        Next
-        <span className="text-[18px] leading-none" aria-hidden="true">
-          &rarr;
-        </span>
-      </button>
-    ),
-  })
+          </form>
+
+          <p className="m-0 mt-4 flex items-center justify-center gap-1.5 text-center text-[11.5px] font-medium text-[#8a869a]">
+            <LockIcon />
+            Your details are safe with us. No spam, ever.
+          </p>
+        </div>
+      ),
+      footer: (
+        // First step: no Back button (form opens directly on first click)
+        <button type="submit" form="ct-details-form" disabled={isSubmitting} className={YELLOW_BTN}>
+          {isSubmitting ? 'Saving…' : 'Next'}
+          <span
+            className="text-[18px] leading-none transition-transform duration-200 group-hover:translate-x-[3px]"
+            aria-hidden="true"
+          >
+            &rarr;
+          </span>
+        </button>
+      ),
+    }
+  }
 
   const renderQuestion = (index) => {
     const q = questions[index]
