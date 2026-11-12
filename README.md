@@ -20,7 +20,7 @@ npm run preview    # optional: preview the build
 
 ## Appointment slot reservations
 
-The form reserves a selected slot for 10 minutes. Other visitors' availability refreshes every 5 seconds, and the Apps Script confirms the reservation under a script lock before saving a booking.
+The form reserves a selected slot for 10 minutes. Other visitors' availability refreshes every 5 seconds, and the Apps Script confirms the reservation under a script lock before saving a booking. The success screen appears as soon as the Sheet confirms the booking; CRM and WhatsApp updates run in the background so they do not hold up the visitor.
 
 1. Open the Apps Script project currently deployed at the URL configured as `FORM_ENDPOINT` in `src/components/Contact.jsx`.
 2. Replace its server code with `apps-script/Code.gs` and save.

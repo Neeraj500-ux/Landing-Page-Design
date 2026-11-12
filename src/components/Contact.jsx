@@ -667,6 +667,7 @@ export default function Contact() {
     setSubmitError('')
 
     const submissionId = getSubmissionId()
+    const reservationId = reservationRef.current?.reservationId || ''
     const fullPhone = toFullPhone(details.phone)
 
     const answerRows = questions.map((q) => ({
@@ -717,120 +718,110 @@ export default function Contact() {
       appointment_datetime: appointmentISO,
     }
 
-    let failedAt = '' // which request was running when an error happened
-
     try {
       if (!FORM_ENDPOINT) {
         throw new Error('Google Sheet URL (FORM_ENDPOINT) is missing.')
       }
-      if (!CRM_ENDPOINT) {
-        throw new Error('CRM endpoint (CRM_ENDPOINT) is missing.')
-      }
 
-      // Always attempt CRM even if the Sheet response is unreadable; retain any Sheet error for the user.
-      let sheetError = null
       if (!sheetSentRef.current) {
-        failedAt = 'Google Sheet'
+        const controller = new AbortController()
+        const timeout = window.setTimeout(() => controller.abort(), 20000)
+        let sheetRes
         try {
-          const sheetRes = await fetch(FORM_ENDPOINT, {
+          sheetRes = await fetch(FORM_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(sheetPayload),
+            signal: controller.signal,
           })
-          let sheetData = null
-          try {
-            sheetData = await sheetRes.json()
-          } catch {
-            sheetData = null
-          }
-          if (['slot_taken', 'reservation_expired'].includes(sheetData?.error)) {
-            reservationRef.current = null
-            await loadBookedSlots(false)
-            setAppointment((p) => ({ ...p, time: '' }))
-            setSubmitError(
-              sheetData.error === 'slot_taken'
-                ? 'Sorry, this slot was just booked by someone else. Please choose another time.'
-                : 'Your time hold expired. Please choose an available time again.'
-            )
-            return
-          }
-          if (!sheetData || sheetData.ok !== true) {
-            throw new Error(sheetData?.error || 'Booking could not be confirmed by Google Sheets.')
-          }
-          sheetSentRef.current = true
-          reservationRef.current = null
-          setReservedSlots((prev) => prev.filter((key) => key !== appointmentKey))
-        } catch (error) {
-          sheetError = error
+        } finally {
+          window.clearTimeout(timeout)
         }
+        let sheetData = null
+        try {
+          sheetData = await sheetRes.json()
+        } catch {
+          sheetData = null
+        }
+        if (['slot_taken', 'reservation_expired'].includes(sheetData?.error)) {
+          reservationRef.current = null
+          await loadBookedSlots(false)
+          setAppointment((p) => ({ ...p, time: '' }))
+          setSubmitError(
+            sheetData.error === 'slot_taken'
+              ? 'Sorry, this slot was just booked by someone else. Please choose another time.'
+              : 'Your time hold expired. Please choose an available time again.'
+          )
+          return
+        }
+        if (!sheetRes.ok || !sheetData || sheetData.ok !== true) {
+          throw new Error(
+            sheetData?.error || `The appointment could not be confirmed (HTTP ${sheetRes.status}).`
+          )
+        }
+        sheetSentRef.current = true
+        reservationRef.current = null
+        setReservedSlots((prev) => prev.filter((key) => key !== appointmentKey))
       }
 
-      if (!crmSavedRef.current) {
-        failedAt = 'CRM'
-        const crmResponse = await fetch(CRM_ENDPOINT, {
+      if (!crmSavedRef.current && CRM_ENDPOINT) {
+        fetch(CRM_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(crmPayload),
         })
-        const responseText = await crmResponse.text()
-        let responseData = {}
-        try {
-          responseData = responseText ? JSON.parse(responseText) : {}
-        } catch {
-          responseData = { message: responseText }
-        }
-        if (!crmResponse.ok || responseData?.ok !== true) {
-          throw new Error(
-            responseData?.error || responseData?.message || `CRM request failed (HTTP ${crmResponse.status}).`
-          )
-        }
-        crmSavedRef.current = true
+          .then(async (crmResponse) => {
+            const responseText = await crmResponse.text()
+            let responseData = {}
+            try {
+              responseData = responseText ? JSON.parse(responseText) : {}
+            } catch {
+              responseData = { message: responseText }
+            }
+            if (!crmResponse.ok || responseData?.ok !== true) {
+              throw new Error(
+                responseData?.error ||
+                  responseData?.message ||
+                  `CRM request failed (HTTP ${crmResponse.status}).`
+              )
+            }
+            crmSavedRef.current = true
+            if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+              window.fbq('track', 'Lead', { content_name: CRM_SERVICE })
+              window.fbq('track', 'Schedule', { content_name: CRM_SERVICE })
+            }
+          })
+          .catch((error) => console.error('[Contact] CRM update failed after booking:', error))
       }
 
-      if (sheetError) {
-        failedAt = 'Google Sheet'
-        throw new Error(
-          `CRM saved the lead, but the Sheet did not confirm its save: ${sheetError instanceof Error ? sheetError.message : 'unknown Sheet error'}`
-        )
-      }
-      // Fire the browser Pixel events only after CRM confirms the lead was saved.
-      if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
-        window.fbq('track', 'Lead', { content_name: CRM_SERVICE })
-        window.fbq('track', 'Schedule', { content_name: CRM_SERVICE })
-      }
+      fetch(WHATSAPP_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
+        body: JSON.stringify({
+          submissionId,
+          phone: fullPhone,
+          appointmentDate: appointmentDateLabel,
+          appointmentTime: appointment.time,
+          timeZone: TIME_ZONE_LABEL,
+        }),
+      }).catch((error) => console.error('[Contact] WhatsApp confirmation failed:', error))
 
-      // WhatsApp confirmation (fire-and-forget: never blocks or breaks the booking)
-      try {
-        fetch(WHATSAPP_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          keepalive: true,
-          body: JSON.stringify({
-            submissionId,
-            phone: fullPhone,
-            appointmentDate: appointmentDateLabel,
-            appointmentTime: appointment.time,
-            timeZone: TIME_ZONE_LABEL,
-          }),
-        }).catch(() => {})
-      } catch {
-        /* ignore */
-      }
-
-      // Is slot ko turant locally bhi booked mark kar do
       setBookedSlots((prev) => [...prev, `${appointment.date}|${appointment.time}`])
       setStep(DONE_STEP)
     } catch (err) {
-      console.error(`[Contact] ${failedAt || 'Submit'} request failed:`, err)
+      console.error('[Contact] Appointment booking failed:', err)
       const isNetwork = err instanceof TypeError || err?.message === 'Failed to fetch'
       const detail = isNetwork
-        ? `${failedAt || 'Server'} request was blocked (network or CORS error).`
+        ? 'The booking server did not respond. Please retry, or contact us on WhatsApp.'
+        : err?.name === 'AbortError'
+          ? 'The booking server timed out. Please check availability and retry.'
         : err instanceof Error
-          ? `${failedAt ? `${failedAt}: ` : ''}${err.message}`
+          ? err.message
           : ''
       setSubmitError(
         detail
-          ? `We couldn't complete your booking: ${detail} Please retry, or contact us on WhatsApp.`
+          ? `We couldn't complete your booking: ${detail}`
           : 'We could not submit your details. Please retry or contact us on WhatsApp.'
       )
     } finally {
@@ -1320,7 +1311,7 @@ export default function Contact() {
             disabled={!valid || isSubmitting || reservationLoading || slotsLoading || Boolean(availabilityError)}
             className={YELLOW_BTN}
           >
-            {isSubmitting ? 'Please wait...' : 'Confirm Appointment'}
+            {isSubmitting ? 'Confirming booking...' : 'Confirm Appointment'}
             {!isSubmitting && (
               <span className="text-[18px] leading-none" aria-hidden="true">
                 &rarr;
