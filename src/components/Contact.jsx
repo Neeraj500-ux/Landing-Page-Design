@@ -313,13 +313,20 @@ export default function Contact() {
   const [otherText, setOtherText] = useState({})
   const [appointment, setAppointment] = useState(initialAppointment)
   const [bookedSlots, setBookedSlots] = useState([]) // e.g. ['2026-11-03|10:00 AM']
+  const [reservedSlots, setReservedSlots] = useState([])
   const [slotsLoading, setSlotsLoading] = useState(false)
+  const [reservationLoading, setReservationLoading] = useState(false)
+  const [reservationSupported, setReservationSupported] = useState(false)
+  const [availabilityError, setAvailabilityError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
   const closeTimer = useRef(null)
   const closeRef = useRef(() => {})
   const scrollRef = useRef(null)
+  const reservationRef = useRef(null)
+  const appointmentRef = useRef(appointment)
+  appointmentRef.current = appointment
   // Keep one ID for this form submission so a CRM retry can be deduplicated server-side.
   const submissionIdRef = useRef('')
   const partialSentRef = useRef(false) // First-step request sent to the Sheet
@@ -339,33 +346,145 @@ export default function Contact() {
 
   // Available dates are rebuilt every time the popup opens (so "today" is always fresh)
   const availableDays = useMemo(
-    () => (isOpen ? buildUpcomingDays(bookedSlots) : []),
-    [isOpen, bookedSlots]
+    () =>
+      isOpen
+        ? buildUpcomingDays([
+            ...bookedSlots,
+            ...reservedSlots.filter((key) => key !== reservationRef.current?.key),
+          ])
+        : [],
+    [isOpen, bookedSlots, reservedSlots]
   )
 
   // Google Sheet (Apps Script) se already booked slots laao
-  const loadBookedSlots = async () => {
-    setSlotsLoading(true)
+  const loadBookedSlots = async (showLoading = true) => {
+    if (showLoading) setSlotsLoading(true)
     try {
       const res = await fetch(`${FORM_ENDPOINT}?action=booked&t=${Date.now()}`)
+      if (!res.ok) throw new Error(`Availability request failed (HTTP ${res.status}).`)
       const data = await res.json()
-      if (Array.isArray(data?.booked)) {
-        setBookedSlots(data.booked)
-        // agar user ka chuna hua slot ab book ho chuka hai to hata do
-        setAppointment((p) => (data.booked.includes(`${p.date}|${p.time}`) ? { ...p, time: '' } : p))
+      if (!Array.isArray(data?.booked) || !Array.isArray(data?.reserved) || data.reservationSupport !== true) {
+        setReservationSupported(false)
+        throw new Error('The booking backend must be updated to enable safe slot reservations.')
       }
-    } catch {
-      // Fail-open: list na mile to bhi booking chalu rehti hai (server dobara check karta hai)
+      setReservationSupported(true)
+      setAvailabilityError('')
+      setBookedSlots(data.booked)
+      setReservedSlots(data.reserved)
+      const currentReservation = reservationRef.current
+      const currentAppointment = appointmentRef.current
+      const selectedKey =
+        currentAppointment.date && currentAppointment.time
+          ? `${currentAppointment.date}|${currentAppointment.time}`
+          : ''
+      const heldByAnotherLead =
+        selectedKey &&
+        data.reserved.includes(selectedKey) &&
+        currentReservation?.key !== selectedKey
+      const booked = selectedKey && data.booked.includes(selectedKey) && !sheetSentRef.current
+      const ownHoldExpired =
+        currentReservation &&
+        !data.reserved.includes(currentReservation.key) &&
+        !data.booked.includes(currentReservation.key)
+      if (heldByAnotherLead || booked || ownHoldExpired) {
+        reservationRef.current = null
+        setAppointment((p) => ({ ...p, time: '' }))
+        setSubmitError(
+          ownHoldExpired
+            ? 'Your time hold expired. Please select an available time again.'
+            : 'This time was just taken by another lead. Please choose another time.'
+        )
+      }
+    } catch (error) {
+      setAvailabilityError(
+        error instanceof Error ? error.message : 'Could not load appointment availability.'
+      )
     } finally {
-      setSlotsLoading(false)
+      if (showLoading) setSlotsLoading(false)
     }
   }
 
-  // Appointment step khulte hi latest booked slots refresh karo
+  // Refresh availability while the appointment step is open so active holds disappear promptly.
   useEffect(() => {
-    if (isOpen && step === APPOINTMENT_STEP) loadBookedSlots()
+    if (isOpen && step === APPOINTMENT_STEP) {
+      loadBookedSlots()
+      const interval = window.setInterval(() => loadBookedSlots(false), 5000)
+      return () => window.clearInterval(interval)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, step])
+
+  const reserveSlot = async (date, time) => {
+    if (!reservationSupported || reservationLoading) return
+    setReservationLoading(true)
+    setSubmitError('')
+    const reservationId = getSubmissionId()
+    try {
+      const response = await fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          stage: 'reserve',
+          reservationId,
+          appointmentDateISO: date,
+          appointmentTime: time,
+        }),
+      })
+      const result = await response.json()
+      if (result?.error === 'slot_taken') {
+        await loadBookedSlots(false)
+        setSubmitError('This time was just taken by another lead. Please choose another time.')
+        return
+      }
+      if (!response.ok || result?.ok !== true || !Array.isArray(result.reserved)) {
+        throw new Error(result?.error || `Could not reserve this time (HTTP ${response.status}).`)
+      }
+      const key = `${date}|${time}`
+      reservationRef.current = {
+        key,
+        reservationId,
+        expiresAt: result.reservationExpiresAt,
+      }
+      setAppointment({ date, time })
+      setReservedSlots(result.reserved)
+      setAvailabilityError('')
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? `We couldn't reserve this time: ${error.message}`
+          : 'We could not reserve this time. Please try again.'
+      )
+    } finally {
+      setReservationLoading(false)
+    }
+  }
+
+  const releaseReservation = async () => {
+    const reservation = reservationRef.current
+    if (!reservation) return
+    reservationRef.current = null
+    setReservedSlots((prev) => prev.filter((key) => key !== reservation.key))
+    setAppointment((prev) =>
+      `${prev.date}|${prev.time}` === reservation.key ? { ...prev, time: '' } : prev
+    )
+    try {
+      const response = await fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        keepalive: true,
+        body: JSON.stringify({
+          stage: 'release',
+          reservationId: reservation.reservationId,
+        }),
+      })
+      const result = await response.json()
+      if (!response.ok || result?.ok !== true) {
+        throw new Error(result?.error || `Could not release time hold (HTTP ${response.status}).`)
+      }
+    } catch (error) {
+      console.error('[Contact] Could not release appointment hold:', error)
+    }
+  }
 
   // Open from anywhere: window.dispatchEvent(new Event('open-contact-popup'))
   // First click opens the details form directly.
@@ -406,7 +525,8 @@ export default function Contact() {
   }, [step])
 
   const closePopup = () => {
-    if (isSubmitting || closing) return
+    if (isSubmitting || reservationLoading || closing) return
+    if (reservationRef.current) releaseReservation()
     setClosing(true)
     closeTimer.current = setTimeout(() => {
       setIsOpen(false)
@@ -417,6 +537,7 @@ export default function Contact() {
         setAnswers({})
         setOtherText({})
         setAppointment(initialAppointment)
+        reservationRef.current = null
         submissionIdRef.current = ''
         partialSentRef.current = false
         partialCrmSavedRef.current = false
@@ -433,6 +554,7 @@ export default function Contact() {
   }
   const goBack = () => {
     setSubmitError('')
+    if (step === APPOINTMENT_STEP && reservationRef.current) releaseReservation()
     setStep((s) => Math.max(DETAILS_STEP, s - 1))
   }
 
@@ -536,6 +658,11 @@ export default function Contact() {
   const submitAll = async () => {
     if (isSubmitting) return
     if (!appointment.date || !appointment.time) return
+    const appointmentKey = `${appointment.date}|${appointment.time}`
+    if (!sheetSentRef.current && reservationRef.current?.key !== appointmentKey) {
+      setSubmitError('Please reserve an available appointment time before submitting.')
+      return
+    }
     setIsSubmitting(true)
     setSubmitError('')
 
@@ -561,6 +688,7 @@ export default function Contact() {
       form: FORM_TITLE,
       stage: 'complete',
       submissionId,
+      reservationId,
       ...details,
       phone: fullPhone,
       answers: answerRows,
@@ -615,16 +743,23 @@ export default function Contact() {
           } catch {
             sheetData = null
           }
-          if (sheetData?.error === 'slot_taken') {
-            await loadBookedSlots()
+          if (['slot_taken', 'reservation_expired'].includes(sheetData?.error)) {
+            reservationRef.current = null
+            await loadBookedSlots(false)
             setAppointment((p) => ({ ...p, time: '' }))
-            setSubmitError('Sorry, this slot was just booked by someone else. Please choose another time.')
+            setSubmitError(
+              sheetData.error === 'slot_taken'
+                ? 'Sorry, this slot was just booked by someone else. Please choose another time.'
+                : 'Your time hold expired. Please choose an available time again.'
+            )
             return
           }
           if (!sheetData || sheetData.ok !== true) {
             throw new Error(sheetData?.error || 'Booking could not be confirmed by Google Sheets.')
           }
           sheetSentRef.current = true
+          reservationRef.current = null
+          setReservedSlots((prev) => prev.filter((key) => key !== appointmentKey))
         } catch (error) {
           sheetError = error
         }
@@ -1005,13 +1140,17 @@ export default function Contact() {
 
   const renderAppointment = () => {
     const slots = selectedDay ? selectedDay.slots : []
-    const valid = Boolean(appointment.date && appointment.time)
+    const appointmentKey = `${appointment.date}|${appointment.time}`
+    const valid = Boolean(
+      appointment.date &&
+        appointment.time &&
+        (sheetSentRef.current || reservationRef.current?.key === appointmentKey)
+    )
 
     const pickDate = (day) => {
+      if (day.key !== appointment.date && reservationRef.current) releaseReservation()
       setAppointment((p) => {
-        // keep the chosen time only if that slot exists on the new day
-        const stillValid = day.slots.some((s) => s.label === p.time)
-        return { date: day.key, time: stillValid ? p.time : '' }
+        return { date: day.key, time: day.key === p.date ? p.time : '' }
       })
     }
 
@@ -1033,6 +1172,12 @@ export default function Contact() {
           <p id="ct-popup-description" className="m-0 mb-3.5 text-[13px] leading-[1.5] text-[#5b5870]">
             Pick a date and time that works best for your free Growth Call.
           </p>
+
+          {availabilityError && (
+            <p className="m-0 mb-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700" role="alert">
+              {availabilityError}
+            </p>
+          )}
 
           {availableDays.length === 0 ? (
             <p className="m-0 rounded-xl border border-[#ece6fb] bg-[#faf8ff] px-3.5 py-3 text-[13px] leading-[1.5] text-[#5b5870]">
@@ -1085,6 +1230,9 @@ export default function Contact() {
                 {slotsLoading && (
                   <span className="ml-2 text-[11.5px] font-medium text-[#8a869a]">Checking availability...</span>
                 )}
+                {reservationLoading && (
+                  <span className="ml-2 text-[11.5px] font-medium text-[#8a869a]">Reserving...</span>
+                )}
               </p>
               {!selectedDay ? (
                 <p className="m-0 rounded-xl border border-dashed border-[#e2dcf2] bg-[#fbfaff] px-3.5 py-3 text-[12.5px] text-[#8a869a]">
@@ -1104,8 +1252,14 @@ export default function Contact() {
                         type="button"
                         role="radio"
                         aria-checked={selected}
-                        disabled={slot.booked}
-                        onClick={() => setAppointment((p) => ({ ...p, time: slot.label }))}
+                        disabled={
+                          slot.booked ||
+                          slotsLoading ||
+                          reservationLoading ||
+                          !reservationSupported ||
+                          Boolean(availabilityError)
+                        }
+                        onClick={() => reserveSlot(selectedDay.key, slot.label)}
                         className={`inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border px-2 py-2.5 text-[13.5px] font-bold disabled:cursor-not-allowed disabled:border-[#eee9f7] disabled:bg-[#f3f1f8] disabled:text-[#aaa5b8] disabled:shadow-none transition-[border-color,background-color,box-shadow] duration-200 [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#a98af0] ${
                           selected
                             ? 'border-[#7c3aed] bg-[#f4efff] text-[#2e0c4d] shadow-[0_0_0_3px_rgba(124,58,237,.14)]'
@@ -1152,13 +1306,18 @@ export default function Contact() {
       ),
       footer: (
         <div className="flex gap-3">
-          <button type="button" onClick={goBack} disabled={isSubmitting} className={BACK_BTN}>
+          <button
+            type="button"
+            onClick={goBack}
+            disabled={isSubmitting || reservationLoading}
+            className={BACK_BTN}
+          >
             Back
           </button>
           <button
             type="button"
             onClick={submitAll}
-            disabled={!valid || isSubmitting}
+            disabled={!valid || isSubmitting || reservationLoading || slotsLoading || Boolean(availabilityError)}
             className={YELLOW_BTN}
           >
             {isSubmitting ? 'Please wait...' : 'Confirm Appointment'}
