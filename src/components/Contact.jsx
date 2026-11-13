@@ -38,12 +38,13 @@ const APPOINTMENT_DAYS_AHEAD = 14 // kitne din aage tak booking dikhani hai
 const SKIP_SUNDAYS = true // Sunday band rakhna hai to true
 const MIN_LEAD_HOURS = 1 // aaj ke slots ke liye kam se kam itne ghante baad ka slot
 const TIME_ZONE_LABEL = 'IST (India Standard Time)'
-// Lunch time (1 PM - 3 PM) ke slots hata diye gaye hain.
+// Available appointment times (IST).
 // h = 24-hour format hour, m = minute
 const TIME_SLOTS = [
   { label: '10:00 AM', h: 10, m: 0 },
   { label: '11:00 AM', h: 11, m: 0 },
   { label: '12:00 PM', h: 12, m: 0 },
+  { label: '01:00 PM', h: 13, m: 0 },
   { label: '03:00 PM', h: 15, m: 0 },
   { label: '04:00 PM', h: 16, m: 0 },
   { label: '05:00 PM', h: 17, m: 0 },
